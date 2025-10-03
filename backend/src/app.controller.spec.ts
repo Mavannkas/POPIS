@@ -15,8 +15,8 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return backend status message', () => {
+      expect(appController.getHello()).toBe('🚀 Hackathon Backend API is running! Connected to SQLite database.');
     });
   });
 });
