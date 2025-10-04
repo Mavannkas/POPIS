@@ -32,6 +32,13 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="auth" options={{ headerShown: false }} />
           <Stack.Screen
+            name="account"
+            options={{
+              title: 'Ustawienia konta',
+              presentation: 'card'
+            }}
+          />
+          <Stack.Screen
             name="search"
             options={{
               title: 'Szukaj wydarzeń',
@@ -49,6 +56,13 @@ export default function RootLayout() {
             name="event/[id]"
             options={{
               title: 'Szczegóły wydarzenia',
+              presentation: 'card'
+            }}
+          />
+          <Stack.Screen
+            name="chat/index"
+            options={{
+              title: 'Czat',
               presentation: 'card'
             }}
           />

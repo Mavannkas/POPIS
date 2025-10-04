@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { me, signIn, signOut, signUp } from './api';
+import { me, signIn, signOut, signUp, updateMe, type UpdateMePayload } from './api';
 import type { AuthUser, SignInPayload, SignUpPayload } from './types';
 
 const AuthContext = createContext<{
@@ -8,6 +8,8 @@ const AuthContext = createContext<{
 	signIn: (p: SignInPayload) => Promise<void>;
 	signUp: (p: SignUpPayload) => Promise<void>;
 	signOut: () => Promise<void>;
+	refresh: () => Promise<void>;
+	updateProfile: (p: UpdateMePayload) => Promise<void>;
 } | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -15,19 +17,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const fetchUser = async () => {
-			try {
-				const { user } = (await me()) as unknown as { user: AuthUser };
-				console.log(user);
-				setUser(user);
-			} catch (error) {
-				console.error('Failed to fetch user:', error);
-			} finally {
-				setLoading(false);
-			}
-		};
-		fetchUser();
+		refresh();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	const refresh = async () => {
+		try {
+			const { user } = (await me()) as unknown as { user: AuthUser };
+			setUser(user);
+		} catch (error) {
+			console.error('Failed to fetch user:', error);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	return (
 		<AuthContext.Provider
@@ -39,6 +42,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				signOut: async () => {
 					await signOut();
 					setUser(null);
+				},
+				refresh,
+				updateProfile: async (p: UpdateMePayload) => {
+					const updated = await updateMe(p);
+					setUser(updated);
 				},
 			}}>
 			{children}
