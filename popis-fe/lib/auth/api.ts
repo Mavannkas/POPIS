@@ -1,5 +1,5 @@
-import type { AuthUser, SignInPayload, SignUpPayload } from './auth-types';
-import { API_URL, apiFetch, wait } from './http';
+import type { AuthUser, SignInPayload, SignUpPayload } from './types';
+import { API_URL, apiFetch, wait } from '../http';
 
 // Single integration surface. If API_URL is not set, we stub locally in-place.
 

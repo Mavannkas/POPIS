@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { c } from '@/constants/theme';
 
-export default function TabLayout() {
+export default function TabLPayout() {
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: c.magenta, headerShown: false }}>
       <Tabs.Screen

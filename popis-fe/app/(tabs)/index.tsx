@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Card } from 'react-native-paper';
 import { TopBar } from '@/components/ui/top-bar';
 import { router } from 'expo-router';
@@ -90,16 +90,22 @@ export default function HomeScreen() {
 
                 <View className="space-y-2 mb-3">
                   <View className="flex-row items-center">
-                    <Text className="text-primary font-medium text-sm mr-2">📅</Text>
-                    <Text className="text-gray-600 text-sm">{event.date}</Text>
+                    <View style={styles.iconCircle}>
+                      <Text style={styles.iconEmoji}>📅</Text>
+                    </View>
+                    <Text className="text-gray-600 text-sm ml-2">{event.date}</Text>
                   </View>
                   <View className="flex-row items-center">
-                    <Text className="text-primary font-medium text-sm mr-2">⏰</Text>
-                    <Text className="text-gray-600 text-sm">{event.time}</Text>
+                    <View style={styles.iconCircle}>
+                      <Text style={styles.iconEmoji}>⏰</Text>
+                    </View>
+                    <Text className="text-gray-600 text-sm ml-2">{event.time}</Text>
                   </View>
                   <View className="flex-row items-center">
-                    <Text className="text-primary font-medium text-sm mr-2">📍</Text>
-                    <Text className="text-gray-600 text-sm">{event.location}</Text>
+                    <View style={styles.iconCircle}>
+                      <Text style={styles.iconEmoji}>📍</Text>
+                    </View>
+                    <Text className="text-gray-600 text-sm ml-2">{event.location}</Text>
                   </View>
                 </View>
 
@@ -126,3 +132,17 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  iconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F1DAE5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconEmoji: {
+    fontSize: 16,
+  },
+});

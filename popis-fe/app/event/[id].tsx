@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Card, Button, Chip } from 'react-native-paper';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -87,37 +87,49 @@ export default function EventDetailScreen() {
             <Card.Content className="p-4">
               <View className="space-y-3">
                 <View className="flex-row items-center">
-                  <IconSymbol name="calendar" size={20} color={colors.primary} />
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>📅</Text>
+                  </View>
                   <Text className="ml-3 text-gray-700 font-medium">
                     {mockEvent.date}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
-                  <IconSymbol name="clock" size={20} color={colors.primary} />
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>⏰</Text>
+                  </View>
                   <Text className="ml-3 text-gray-700 font-medium">
                     {mockEvent.time}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
-                  <IconSymbol name="location" size={20} color={colors.primary} />
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>📍</Text>
+                  </View>
                   <Text className="ml-3 text-gray-700 font-medium">
                     {mockEvent.location}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
-                  <IconSymbol name="person.2" size={20} color={colors.primary} />
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>👥</Text>
+                  </View>
                   <Text className="ml-3 text-gray-700 font-medium">
                     {mockEvent.attendees}/{mockEvent.maxAttendees} uczestników
                   </Text>
                 </View>
                 <View className="flex-row items-center">
-                  <IconSymbol name="dollarsign.circle" size={20} color={colors.primary} />
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>💰</Text>
+                  </View>
                   <Text className="ml-3 text-gray-700 font-medium">
                     {mockEvent.price}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
-                  <IconSymbol name="chart.bar" size={20} color={colors.primary} />
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>📊</Text>
+                  </View>
                   <Text className="ml-3 text-gray-700 font-medium">
                     Poziom: {mockEvent.level}
                   </Text>
@@ -206,3 +218,17 @@ export default function EventDetailScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F1DAE5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconEmoji: {
+    fontSize: 18,
+  },
+});
