@@ -248,6 +248,36 @@ export async function getMyApplications(): Promise<MyApplicationsResponse> {
   return apiFetch<MyApplicationsResponse>(`/api/my/applications`, { method: 'GET', credentials: 'include' });
 }
 
+export interface ApplyToEventPayload {
+  eventId: string;
+  message?: string;
+}
+
+export interface ApplyToEventResponse {
+  success: boolean;
+  application?: Application;
+  error?: string;
+}
+
+export async function applyToEvent(payload: ApplyToEventPayload): Promise<ApplyToEventResponse> {
+  if (!API_URL) {
+    // Simulate success in stub mode
+    await new Promise(r => setTimeout(r, 300));
+    return { success: true, application: {
+      id: 'a_stub',
+      event: payload.eventId as any,
+      volunteer: { id: 'stub_user' },
+      status: 'pending',
+      appliedAt: new Date().toISOString(),
+    } } as any;
+  }
+  return apiFetch<ApplyToEventResponse>(`/api/events/apply`, {
+    method: 'POST',
+    credentials: 'include',
+    json: payload,
+  });
+}
+
 export function getCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
     education: 'Edukacja',

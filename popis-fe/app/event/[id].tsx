@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { Card, Button, Chip } from 'react-native-paper';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { CategoryIcon } from '@/components/ui/category-icon';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { TextArea } from '@/components/ui/textarea';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Stack } from 'expo-router';
-import { getCategoryEmoji, getCategoryLabel } from '@/lib/services/events';
+import { getCategoryEmoji, getCategoryLabel, applyToEvent } from '@/lib/services/events';
 
 export default function EventDetailScreen() {
   const colors = Colors;
@@ -45,15 +42,27 @@ export default function EventDetailScreen() {
     level: 'Początkujący',
   };
 
-  const handleJoinEvent = () => {
-    // TODO: Implement join event logic
-    console.log('Joining event:', mockEvent.id);
+  const [joining, setJoining] = useState(false);
+  const handleJoinEvent = async () => {
+    if (!id) return;
+    try {
+      setJoining(true);
+      const res = await applyToEvent({ eventId: String(id), message: recommendation.trim() || undefined });
+      if (res.success) {
+        // Navigate back or show success toast
+        console.log('Applied successfully');
+        router.back();
+      } else {
+        console.warn('Apply failed', res.error);
+      }
+    } catch (e) {
+      console.error('Apply error', e);
+    } finally {
+      setJoining(false);
+    }
   };
 
-  const handleShareEvent = () => {
-    // TODO: Implement share event logic
-    console.log('Sharing event:', mockEvent.id);
-  };
+  // Share action can be implemented later if needed
 
   return (
     <View className="flex-1 bg-white">
@@ -225,6 +234,8 @@ export default function EventDetailScreen() {
             fontSize: 14,
             fontWeight: '600',
           }}
+          loading={joining}
+          disabled={joining}
         >
           Dołącz do wydarzenia
         </Button>

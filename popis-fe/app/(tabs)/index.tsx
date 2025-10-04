@@ -3,12 +3,13 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator
 import { Card, Chip } from 'react-native-paper';
 import { TopBar } from '@/components/ui/top-bar';
 import { CategoryIcon } from '@/components/ui/category-icon';
-import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, type Event } from '@/lib/services/events';
+import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, applyToEvent, type Event } from '@/lib/services/events';
 import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -23,6 +24,23 @@ export default function HomeScreen() {
       }
     })();
   }, []);
+
+  const onJoin = async (eventId: string) => {
+    try {
+      setJoiningId(eventId);
+      const res = await applyToEvent({ eventId });
+      if (res.success) {
+        // Simple success feedback; could add toast
+        console.log('Applied to event', eventId);
+      } else {
+        console.warn('Apply failed', res.error);
+      }
+    } catch (e) {
+      console.error('Apply error', e);
+    } finally {
+      setJoiningId(prev => (prev === eventId ? null : prev));
+    }
+  };
 
   return (
     <View className="flex-1 bg-white">
@@ -109,9 +127,13 @@ export default function HomeScreen() {
                       {event.maxVolunteers ? `👥 miejsca: ${event.maxVolunteers}` : '👥 liczba miejsc n/d'}
                     </Text>
                   </View>
-                  <TouchableOpacity className="bg-primary px-4 py-2 rounded-full">
+                  <TouchableOpacity
+                    className="bg-primary px-4 py-2 rounded-full"
+                    onPress={() => onJoin(event.id)}
+                    disabled={joiningId === event.id}
+                  >
                     <Text className="text-white font-medium text-sm">
-                      Dołącz
+                      {joiningId === event.id ? 'Wysyłanie...' : 'Dołącz'}
                     </Text>
                   </TouchableOpacity>
                 </View>

@@ -16,7 +16,8 @@ export const GET = async (request: NextRequest) => {
       )
     }
     
-    if (user.role !== 'volunteer') {
+    // Volunteers live in the 'users' collection (no explicit role field)
+    if (user.collection !== 'users') {
       return Response.json(
         { success: false, error: 'Only volunteers can access this endpoint' },
         { status: 403 }
