@@ -32,6 +32,9 @@ export default buildConfig({
         path: '@/components/AdminNavbar#AdminNavbar',
       },
     },
+    meta: {
+      titleSuffix: '- Popis',
+    },
     theme: 'light',
     importMap: {
       baseDir: path.resolve(dirname),

@@ -1,3 +1,5 @@
+@import 'leaflet/dist/leaflet.css';
+
 .table {
   width: 100%;
 }
@@ -145,7 +147,9 @@ form[action*='/api/offers'] .collection-edit__auth {
   font-size: 1.125rem;
   line-height: 0;
 }
-
+.dupa {
+  color: penis;
+}
 // :root {
 //   --theme-elevation-0: hsl(332, 45%, 98%);
 //   --theme-elevation-50: hsl(332, 45%, 92%);
@@ -168,3 +172,95 @@ form[action*='/api/offers'] .collection-edit__auth {
 //   --theme-elevation-900: hsl(332, 78%, 12%);
 //   --theme-elevation-950: hsl(332, 80%, 8%);
 // }
+
+.location-picker {
+  margin: 20px 0;
+  width: 100%;
+  position: relative;
+  z-index: 0;
+}
+
+.location-search {
+  margin-bottom: 16px;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #0066cc;
+}
+
+.search-button {
+  padding: 8px 16px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.search-button:hover {
+  background-color: #0052a3;
+}
+
+.search-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.search-results {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+}
+
+.search-result-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover {
+  background-color: #f5f5f5;
+}
+
+.map-info {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #666;
+}
+
+.map-loading {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  color: #666;
+}

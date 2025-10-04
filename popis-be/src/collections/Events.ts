@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { LocationPicker } from '../components/LocationPicker'
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -79,7 +80,8 @@ export const Events: CollectionConfig = {
                     { label: 'Wydarzenie szkolne', value: 'school' },
                   ],
                   admin: {
-                    description: 'Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)',
+                    description:
+                      'Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)',
                   },
                 },
                 {
@@ -126,6 +128,15 @@ export const Events: CollectionConfig = {
                   label: 'Miasto',
                 },
                 {
+                  name: 'mapPicker',
+                  type: 'ui',
+                  admin: {
+                    components: {
+                      Field: '@/components/LocationPicker#LocationPicker',
+                    },
+                  },
+                },
+                {
                   type: 'row',
                   fields: [
                     {
@@ -133,7 +144,7 @@ export const Events: CollectionConfig = {
                       type: 'number',
                       label: 'Szerokość geograficzna',
                       admin: {
-                        description: 'Szerokość geograficzna (dla mapy)',
+                        hidden: true,
                       },
                     },
                     {
@@ -141,7 +152,7 @@ export const Events: CollectionConfig = {
                       type: 'number',
                       label: 'Długość geograficzna',
                       admin: {
-                        description: 'Długość geograficzna (dla mapy)',
+                        hidden: true,
                       },
                     },
                   ],
