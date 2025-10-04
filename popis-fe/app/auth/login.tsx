@@ -35,13 +35,13 @@ export default function LoginScreen() {
         flex: 1,
         backgroundColor: 'white',
         paddingHorizontal: 32,
-        paddingTop: 64,
+        paddingTop: 20,
       }}
     >
-      <View style={{ alignItems: "center" }}>
+      <View style={{ alignItems: "center", marginBottom: 20 }}>
         <Image
           source={require("@/assets/images/icon.png")}
-          style={{ width: 240, objectFit: "contain" }}
+          style={{ width: 200, objectFit: "contain" }}
         />
       </View>
 

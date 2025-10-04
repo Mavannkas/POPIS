@@ -60,9 +60,9 @@ export default function RegisterScreen() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: 'white' }} contentContainerStyle={{ padding: 32, paddingTop: 64 }}>
-      <View style={{ alignItems: 'center' }}>
-        <Image source={require('@/assets/images/icon.png')} style={{ width: 240, objectFit: 'contain' }} />
+    <ScrollView style={{ flex: 1, backgroundColor: 'white' }} contentContainerStyle={{ padding: 32, paddingTop: 20 }}>
+      <View style={{ alignItems: 'center', marginBottom: 20 }}>
+        <Image source={require('@/assets/images/icon.png')} style={{ width: 200, objectFit: 'contain' }} />
       </View>
 
       <Text style={{ textAlign: 'center', fontSize: 24, marginBottom: 8, color: 'black' }}>Zarejestruj się</Text>
