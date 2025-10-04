@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { Card } from 'react-native-paper';
+import { Card, Chip } from 'react-native-paper';
 import { TopBar } from '@/components/ui/top-bar';
+import { CategoryIcon } from '@/components/ui/category-icon';
 import { router } from 'expo-router';
 
 export default function HomeScreen() {
@@ -14,11 +15,12 @@ export default function HomeScreen() {
       date: '21-01-2025',
       time: '10:00 - 12:00',
       location: 'Sala 101, Politechnika',
-      category: 'Edukacja',
+      category: 'education',
       attendees: 25,
       maxAttendees: 30,
       status: 'available',
       organizer: 'Patryk Pietrzyk',
+      tags: ['React', 'JavaScript', 'Programowanie frontendowe'],
     },
     {
       id: 2,
@@ -26,11 +28,12 @@ export default function HomeScreen() {
       date: '22-01-2025',
       time: '14:00 - 15:00',
       location: 'Online',
-      category: 'Mentoring',
+      category: 'social',
       attendees: 8,
       maxAttendees: 10,
       status: 'available',
       organizer: 'Anna Kowalska',
+      tags: ['Mentoring', 'Programowanie', 'Rozwój osobisty'],
     },
     {
       id: 3,
@@ -38,11 +41,12 @@ export default function HomeScreen() {
       date: '25-01-2025',
       time: '09:00 - 18:00',
       location: 'Centrum Konferencyjne',
-      category: 'Konkurs',
+      category: 'education',
       attendees: 45,
       maxAttendees: 50,
       status: 'almost_full',
       organizer: 'Tech Community',
+      tags: ['Hackaton', 'Startup', 'Innowacje'],
     },
   ];
 
@@ -106,6 +110,23 @@ export default function HomeScreen() {
                       <Text style={styles.iconEmoji}>📍</Text>
                     </View>
                     <Text className="text-gray-600 text-sm ml-2">{event.location}</Text>
+                  </View>
+                </View>
+
+                {/* Tags */}
+                <View className="mb-3">
+                  <View className="flex-row flex-wrap gap-2">
+                    {event.tags.map((tag) => (
+                      <View key={tag} className="flex-row items-center">
+                        <CategoryIcon category={event.category} size="small" />
+                        <Chip
+                          style={{ backgroundColor: '#F5F5F5', marginLeft: 4 }}
+                          textStyle={{ color: '#666', fontSize: 12 }}
+                        >
+                          {tag}
+                        </Chip>
+                      </View>
+                    ))}
                   </View>
                 </View>
 

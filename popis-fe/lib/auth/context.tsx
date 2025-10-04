@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { me, signIn, signOut, signUp } from './auth-api';
-import type { AuthUser, SignInPayload, SignUpPayload } from './auth-types';
+import { me, signIn, signOut, signUp } from './api';
+import type { AuthUser, SignInPayload, SignUpPayload } from './types';
 
 const AuthContext = createContext<{
   user: AuthUser | null;

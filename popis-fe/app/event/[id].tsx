@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Card, Button, Chip } from 'react-native-paper';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { CategoryIcon } from '@/components/ui/category-icon';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -18,7 +19,7 @@ export default function EventDetailScreen() {
     date: '21-01-2025',
     time: '10:00 - 12:00',
     location: 'Sala 101, Politechnika Warszawska',
-    category: 'Edukacja',
+    category: 'education',
     organizer: 'Patryk Pietrzyk',
     attendees: 25,
     maxAttendees: 30,
@@ -34,7 +35,7 @@ export default function EventDetailScreen() {
       '11:15 - 11:30: Przerwa',
       '11:30 - 12:00: Stan aplikacji i eventy',
     ],
-    tags: ['React', 'JavaScript', 'Frontend', 'Workshop'],
+    tags: ['React', 'JavaScript', 'Programowanie frontendowe', 'Warsztaty'],
     image: 'https://picsum.photos/400/200?random=1',
     price: 'Bezpłatne',
     level: 'Początkujący',
@@ -181,13 +182,15 @@ export default function EventDetailScreen() {
             </Text>
             <View className="flex-row flex-wrap gap-2">
               {mockEvent.tags.map((tag) => (
-                <Chip
-                  key={tag}
-                  style={{ backgroundColor: '#F5F5F5' }}
-                  textStyle={{ color: '#666' }}
-                >
-                  {tag}
-                </Chip>
+                <View key={tag} className="flex-row items-center">
+                  <CategoryIcon category={mockEvent.category} size="small" />
+                  <Chip
+                    style={{ backgroundColor: '#F5F5F5', marginLeft: 4 }}
+                    textStyle={{ color: '#666', fontSize: 12 }}
+                  >
+                    {tag}
+                  </Chip>
+                </View>
               ))}
             </View>
           </View>
