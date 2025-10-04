@@ -16,4 +16,4 @@ echo "✅ Docker is running"
 echo "🐳 Starting containers..."
 echo ""
 
-docker-compose up
+docker compose up
