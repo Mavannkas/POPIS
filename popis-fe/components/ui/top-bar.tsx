@@ -5,6 +5,7 @@ import { IconSymbol } from './icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { router } from 'expo-router';
+import { useAuth } from '@/app/auth/context';
 
 interface TopBarProps {
   showSearch?: boolean;
@@ -13,6 +14,7 @@ interface TopBarProps {
 export function TopBar({ showSearch = true }: TopBarProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const { signOut } = useAuth();
 
   const handleNotificationPress = () => {
     router.push('/notifications' as any);
@@ -22,15 +24,22 @@ export function TopBar({ showSearch = true }: TopBarProps) {
     router.push('/search' as any);
   };
 
+  const handleProfilePress = () => {
+    signOut();
+  };
+
   return (
     <View className="bg-white px-4 pt-12 pb-4 shadow-sm">
       <View className="flex-row items-center justify-between mb-4">
         {/* Logo/Brand */}
-        <View className="flex-row items-center">
+        <TouchableOpacity
+          onPress={handleProfilePress}
+          className="flex-row items-center"
+        >
           <View className="w-8 h-8 bg-primary rounded-full items-center justify-center">
             <Text className="text-white font-bold text-lg">P</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Notification Button */}
         <TouchableOpacity
