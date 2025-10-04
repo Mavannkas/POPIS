@@ -1,5 +1,4 @@
 import { MD3LightTheme, configureFonts } from 'react-native-paper';
-import { Platform } from 'react-native';
 
 // Paleta kolorów - zmień tutaj, by zmienić cały motyw
 export const c = {
