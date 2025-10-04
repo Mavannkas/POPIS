@@ -18,7 +18,8 @@ export const POST = async (request: NextRequest) => {
       )
     }
     
-    if (user.role !== 'volunteer') {
+    // Volunteers live in 'users' collection (no explicit role)
+    if (user.collection !== 'users') {
       return Response.json(
         { success: false, error: 'Only volunteers can apply to events' },
         { status: 403 }
@@ -28,6 +29,14 @@ export const POST = async (request: NextRequest) => {
     if (!eventId) {
       return Response.json(
         { success: false, error: 'Event ID is required' },
+        { status: 400 }
+      )
+    }
+
+    // Require application message (why the user should be selected)
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return Response.json(
+        { success: false, error: 'Application message is required' },
         { status: 400 }
       )
     }
@@ -70,13 +79,31 @@ export const POST = async (request: NextRequest) => {
       )
     }
     
-    // Check age requirement
-    const userAge = user.isMinor ? 17 : 18 // Simplified
+    // Check age requirement (simple flags computed on user)
+    const userAge = user.isMinor ? 17 : 18
     if (event.minAge && userAge < event.minAge) {
       return Response.json(
         { success: false, error: 'You do not meet the age requirement' },
         { status: 400 }
       )
+    }
+
+    // If event is school-type ensure student belongs to target school (if set)
+    if (event.eventType === 'school' && event.targetSchool) {
+      if (!user.isStudent || !user.school) {
+        return Response.json(
+          { success: false, error: 'Only students of the target school can apply' },
+          { status: 403 }
+        )
+      }
+      const targetId = typeof event.targetSchool === 'object' ? event.targetSchool.id : event.targetSchool
+      const userSchoolId = typeof user.school === 'object' ? user.school.id : user.school
+      if (String(targetId) !== String(userSchoolId)) {
+        return Response.json(
+          { success: false, error: 'This school event is restricted to your school' },
+          { status: 403 }
+        )
+      }
     }
     
     // Create application
@@ -85,7 +112,7 @@ export const POST = async (request: NextRequest) => {
       data: {
         event: eventId,
         volunteer: user.id,
-        message: message || '',
+        message: message.trim(),
         status: 'pending',
       },
     })
