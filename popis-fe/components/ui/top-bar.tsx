@@ -4,6 +4,7 @@ import { IconSymbol } from './icon-symbol';
 import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
 import { useAuth } from '@/lib/auth/context';
+import { useNotifications } from '@/lib/notifications/context';
 
 interface TopBarProps {
 	showSearch?: boolean;
@@ -12,6 +13,7 @@ interface TopBarProps {
 export function TopBar({ showSearch = true }: TopBarProps) {
 	const colors = Colors;
 	const { signOut } = useAuth();
+	const { unreadCount } = useNotifications();
 	const [profileSidebarVisible, setProfileSidebarVisible] = useState(false);
 	const slideAnim = useRef(new Animated.Value(-320)).current; // Start off-screen to the left
 
@@ -82,9 +84,13 @@ export function TopBar({ showSearch = true }: TopBarProps) {
 					<TouchableOpacity onPress={handleNotificationPress} className="relative p-2">
 						<IconSymbol name="bell.fill" size={24} color={colors.primary} />
 						{/* Notification Badge */}
-						<View className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full items-center justify-center">
-							<Text className="text-white text-xs font-bold">3</Text>
-						</View>
+						{unreadCount > 0 && (
+							<View className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full items-center justify-center">
+								<Text className="text-white text-xs font-bold">
+									{unreadCount > 9 ? '9+' : unreadCount}
+								</Text>
+							</View>
+						)}
 					</TouchableOpacity>
 				</View>
 

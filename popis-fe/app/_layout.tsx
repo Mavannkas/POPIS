@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
 import { theme } from '@/constants/theme';
 import { AuthProvider } from '@/lib/auth/context';
+import { NotificationProvider } from '@/lib/notifications/context';
 import { useFonts, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { View } from 'react-native';
 import './globals.css';
@@ -14,7 +15,8 @@ export default function RootLayout() {
   return (
     <PaperProvider theme={theme}>
       <AuthProvider>
-        <Stack
+        <NotificationProvider>
+          <Stack
           screenOptions={{
             headerBackTitle: '',
             headerStyle: {
@@ -50,8 +52,9 @@ export default function RootLayout() {
               presentation: 'card'
             }}
           />
-        </Stack>
-        <StatusBar style="dark" />
+          </Stack>
+          <StatusBar style="dark" />
+        </NotificationProvider>
       </AuthProvider>
     </PaperProvider>
   );
