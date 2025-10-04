@@ -193,6 +193,19 @@ export async function getAvailableEvents(filters?: EventFilters): Promise<Events
   return apiFetch<EventsResponse>(path);
 }
 
+export async function getEventById(id: string): Promise<Event | null> {
+  if (!id) return null;
+  if (!API_URL) {
+    // Stub mode: return from mock list
+    const found = MOCK_EVENTS.find(e => e.id === id);
+    // Fallback: sometimes ids are numeric in mock
+    return found || MOCK_EVENTS.find(e => e.id === String(id)) || null;
+  }
+  // Fetch a single event from Payload REST API (proxied under Next)
+  // Depth 2 to populate relationships like image/organization if needed
+  return apiFetch<Event>(`/api/events/${encodeURIComponent(id)}?depth=2`);
+}
+
 export function getCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
     education: 'Edukacja',
