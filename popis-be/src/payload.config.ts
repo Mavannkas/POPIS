@@ -16,6 +16,7 @@ import { Applications } from './collections/Applications'
 import { Certificates } from './collections/Certificates'
 import { Schools } from './collections/Schools'
 import { Invitations } from './collections/Invitations'
+import { mongooseAdapter } from '@payloadcms/db-mongodb'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -30,6 +31,11 @@ export default buildConfig({
       },
       Nav: {
         path: '@/components/AdminNavbar#AdminNavbar',
+      },
+      views: {
+        dashboard: {
+          Component: '@/components/AdminDashboard#AdminDashboard',
+        },
       },
     },
     meta: {
@@ -52,11 +58,8 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: sqliteAdapter({
-    push: true,
-    client: {
-      url: process.env.DATABASE_URI || '',
-    },
+  db: mongooseAdapter({
+    url: process.env.DATABASE_URI ?? '',
   }),
   sharp,
   plugins: [payloadCloudPlugin()],

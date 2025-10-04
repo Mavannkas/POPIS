@@ -179,6 +179,9 @@ form[action*='/api/offers'] .collection-edit__auth {
   position: relative;
   z-index: 0;
 }
+.step-nav__home {
+  width: 32px !important;
+}
 
 .location-search {
   margin-bottom: 16px;

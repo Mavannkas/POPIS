@@ -1,0 +1,102 @@
+.calendar-widget {
+  border-radius: var(--style-radius-m);
+  border: 1px solid var(--theme-elevation-150);
+  background-color: transparent;
+  grid-column: span 4 / span 4;
+
+  @media (max-width: 1024px) {
+    grid-column: span 1 / span 1;
+  }
+}
+
+.calendar-widget__header {
+  padding: var(--base);
+  border-bottom: 1px solid var(--theme-elevation-150);
+}
+
+.calendar-widget__title {
+  font-size: var(--font-size-h4);
+  font-weight: 600;
+  margin: 0;
+  color: var(--theme-elevation-900);
+  text-transform: capitalize;
+}
+
+.calendar-widget__content {
+  padding: var(--base);
+  margin-top: var(--base);
+}
+
+.calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  width: 100%;
+}
+
+.calendar__day-header {
+  padding: calc(var(--base) / 2);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--theme-elevation-900);
+  opacity: 0.75;
+  width: 100%;
+}
+
+.calendar__day {
+  min-height: 70px;
+  max-height: 70px;
+  padding: calc(var(--base) / 4);
+  border: 1px solid var(--theme-elevation-150);
+  background-color: transparent;
+  position: relative;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  overflow: hidden;
+
+  &--empty {
+    background-color: var(--theme-elevation-50);
+    opacity: 0.5;
+  }
+
+  &--has-events {
+    background-color: #D590B0;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #C05989;
+    }
+
+    .calendar__day-number {
+      font-weight: 600;
+      color: #5C0A30;
+    }
+  }
+}
+
+.calendar__day-number {
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin-bottom: calc(var(--base) / 4);
+  color: var(--theme-elevation-900);
+}
+
+.calendar__events {
+  font-size: 0.8rem;
+  color: #5C0A30;
+  opacity: 0.9;
+}
+
+.calendar__event {
+  background-color: #BF407B;
+  color: white;
+  padding: 2px 4px;
+  margin-bottom: 2px;
+  border-radius: var(--style-radius-s);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}

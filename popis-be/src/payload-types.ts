@@ -80,7 +80,11 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    users: {
+      events: 'events';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     admins: AdminsSelect<false> | AdminsSelect<true>;
@@ -95,7 +99,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: number;
+    defaultIDType: string;
   };
   globals: {};
   globalsSelect: {};
@@ -153,7 +157,7 @@ export interface AdminAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   phone?: string | null;
@@ -168,7 +172,7 @@ export interface User {
   /**
    * Szkoła ucznia (wymagane jeśli isStudent=true)
    */
-  school?: (number | null) | School;
+  school?: (string | null) | School;
   /**
    * Zatwierdzenie wieku
    */
@@ -185,6 +189,11 @@ export interface User {
    * Stream Chat user ID (auto-generated)
    */
   streamUserId?: string | null;
+  events?: {
+    docs?: (string | Event)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -210,7 +219,7 @@ export interface User {
  * via the `definition` "schools".
  */
 export interface School {
-  id: number;
+  id: string;
   /**
    * Nazwa szkoły
    */
@@ -240,10 +249,113 @@ export interface School {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: string;
+  title: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  category: 'education' | 'environment' | 'social' | 'health' | 'animals' | 'culture' | 'sport' | 'other';
+  size: 'small' | 'medium' | 'large';
+  /**
+   * Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)
+   */
+  eventType: 'public' | 'school';
+  /**
+   * Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)
+   */
+  targetSchool?: (string | null) | School;
+  /**
+   * Główne zdjęcie wydarzenia
+   */
+  image?: (string | null) | Media;
+  location: {
+    address: string;
+    city: string;
+    lat?: number | null;
+    lng?: number | null;
+  };
+  startDate: string;
+  endDate?: string | null;
+  /**
+   * Przewidywana liczba godzin wolontariatu
+   */
+  duration: number;
+  /**
+   * Minimalny wiek uczestnika
+   */
+  minAge: number;
+  /**
+   * Maksymalna liczba wolontariuszy (opcjonalne)
+   */
+  maxVolunteers?: number | null;
+  /**
+   * Wymagania dla wolontariuszy
+   */
+  requirements?: string | null;
+  /**
+   * Dodatkowe informacje o wydarzeniu (opcjonalne)
+   */
+  additionalInfo?: string | null;
+  participants?:
+    | {
+        user?: (string | null) | User;
+        task?: string | null;
+        isAccepted?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  status: 'draft' | 'published' | 'completed' | 'cancelled';
+  /**
+   * Organizacja odpowiedzialna za wydarzenie
+   */
+  organization: string | Admin;
+  /**
+   * Użytkownik który stworzył wydarzenie
+   */
+  createdBy?: (string | null) | Admin;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: string;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "admins".
  */
 export interface Admin {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   phone?: string | null;
@@ -286,107 +398,12 @@ export interface Admin {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events".
- */
-export interface Event {
-  id: number;
-  title: string;
-  description: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  category: 'education' | 'environment' | 'social' | 'health' | 'animals' | 'culture' | 'sport' | 'other';
-  size: 'small' | 'medium' | 'large';
-  /**
-   * Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)
-   */
-  eventType: 'public' | 'school';
-  /**
-   * Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)
-   */
-  targetSchool?: (number | null) | School;
-  /**
-   * Główne zdjęcie wydarzenia
-   */
-  image?: (number | null) | Media;
-  location: {
-    address: string;
-    city: string;
-    lat?: number | null;
-    lng?: number | null;
-  };
-  startDate: string;
-  endDate?: string | null;
-  /**
-   * Przewidywana liczba godzin wolontariatu
-   */
-  duration: number;
-  /**
-   * Minimalny wiek uczestnika
-   */
-  minAge: number;
-  /**
-   * Maksymalna liczba wolontariuszy (opcjonalne)
-   */
-  maxVolunteers?: number | null;
-  /**
-   * Wymagania dla wolontariuszy
-   */
-  requirements?: string | null;
-  /**
-   * Dodatkowe informacje o wydarzeniu (opcjonalne)
-   */
-  additionalInfo?: string | null;
-  status: 'draft' | 'published' | 'completed' | 'cancelled';
-  /**
-   * Organizacja odpowiedzialna za wydarzenie
-   */
-  organization: number | Admin;
-  /**
-   * Użytkownik który stworzył wydarzenie
-   */
-  createdBy?: (number | null) | Admin;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "applications".
  */
 export interface Application {
-  id: number;
-  event: number | Event;
-  volunteer: number | User;
+  id: string;
+  event: string | Event;
+  volunteer: string | User;
   /**
    * Wiadomość od wolontariusza
    */
@@ -417,17 +434,17 @@ export interface Application {
  * via the `definition` "certificates".
  */
 export interface Certificate {
-  id: number;
+  id: string;
   /**
    * Powiązane zgłoszenie
    */
-  application: number | Application;
-  volunteer: number | User;
-  event: number | Event;
+  application: string | Application;
+  volunteer: string | User;
+  event: string | Event;
   /**
    * Wypełniane automatycznie z wydarzenia
    */
-  organization?: (number | null) | Admin;
+  organization?: (string | null) | Admin;
   /**
    * Liczba przepracowanych godzin
    */
@@ -435,11 +452,11 @@ export interface Certificate {
   /**
    * Kto wystawił zaświadczenie (organizacja lub koordynator)
    */
-  issuedBy?: (number | null) | Admin;
+  issuedBy?: (string | null) | Admin;
   /**
    * Koordynator który zatwierdził (opcjonalne)
    */
-  approvedBy?: (number | null) | Admin;
+  approvedBy?: (string | null) | Admin;
   /**
    * Dodatkowe uwagi
    */
@@ -461,15 +478,15 @@ export interface Certificate {
  * via the `definition` "invitations".
  */
 export interface Invitation {
-  id: number;
+  id: string;
   /**
    * Wydarzenie do którego zapraszamy
    */
-  event: number | Event;
+  event: string | Event;
   /**
    * Zaproszony wolontariusz
    */
-  volunteer: number | User;
+  volunteer: string | User;
   /**
    * Wiadomość dla wolontariusza (opcjonalne)
    */
@@ -478,7 +495,7 @@ export interface Invitation {
   /**
    * Kto wysłał zaproszenie (organizacja lub koordynator)
    */
-  invitedBy: number | Admin;
+  invitedBy: string | Admin;
   /**
    * Data wysłania zaproszenia
    */
@@ -495,49 +512,49 @@ export interface Invitation {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: number;
+  id: string;
   document?:
     | ({
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       } | null)
     | ({
         relationTo: 'admins';
-        value: number | Admin;
+        value: string | Admin;
       } | null)
     | ({
         relationTo: 'media';
-        value: number | Media;
+        value: string | Media;
       } | null)
     | ({
         relationTo: 'events';
-        value: number | Event;
+        value: string | Event;
       } | null)
     | ({
         relationTo: 'applications';
-        value: number | Application;
+        value: string | Application;
       } | null)
     | ({
         relationTo: 'certificates';
-        value: number | Certificate;
+        value: string | Certificate;
       } | null)
     | ({
         relationTo: 'schools';
-        value: number | School;
+        value: string | School;
       } | null)
     | ({
         relationTo: 'invitations';
-        value: number | Invitation;
+        value: string | Invitation;
       } | null);
   globalSlug?: string | null;
   user:
     | {
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       }
     | {
         relationTo: 'admins';
-        value: number | Admin;
+        value: string | Admin;
       };
   updatedAt: string;
   createdAt: string;
@@ -547,15 +564,15 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: number;
+  id: string;
   user:
     | {
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       }
     | {
         relationTo: 'admins';
-        value: number | Admin;
+        value: string | Admin;
       };
   key?: string | null;
   value?:
@@ -575,7 +592,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: number;
+  id: string;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -596,6 +613,7 @@ export interface UsersSelect<T extends boolean = true> {
   isMinor?: T;
   isAdult?: T;
   streamUserId?: T;
+  events?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -698,6 +716,14 @@ export interface EventsSelect<T extends boolean = true> {
   maxVolunteers?: T;
   requirements?: T;
   additionalInfo?: T;
+  participants?:
+    | T
+    | {
+        user?: T;
+        task?: T;
+        isAccepted?: T;
+        id?: T;
+      };
   status?: T;
   organization?: T;
   createdBy?: T;

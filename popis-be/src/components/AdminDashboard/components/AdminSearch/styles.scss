@@ -1,0 +1,90 @@
+.admin-search {
+  position: relative;
+  order: 3;
+  width: 100%;
+  overflow: visible;
+
+  @media (min-width: 768px) {
+    order: 0;
+    width: fit-content;
+    min-width: 450px;
+  }
+}
+
+.admin-search__input {
+  width: 100%;
+  padding: calc(var(--base) / 2) var(--base);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+  background-color: var(--theme-elevation-50);
+  color: var(--theme-foreground);
+  font-size: var(--font-size-base);
+  opacity: 0.75;
+
+  &::placeholder {
+    color: var(--theme-elevation-900);
+  }
+
+  &:focus {
+    outline: none;
+    opacity: 1;
+    border-color: var(--theme-elevation-200);
+  }
+}
+
+.admin-search__results {
+  position: absolute;
+  left: -1px;
+  top: 100%;
+  z-index: 50;
+  width: calc(100% + 2px);
+  max-height: 350px;
+  overflow-y: auto;
+  border: 1px solid var(--theme-elevation-150);
+  border-top: none;
+  border-radius: 0 0 var(--style-radius-s) var(--style-radius-s);
+  background-color: var(--theme-elevation-50);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.admin-search__empty {
+  padding: var(--base);
+  text-align: center;
+  color: var(--theme-elevation-900);
+  opacity: 0.75;
+  font-size: var(--font-size-small);
+}
+
+.admin-search__group {
+  padding: calc(var(--base) / 2) 0;
+}
+
+.admin-search__group-heading {
+  padding: calc(var(--base) / 2) var(--base);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--theme-elevation-900);
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-search__item {
+  display: block;
+  padding: calc(var(--base) / 2) var(--base);
+  color: var(--theme-foreground);
+  font-size: var(--font-size-base);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--theme-elevation-150);
+  }
+}
+
+.admin-search__separator {
+  height: 1px;
+  background-color: var(--theme-elevation-150);
+  margin: calc(var(--base) / 2) 0;
+}

@@ -98,7 +98,7 @@ export const Events: CollectionConfig = {
             },
             {
               name: 'image',
-              type: 'relationship',
+              type: 'upload',
               relationTo: 'media',
               label: 'Zdjęcie',
               admin: {
@@ -241,6 +241,49 @@ export const Events: CollectionConfig = {
             },
           ],
         },
+        {
+          label: 'Uczestnicy',
+          fields: [
+            {
+              name: 'participants',
+              label: 'Uczestnicy',
+              labels: {
+                singular: 'Uczestnik',
+                plural: 'Uczestnicy',
+              },
+              type: 'array',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'user',
+                      label: 'Uczestnik',
+                      type: 'relationship',
+                      admin: {
+                        width: '50%',
+                      },
+                      relationTo: 'users',
+                    },
+                    {
+                      name: 'task',
+                      type: 'text',
+                      admin: {
+                        width: '50%',
+                      },
+                      label: 'Przypisane zadanie',
+                    },
+                  ],
+                },
+                {
+                  name: 'isAccepted',
+                  label: 'Zaakceptowany',
+                  type: 'checkbox',
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
     {
@@ -271,6 +314,7 @@ export const Events: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Organizacja odpowiedzialna za wydarzenie',
+        appearance: 'drawer',
       },
     },
     {

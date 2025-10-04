@@ -10,9 +10,6 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
     defaultColumns: ['email', 'role', 'firstName', 'lastName', 'verified'],
     // Wolontariusze nie mają dostępu do admin panelu - używają tylko mobile app
-    hidden: ({ user }: { user: any }) => {
-      return true // Zawsze ukryte - wolontariusze używają tylko mobile app
-    },
   },
   auth: true,
   fields: [
@@ -40,6 +37,9 @@ export const Users: CollectionConfig = {
           name: 'phone',
           type: 'text',
           label: 'Telefon',
+          admin: {
+            width: '50%',
+          },
         },
         {
           name: 'birthDate',
@@ -119,6 +119,13 @@ export const Users: CollectionConfig = {
         readOnly: true,
       },
     },
+    {
+      name: 'events',
+      type: 'join',
+      hasMany: true,
+      collection: 'events',
+      on: 'participants.user',
+    },
   ],
   access: {
     create: () => true,
@@ -135,12 +142,12 @@ export const Users: CollectionConfig = {
           const today = new Date()
           const age = today.getFullYear() - birthDate.getFullYear()
           const monthDiff = today.getMonth() - birthDate.getMonth()
-          
+
           let actualAge = age
           if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
             actualAge = age - 1
           }
-          
+
           data.isMinor = actualAge < 18
           data.isAdult = actualAge >= 18
         }

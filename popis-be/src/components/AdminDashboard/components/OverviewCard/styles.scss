@@ -1,0 +1,48 @@
+.overview-card {
+  border-radius: var(--style-radius-m);
+  border: 1px solid var(--theme-elevation-150);
+  background-color: transparent;
+}
+
+.overview-card__header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--base) var(--base) calc(var(--base) / 2) var(--base);
+  color: var(--theme-elevation-900);
+}
+
+.overview-card__label {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.overview-card__icon {
+  opacity: 0.75;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.overview-card__content {
+  padding: calc(var(--base) / 2) var(--base) var(--base) var(--base);
+  color: var(--theme-elevation-900);
+}
+
+.overview-card__value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.overview-card__subtitle {
+  margin: calc(var(--base) / 4) 0 0 0;
+  font-size: 1rem;
+  color: var(--theme-elevation-900);
+  opacity: 0.75;
+}
