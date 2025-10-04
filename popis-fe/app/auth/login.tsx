@@ -1,9 +1,10 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import { useAuth } from "@/lib/auth/context";
 import { Colors } from "@/constants/theme";
+import { KeyboardAwareScrollView, Input } from "@/components/ui";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -29,10 +30,12 @@ export default function LoginScreen() {
   }
 
   return (
-    <View
+    <KeyboardAwareScrollView
       style={{
         flex: 1,
         backgroundColor: 'white',
+      }}
+      contentContainerStyle={{
         paddingHorizontal: 32,
         paddingTop: 20,
       }}
@@ -63,32 +66,27 @@ export default function LoginScreen() {
         }}
       />
 
-      <TextInput
-        label="Adres e-mail"
-        value={email}
-        onChangeText={setEmail}
-        mode="outlined"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        style={{ marginBottom: 16, backgroundColor: 'white', paddingLeft: 10 }}
-        outlineStyle={{ borderRadius: 25 }}
-      />
+      <View style={{ marginBottom: 16 }}>
+        <Input
+          label="Adres e-mail"
+          value={email}
+          onChangeText={setEmail}
+          variant="outlined"
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+      </View>
 
-      <TextInput
-        label="Hasło"
-        value={password}
-        onChangeText={setPassword}
-        mode="outlined"
-        secureTextEntry
-        style={{ marginBottom: 24, backgroundColor: 'white', paddingLeft: 10 }}
-        outlineStyle={{ borderRadius: 25 }}
-      />
-
-      {error && (
-        <Text style={{ color: "red", textAlign: "center", marginBottom: 12 }}>
-          {error}
-        </Text>
-      )}
+      <View style={{ marginBottom: 24 }}>
+        <Input
+          label="Hasło"
+          value={password}
+          onChangeText={setPassword}
+          variant="outlined"
+          secureTextEntry
+          error={error || undefined}
+        />
+      </View>
 
       <Button
         mode="contained"
@@ -125,6 +123,6 @@ export default function LoginScreen() {
         ZAREJESTRUJ SIĘ
       </Button>
 
-    </View>
+    </KeyboardAwareScrollView>
   );
 }

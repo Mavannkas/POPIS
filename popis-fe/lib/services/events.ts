@@ -1,4 +1,4 @@
-import { apiFetch } from './http';
+import { apiFetch, API_URL } from '../http';
 
 export interface Event {
   id: string;
@@ -33,11 +33,12 @@ export interface EventsResponse {
 }
 
 export interface EventFilters {
-  category?: string;
+  category?: string | string[];
   city?: string;
   minAge?: number;
   search?: string;
   eventType?: 'public' | 'school';
+  size?: ('small' | 'medium' | 'large')[] | 'small' | 'medium' | 'large';
 }
 
 // Mock data for development - replace with real API later
@@ -150,51 +151,46 @@ const MOCK_EVENTS: Event[] = [
 ];
 
 export async function getAvailableEvents(filters?: EventFilters): Promise<EventsResponse> {
-  // TODO: Replace mock data with real API call
-  // const params = new URLSearchParams();
-  // if (filters?.category) params.append('category', filters.category);
-  // if (filters?.city) params.append('city', filters.city);
-  // if (filters?.minAge) params.append('minAge', filters.minAge.toString());
-  // if (filters?.search) params.append('search', filters.search);
-  // if (filters?.eventType) params.append('eventType', filters.eventType);
-  // const queryString = params.toString();
-  // const path = `/api/events/available${queryString ? `?${queryString}` : ''}`;
-  // return apiFetch<EventsResponse>(path);
-
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Apply filters to mock data
-  let filteredEvents = [...MOCK_EVENTS];
-
+  const params = new URLSearchParams();
   if (filters?.category) {
-    filteredEvents = filteredEvents.filter(e => e.category === filters.category);
+    const cats = Array.isArray(filters.category) ? filters.category : [filters.category];
+    cats.forEach(c => params.append('category', c));
   }
-  if (filters?.city) {
-    filteredEvents = filteredEvents.filter(e => 
-      e.location.city.toLowerCase().includes(filters.city!.toLowerCase())
-    );
+  if (filters?.city) params.append('city', filters.city);
+  if (filters?.minAge) params.append('minAge', filters.minAge.toString());
+  if (filters?.search) params.append('search', filters.search);
+  if (filters?.eventType) params.append('eventType', filters.eventType);
+  if (filters?.size) {
+    const sizes = Array.isArray(filters.size) ? filters.size : [filters.size];
+    sizes.forEach(s => params.append('size', s));
   }
-  if (filters?.minAge) {
-    filteredEvents = filteredEvents.filter(e => e.minAge <= filters.minAge!);
-  }
-  if (filters?.search) {
-    const searchLower = filters.search.toLowerCase();
-    filteredEvents = filteredEvents.filter(e => 
-      e.title.toLowerCase().includes(searchLower) ||
-      e.description.toLowerCase().includes(searchLower)
-    );
-  }
-  if (filters?.eventType) {
-    filteredEvents = filteredEvents.filter(e => e.eventType === filters.eventType);
+  const queryString = params.toString();
+  const path = `/api/events/available${queryString ? `?${queryString}` : ''}`;
+
+  if (!API_URL) {
+    // Stub locally in-place when API_URL is not set
+    await new Promise(resolve => setTimeout(resolve, 500));
+    let filteredEvents = [...MOCK_EVENTS];
+    if (filters?.category) {
+      const cats = Array.isArray(filters.category) ? filters.category : [filters.category];
+      filteredEvents = filteredEvents.filter(e => cats.includes(e.category));
+    }
+    if (filters?.city) filteredEvents = filteredEvents.filter(e => e.location.city.toLowerCase().includes(filters.city!.toLowerCase()));
+    if (filters?.minAge) filteredEvents = filteredEvents.filter(e => e.minAge <= filters.minAge!);
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredEvents = filteredEvents.filter(e => e.title.toLowerCase().includes(searchLower) || e.description.toLowerCase().includes(searchLower));
+    }
+    if (filters?.eventType) filteredEvents = filteredEvents.filter(e => e.eventType === filters.eventType);
+    if (filters?.size) {
+      const sizes = Array.isArray(filters.size) ? filters.size : [filters.size];
+      filteredEvents = filteredEvents.filter(e => sizes.includes(e.size as any));
+    }
+
+    return { success: true, events: filteredEvents, totalDocs: filteredEvents.length, page: 1 };
   }
 
-  return {
-    success: true,
-    events: filteredEvents,
-    totalDocs: filteredEvents.length,
-    page: 1,
-  };
+  return apiFetch<EventsResponse>(path);
 }
 
 export function getCategoryLabel(category: string): string {

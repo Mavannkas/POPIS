@@ -24,6 +24,10 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  // Filters / sliders
+  'line.3.horizontal.decrease.circle.fill': 'tune',
+  'line.3.horizontal.decrease': 'tune',
+  'slider.horizontal.3': 'tune',
 } as IconMapping;
 
 /**

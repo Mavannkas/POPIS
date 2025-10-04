@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions, ScrollView } from 'react-native';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import { TopBar } from '@/components/ui/top-bar';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
 import { Event, getCategoryColor, getCategoryLabel, getCategoryEmoji } from '@/lib/services/events';
 import * as Location from 'expo-location';
@@ -19,8 +20,10 @@ const DEFAULT_LOCATION = {
 };
 
 interface MapViewNativeProps {
-	events: Event[];
-	loading: boolean;
+    events: Event[];
+    loading: boolean;
+    onOpenFilters?: () => void;
+  activeFiltersCount?: number;
 }
 
 async function getUserLocation() {
@@ -31,7 +34,7 @@ async function getUserLocation() {
 	return null;
 }
 
-export default function MapViewNative({ events, loading }: MapViewNativeProps) {
+export default function MapViewNative({ events, loading, onOpenFilters, activeFiltersCount = 0 }: MapViewNativeProps) {
 	const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
 	const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
 	const [initialRegion, setInitialRegion] = useState(DEFAULT_LOCATION);
@@ -256,6 +259,17 @@ export default function MapViewNative({ events, loading }: MapViewNativeProps) {
 					</TouchableOpacity>
 				)}
 
+				{!loading && !selectedMarker && (
+					<TouchableOpacity style={styles.filtersFab} onPress={onOpenFilters}>
+						<IconSymbol name={'line.3.horizontal.decrease.circle.fill'} size={22} color={'white'} />
+						{activeFiltersCount > 0 && (
+							<View style={styles.filtersBadge}>
+								<Text style={styles.filtersBadgeText}>{activeFiltersCount}</Text>
+							</View>
+						)}
+					</TouchableOpacity>
+				)}
+
 				{!loading && !selectedMarker && events && (
 					<View className="absolute bottom-4 left-4 right-4 bg-white rounded-full px-4 py-3 shadow-lg">
 						<Text className="text-center text-gray-700 font-medium">
@@ -272,6 +286,21 @@ const styles = StyleSheet.create({
 	map: {
 		width: '100%',
 		height: '100%',
+	},
+	filtersButton: {
+		backgroundColor: 'white',
+		paddingHorizontal: 14,
+		paddingVertical: 10,
+		borderRadius: 20,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		elevation: 4,
+	},
+	filtersButtonText: {
+		color: '#1f2937',
+		fontWeight: '600',
 	},
 	locationButton: {
 		position: 'absolute',
@@ -291,6 +320,39 @@ const styles = StyleSheet.create({
 	},
 	locationButtonIcon: {
 		fontSize: 24,
+	},
+	filtersFab: {
+		position: 'absolute',
+		bottom: 140,
+		right: 16,
+		width: 50,
+		height: 50,
+		borderRadius: 25,
+		backgroundColor: '#3B82F6',
+		alignItems: 'center',
+		justifyContent: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+		elevation: 6,
+	},
+	filtersBadge: {
+		position: 'absolute',
+		top: -4,
+		right: -4,
+		backgroundColor: '#EF4444',
+		borderRadius: 10,
+		paddingHorizontal: 5,
+		minWidth: 20,
+		height: 20,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	filtersBadgeText: {
+		color: 'white',
+		fontSize: 12,
+		fontWeight: '700',
 	},
 	markerContainer: {
 		alignItems: 'center',
