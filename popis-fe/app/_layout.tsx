@@ -13,7 +13,11 @@ export default function RootLayout() {
 	return (
 		<PaperProvider theme={MD3LightTheme}>
 			<ThemeProvider value={NavigationDefaultTheme}>
-				<Stack>
+				<Stack
+					screenOptions={{
+						headerBackTitle: '',
+					}}
+				>
 					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 					<Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
 				</Stack>
