@@ -8,15 +8,11 @@ export default function AppIndex() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  console.log('AppIndex render - user:', user, 'loading:', loading);
-
   useEffect(() => {
     if (!loading) {
       if (user) {
-        console.log('Redirecting to /(tabs)');
         router.replace('/(tabs)');
       } else {
-        console.log('Redirecting to /auth/login');
         router.replace('/auth/login');
       }
     }
