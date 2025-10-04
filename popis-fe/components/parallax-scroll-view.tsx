@@ -1,21 +1,15 @@
 import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, { interpolate, useAnimatedRef, useAnimatedStyle, useScrollViewOffset } from 'react-native-reanimated';
-
-import { ThemedView } from '@/components/themed-view';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useThemeColor } from '@/hooks/use-theme-color';
 
 const HEADER_HEIGHT = 250;
 
 type Props = PropsWithChildren<{
 	headerImage: ReactElement;
-	headerBackgroundColor: { dark: string; light: string };
+	headerBackgroundColor: string;
 }>;
 
 export default function ParallaxScrollView({ children, headerImage, headerBackgroundColor }: Props) {
-	const backgroundColor = useThemeColor({}, 'background');
-	const colorScheme = useColorScheme() ?? 'light';
 	const scrollRef = useAnimatedRef<Animated.ScrollView>();
 	const scrollOffset = useScrollViewOffset(scrollRef);
 	const headerAnimatedStyle = useAnimatedStyle(() => {
@@ -36,12 +30,12 @@ export default function ParallaxScrollView({ children, headerImage, headerBackgr
 	});
 
 	return (
-		<Animated.ScrollView ref={scrollRef} style={{ backgroundColor, flex: 1 }} scrollEventThrottle={16}>
+		<Animated.ScrollView ref={scrollRef} style={styles.container} scrollEventThrottle={16}>
 			<Animated.View
-				style={[styles.header, { backgroundColor: headerBackgroundColor[colorScheme] }, headerAnimatedStyle]}>
+				style={[styles.header, { backgroundColor: headerBackgroundColor }, headerAnimatedStyle]}>
 				{headerImage}
 			</Animated.View>
-			<ThemedView style={styles.content}>{children}</ThemedView>
+			<View style={styles.content}>{children}</View>
 		</Animated.ScrollView>
 	);
 }
