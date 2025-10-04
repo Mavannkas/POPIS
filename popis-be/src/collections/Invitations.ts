@@ -155,6 +155,52 @@ export const Invitations: CollectionConfig = {
     ],
     afterChange: [
       async ({ doc, req, operation, previousDoc }) => {
+        // Send notification when invitation is created
+        if (operation === 'create') {
+          try {
+            const NotificationService = (await import('../services/NotificationService')).default
+
+            // Get event details
+            const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
+            const event = await req.payload.findByID({
+              collection: 'events',
+              id: eventId as string,
+            })
+
+            const volunteerId = typeof doc.volunteer === 'object' ? doc.volunteer.id : doc.volunteer
+
+            // Create notification in database
+            const notification = await req.payload.create({
+              collection: 'notifications',
+              data: {
+                type: 'event_invitation',
+                recipient: volunteerId,
+                event: eventId,
+                message: `Zostałeś zaproszony do wydarzenia: ${event.title}`,
+                read: false,
+                metadata: {
+                  invitationId: doc.id,
+                  invitedBy: doc.invitedBy,
+                },
+              },
+            })
+
+            // Send real-time notification via SSE
+            NotificationService.sendNotification(volunteerId, {
+              id: notification.id,
+              type: 'event_invitation',
+              message: notification.message,
+              event: event,
+              createdAt: notification.createdAt,
+              read: false,
+            })
+
+            console.log('Notification sent for invitation:', doc.id)
+          } catch (error) {
+            console.error('Error sending invitation notification:', error)
+          }
+        }
+
         // When invitation is accepted, auto-create application
         if (doc.status === 'accepted' && previousDoc?.status === 'pending') {
           try {

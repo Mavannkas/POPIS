@@ -76,6 +76,7 @@ export interface Config {
     certificates: Certificate;
     schools: School;
     invitations: Invitation;
+    notifications: Notification;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -94,6 +95,7 @@ export interface Config {
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     schools: SchoolsSelect<false> | SchoolsSelect<true>;
     invitations: InvitationsSelect<false> | InvitationsSelect<true>;
+    notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -509,6 +511,32 @@ export interface Invitation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications".
+ */
+export interface Notification {
+  id: string;
+  type: 'event_invitation' | 'join_request_accepted' | 'join_request_rejected';
+  recipient: string | User;
+  event: string | Event;
+  message: string;
+  read?: boolean | null;
+  /**
+   * Additional data specific to notification type
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -545,6 +573,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'invitations';
         value: string | Invitation;
+      } | null)
+    | ({
+        relationTo: 'notifications';
+        value: string | Notification;
       } | null);
   globalSlug?: string | null;
   user:
@@ -792,6 +824,20 @@ export interface InvitationsSelect<T extends boolean = true> {
   invitedBy?: T;
   invitedAt?: T;
   respondedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications_select".
+ */
+export interface NotificationsSelect<T extends boolean = true> {
+  type?: T;
+  recipient?: T;
+  event?: T;
+  message?: T;
+  read?: T;
+  metadata?: T;
   updatedAt?: T;
   createdAt?: T;
 }
