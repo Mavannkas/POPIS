@@ -209,20 +209,17 @@ export const Events: CollectionConfig = {
       if (!user) {
         // Public can see only published public events
         return {
-          and: [
-            { status: { equals: 'published' } },
-            { eventType: { equals: 'public' } },
-          ],
+          and: [{ status: { equals: 'published' } }, { eventType: { equals: 'public' } }],
         }
       }
       if (user.role === 'superadmin') return true
-      
+
       if (user.role === 'volunteer') {
         // Volunteers see published events based on their student status
         const conditions: any = {
           status: { equals: 'published' },
         }
-        
+
         // If not a student, can only see public events
         if (!user.isStudent) {
           conditions.eventType = { equals: 'public' }
@@ -246,10 +243,10 @@ export const Events: CollectionConfig = {
             },
           ]
         }
-        
+
         return conditions
       }
-      
+
       // Organization/coordinator can see their own events
       return {
         or: [

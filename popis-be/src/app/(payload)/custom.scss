@@ -1,0 +1,170 @@
+.table {
+  width: 100%;
+}
+.login__form a {
+  display: none;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+
+@layer utilities {
+  body {
+    margin: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .direction-rtl {
+    direction: rtl;
+  }
+
+  .header {
+    z-index: 10;
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    position: relative;
+    transition:
+      transform 0.3s,
+      width 0.3s,
+      max-width 0.3s,
+      background-color 0.3s,
+      backdrop-filter 0.3s,
+      padding 0.3s;
+    justify-content: space-between;
+  }
+
+  .header.scrolled {
+    background-color: rgba(230, 234, 249, 0.5);
+  }
+
+  .header.scrolled .backdrop_blur {
+    backdrop-filter: blur(16px);
+    z-index: -30;
+  }
+
+  @media (min-width: 768px) {
+    .header.opened {
+      padding: 1.5rem 0;
+    }
+
+    .header.scrolled {
+      border-radius: 1.5rem;
+      max-width: 76rem;
+    }
+
+    .header.scrolled .backdrop_blur {
+      border-radius: 1.5rem;
+    }
+  }
+
+  .header_hidden {
+    transform: translateX(-50%) translateY(-100%);
+  }
+}
+
+.table {
+  width: 100%;
+}
+.login__form a {
+  display: none;
+}
+
+.custom-select {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+}
+
+.variant-gap-row .row__fields {
+  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 0;
+}
+
+.w-full-border {
+  width: calc(100% + 2px);
+}
+
+form[action*='/api/offers'] .auth-fields,
+form[action*='/api/offers'] .collection-edit__auth {
+  display: none;
+}
+
+@layer base {
+  button:not([disabled]),
+  [role='button']:not([disabled]) {
+    cursor: pointer;
+  }
+}
+
+.translator__close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.translator__close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.translator__close::before,
+.translator__close::after {
+  height: 20px;
+  left: 50%;
+  top: 50%;
+}
+
+.nav-group__label {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+/* AdminNavbar styles */
+.nav__link {
+  display: flex;
+  align-items: center;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.nav__icon {
+  margin-right: 0.5rem;
+}
+
+.nav__link-label {
+  font-size: 1.125rem;
+  line-height: 0;
+}
+
+:root {
+  --theme-elevation-0: hsl(332, 45%, 98%);
+  --theme-elevation-50: hsl(332, 45%, 92%);
+  --theme-elevation-100: hsl(332, 45%, 85%);
+  --theme-elevation-150: hsl(332, 45%, 80%);
+  --theme-elevation-200: hsl(332, 50%, 72%);
+  --theme-elevation-250: hsl(332, 55%, 65%);
+  --theme-elevation-300: hsl(332, 60%, 58%);
+  --theme-elevation-350: hsl(332, 62%, 52%);
+  --theme-elevation-400: hsl(332, 65%, 46%);
+  --theme-elevation-450: hsl(332, 68%, 42%);
+  --theme-elevation-500: hsl(332, 68%, 39%);
+  --theme-elevation-550: hsl(332, 68%, 36%);
+  --theme-elevation-600: hsl(332, 68%, 39%);
+  --theme-elevation-650: hsl(332, 70%, 32%);
+  --theme-elevation-700: hsl(332, 72%, 28%);
+  --theme-elevation-750: hsl(332, 74%, 24%);
+  --theme-elevation-800: hsl(332, 68%, 39%);
+  --theme-elevation-850: hsl(332, 76%, 16%);
+  --theme-elevation-900: hsl(332, 78%, 12%);
+  --theme-elevation-950: hsl(332, 80%, 8%);
+}

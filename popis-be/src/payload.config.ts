@@ -22,6 +22,16 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Admins.slug,
+    components: {
+      graphics: {
+        Logo: '@/components/AdminLogoBig/AdminLogoBig#AdminLogoBig',
+        Icon: '@/components/AdminLogoIcon/AdminLogoIcon#AdminLogoIcon',
+      },
+      Nav: {
+        path: '@/components/AdminNavbar#AdminNavbar',
+      },
+    },
+    theme: 'light',
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -33,6 +43,7 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: sqliteAdapter({
+    push: true,
     client: {
       url: process.env.DATABASE_URI || '',
     },
