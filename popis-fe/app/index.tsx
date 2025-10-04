@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/lib/auth-context';
+import { useAuth } from '@/lib/auth/context';
 import { View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { useEffect } from 'react';
@@ -22,4 +22,3 @@ export default function AppIndex() {
 
   return <View />;
 }
-

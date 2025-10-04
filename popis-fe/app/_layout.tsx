@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
 import { theme } from '@/constants/theme';
-import { AuthProvider } from '@/lib/auth-context';
+import { AuthProvider } from '@/lib/auth/context';
 import { useFonts, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { View } from 'react-native';
 import './globals.css';

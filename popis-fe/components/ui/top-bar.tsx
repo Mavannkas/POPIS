@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Modal, Pressable, Animated } from "react-
 import { IconSymbol } from "./icon-symbol";
 import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/lib/auth/context";
 
 interface TopBarProps {
   showSearch?: boolean;
