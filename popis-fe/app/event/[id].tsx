@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, TextInput } from 'react-native';
 import { Card, Button, Chip } from 'react-native-paper';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { CategoryIcon } from '@/components/ui/category-icon';
@@ -11,6 +11,7 @@ import { Stack } from 'expo-router';
 export default function EventDetailScreen() {
   const colors = Colors;
   const { id } = useLocalSearchParams();
+  const [recommendation, setRecommendation] = useState('');
 
   // Mock event data - in real app this would be fetched based on ID
   const mockEvent = {
@@ -65,73 +66,65 @@ export default function EventDetailScreen() {
         </View>
 
         <View className="px-4 py-6">
-          {/* Title and Category */}
-          <View className="flex-row justify-between items-start mb-4">
-            <View className="flex-1 mr-3">
-              <Text className="text-2xl font-bold text-gray-800 mb-2">
-                {mockEvent.title}
-              </Text>
-              <Text className="text-primary font-medium text-base">
-                👤 {mockEvent.organizer}
-              </Text>
-            </View>
-            <Chip
-              style={{ backgroundColor: colors.primary + '20' }}
-              textStyle={{ color: colors.primary, fontWeight: '600' }}
-            >
-              {mockEvent.category}
-            </Chip>
+          {/* Title and Organizer */}
+          <View className="mb-4">
+            <Text className="text-2xl font-bold text-gray-800 mb-2">
+              {mockEvent.title}
+            </Text>
+            <Text className="text-primary font-medium text-base" style={{ marginLeft: 2 }}>
+              👤 {mockEvent.organizer} 
+            </Text>
           </View>
 
           {/* Event Details */}
-          <Card className="mb-6 bg-gray-50">
-            <Card.Content className="p-4">
-              <View className="space-y-3">
-                <View className="flex-row items-center">
+          <Card style={{ backgroundColor: '#F9F9F9', marginBottom: 24, elevation: 0 }}>
+            <Card.Content style={{ padding: 16, backgroundColor: 'transparent' }}>
+              <View style={{ gap: 12 }}>
+                <View className="flex-row items-center" style={{ marginBottom: 2 }}>
                   <View style={styles.iconCircle}>
                     <Text style={styles.iconEmoji}>📅</Text>
                   </View>
-                  <Text className="ml-3 text-gray-700 font-medium">
+                  <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
                     {mockEvent.date}
                   </Text>
                 </View>
-                <View className="flex-row items-center">
+                <View className="flex-row items-center" style={{ marginBottom: 2 }}>
                   <View style={styles.iconCircle}>
                     <Text style={styles.iconEmoji}>⏰</Text>
                   </View>
-                  <Text className="ml-3 text-gray-700 font-medium">
+                  <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
                     {mockEvent.time}
                   </Text>
                 </View>
-                <View className="flex-row items-center">
+                <View className="flex-row items-center" style={{ marginBottom: 2 }}>
                   <View style={styles.iconCircle}>
                     <Text style={styles.iconEmoji}>📍</Text>
                   </View>
-                  <Text className="ml-3 text-gray-700 font-medium">
+                  <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
                     {mockEvent.location}
                   </Text>
                 </View>
-                <View className="flex-row items-center">
+                <View className="flex-row items-center" style={{ marginBottom: 2 }}>
                   <View style={styles.iconCircle}>
                     <Text style={styles.iconEmoji}>👥</Text>
                   </View>
-                  <Text className="ml-3 text-gray-700 font-medium">
+                  <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
                     {mockEvent.attendees}/{mockEvent.maxAttendees} uczestników
                   </Text>
                 </View>
-                <View className="flex-row items-center">
+                <View className="flex-row items-center" style={{ marginBottom: 2 }}>
                   <View style={styles.iconCircle}>
                     <Text style={styles.iconEmoji}>💰</Text>
                   </View>
-                  <Text className="ml-3 text-gray-700 font-medium">
+                  <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
                     {mockEvent.price}
                   </Text>
                 </View>
-                <View className="flex-row items-center">
+                <View className="flex-row items-center" style={{ marginBottom: 2 }}>
                   <View style={styles.iconCircle}>
                     <Text style={styles.iconEmoji}>📊</Text>
                   </View>
-                  <Text className="ml-3 text-gray-700 font-medium">
+                  <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
                     Poziom: {mockEvent.level}
                   </Text>
                 </View>
@@ -175,24 +168,40 @@ export default function EventDetailScreen() {
             ))}
           </View>
 
-          {/* Tags */}
+          {/* Category */}
+          <View className="mb-6">
+            <Text className="text-lg font-semibold text-gray-800 mb-3">
+              Kategoria
+            </Text>
+            <View className="flex-row items-center">
+              <CategoryIcon category={mockEvent.category} size="small" />
+              <Chip
+                style={{ backgroundColor: '#F5F5F5', marginLeft: 4 }}
+                textStyle={{ color: '#666', fontSize: 12 }}
+              >
+                {mockEvent.category}
+              </Chip>
+            </View>
+          </View>
+
+          {/* Recommendation Textarea */}
           <View className="mb-8">
             <Text className="text-lg font-semibold text-gray-800 mb-3">
-              Tagi
+              Dlaczego powinieneś zostać wybrany?
             </Text>
-            <View className="flex-row flex-wrap gap-2">
-              {mockEvent.tags.map((tag) => (
-                <View key={tag} className="flex-row items-center">
-                  <CategoryIcon category={mockEvent.category} size="small" />
-                  <Chip
-                    style={{ backgroundColor: '#F5F5F5', marginLeft: 4 }}
-                    textStyle={{ color: '#666', fontSize: 12 }}
-                  >
-                    {tag}
-                  </Chip>
-                </View>
-              ))}
-            </View>
+            <Text className="text-gray-600 text-sm mb-3">
+              Opisz swoje doświadczenie, motywację lub powody, dla których chcesz uczestniczyć w tym wydarzeniu.
+            </Text>
+            <TextInput
+              style={styles.textArea}
+              multiline
+              numberOfLines={6}
+              value={recommendation}
+              onChangeText={setRecommendation}
+              placeholder="Napisz swoją rekomendację..."
+              placeholderTextColor="#999"
+              textAlignVertical="top"
+            />
           </View>
         </View>
       </ScrollView>
@@ -204,14 +213,14 @@ export default function EventDetailScreen() {
           onPress={handleJoinEvent}
           style={{
             backgroundColor: colors.primary,
-            borderRadius: 25,
-            paddingVertical: 8,
+            borderRadius: 20,
+            paddingVertical: 4,
           }}
           contentStyle={{
-            paddingVertical: 8,
+            paddingVertical: 4,
           }}
           labelStyle={{
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: '600',
           }}
         >
@@ -233,5 +242,16 @@ const styles = StyleSheet.create({
   },
   iconEmoji: {
     fontSize: 18,
+  },
+  textArea: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#FAFAFA',
+    minHeight: 120,
+    maxHeight: 200,
   },
 });
