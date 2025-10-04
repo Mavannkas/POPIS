@@ -3,6 +3,7 @@ export type AuthUser = {
   email: string;
   firstName?: string;
   lastName?: string;
+  isStudent?: boolean;
 };
 
 export type SignInPayload = { email: string; password: string };
