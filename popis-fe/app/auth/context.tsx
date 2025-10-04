@@ -25,12 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         signIn: async (p) => setUser(await signIn(p)),
         signUp: async (p) => setUser(await signUp(p)),
-        signOut: async () => {
-          console.log('Auth context signOut called');
-          await signOut();
-          console.log('Setting user to null');
-          setUser(null);
-        },
+        signOut: async () => { await signOut(); setUser(null); },
       }}
     >
       {children}
