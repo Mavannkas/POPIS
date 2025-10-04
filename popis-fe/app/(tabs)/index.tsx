@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { Card, Chip } from 'react-native-paper';
 import { TopBar } from '@/components/ui/top-bar';
 import { CategoryIcon } from '@/components/ui/category-icon';
+import { getCategoryEmoji, getCategoryLabel } from '@/lib/services/events';
 import { router } from 'expo-router';
 
 export default function HomeScreen() {
@@ -50,14 +51,7 @@ export default function HomeScreen() {
     },
   ];
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Edukacja': return 'bg-blue-100 text-blue-800';
-      case 'Mentoring': return 'bg-green-100 text-green-800';
-      case 'Konkurs': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+  
 
   return (
     <View className="flex-1 bg-white">
@@ -85,9 +79,10 @@ export default function HomeScreen() {
                       👤 {event.organizer}
                     </Text>
                   </View>
-                  <View className={`px-3 py-1 rounded-full ${getCategoryColor(event.category)}`}>
-                    <Text className="text-xs font-medium">
-                      {event.category}
+                  <View className={`px-3 py-1 rounded-full bg-primary/10 flex-row items-center`}>
+                    <Text className="text-xs mr-1">{getCategoryEmoji(event.category)}</Text>
+                    <Text className="text-xs font-medium text-primary">
+                      {getCategoryLabel(event.category)}
                     </Text>
                   </View>
                 </View>

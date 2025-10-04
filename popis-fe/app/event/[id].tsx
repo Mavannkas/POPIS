@@ -9,6 +9,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Stack } from 'expo-router';
+import { getCategoryEmoji, getCategoryLabel } from '@/lib/services/events';
 
 export default function EventDetailScreen() {
   const colors = Colors;
@@ -67,14 +68,23 @@ export default function EventDetailScreen() {
         </View>
 
         <View className="px-4 py-6">
-          {/* Title and Organizer */}
-          <View className="mb-4">
-            <Text className="text-2xl font-bold text-gray-800 mb-2">
-              {mockEvent.title}
-            </Text>
-            <Text className="text-primary font-medium text-base" style={{ marginLeft: 2 }}>
-              👤 {mockEvent.organizer} 
-            </Text>
+          {/* Title and Category */}
+          <View className="flex-row justify-between items-start mb-4">
+            <View className="flex-1 mr-3">
+              <Text className="text-2xl font-bold text-gray-800 mb-2">
+                {mockEvent.title}
+              </Text>
+              <Text className="text-primary font-medium text-base">
+                👤 {mockEvent.organizer}
+              </Text>
+            </View>
+            <Chip
+              style={{ backgroundColor: colors.primary + '20' }}
+              textStyle={{ color: colors.primary, fontWeight: '600' }}
+            >
+              <Text className="mr-1">{getCategoryEmoji(mockEvent.category)}</Text>
+              {getCategoryLabel(mockEvent.category)}
+            </Chip>
           </View>
 
           {/* Event Details */}
