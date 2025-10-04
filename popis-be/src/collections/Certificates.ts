@@ -27,80 +27,82 @@ export const Certificates: CollectionConfig = {
       },
     },
     {
-      name: 'volunteer',
-      type: 'relationship',
-      relationTo: 'users',
-      required: true,
-      label: 'Wolontariusz',
+      type: 'row',
+      fields: [
+        {
+          name: 'volunteer',
+          type: 'relationship',
+          relationTo: 'users',
+          required: true,
+          label: 'Wolontariusz',
+        },
+        {
+          name: 'event',
+          type: 'relationship',
+          relationTo: 'events',
+          required: true,
+          label: 'Wydarzenie',
+        },
+      ],
     },
     {
-      name: 'event',
-      type: 'relationship',
-      relationTo: 'events',
-      required: true,
-      label: 'Wydarzenie',
+      type: 'row',
+      fields: [
+        {
+          name: 'organization',
+          type: 'relationship',
+          relationTo: 'admins',
+          filterOptions: {
+            role: { equals: 'organization' },
+          },
+          label: 'Organizacja',
+          admin: {
+            description: 'Wypełniane automatycznie z wydarzenia',
+          },
+        },
+        {
+          name: 'hoursWorked',
+          type: 'number',
+          required: true,
+          label: 'Przepracowane godziny',
+          admin: {
+            description: 'Liczba przepracowanych godzin',
+          },
+        },
+      ],
     },
     {
-      name: 'organization',
-      type: 'relationship',
-      relationTo: 'admins',
-      filterOptions: {
-        role: { equals: 'organization' },
-      },
-      label: 'Organizacja',
+      type: 'row',
+      fields: [
+        {
+          name: 'issuedBy',
+          type: 'relationship',
+          relationTo: 'admins',
+          label: 'Wystawione przez',
+          admin: {
+            description: 'Kto wystawił zaświadczenie (organizacja lub koordynator)',
+          },
+        },
+        {
+          name: 'approvedBy',
+          type: 'relationship',
+          relationTo: 'admins',
+          filterOptions: {
+            role: { equals: 'coordinator' },
+          },
+          label: 'Zatwierdzone przez',
+          admin: {
+            description: 'Koordynator który zatwierdził (opcjonalne)',
+          },
+        },
+      ],
+    },
+    {
+      name: 'notes',
+      type: 'textarea',
+      label: 'Notatki',
       admin: {
-        description: 'Wypełniane automatycznie z wydarzenia',
-      },
-    },
-    {
-      name: 'hoursWorked',
-      type: 'number',
-      required: true,
-      label: 'Przepracowane godziny',
-      admin: {
-        description: 'Liczba przepracowanych godzin',
-      },
-    },
-    {
-      name: 'issuedBy',
-      type: 'relationship',
-      relationTo: 'admins',
-      label: 'Wystawione przez',
-      admin: {
-        description: 'Kto wystawił zaświadczenie (organizacja lub koordynator)',
-      },
-    },
-    {
-      name: 'approvedBy',
-      type: 'relationship',
-      relationTo: 'admins',
-      filterOptions: {
-        role: { equals: 'coordinator' },
-      },
-      label: 'Zatwierdzone przez',
-      admin: {
-        description: 'Koordynator który zatwierdził (opcjonalne)',
-      },
-    },
-    {
-      name: 'issueDate',
-      type: 'date',
-      required: true,
-      label: 'Data wystawienia',
-      admin: {
-        readOnly: true,
-        description: 'Data wystawienia',
-      },
-    },
-    {
-      name: 'certificateNumber',
-      type: 'text',
-      required: true,
-      unique: true,
-      label: 'Numer certyfikatu',
-      admin: {
-        readOnly: true,
-        description: 'Unikalny numer zaświadczenia',
+        description: 'Dodatkowe uwagi',
       },
     },
     {
@@ -113,55 +115,39 @@ export const Certificates: CollectionConfig = {
         { label: 'Oczekujące', value: 'pending' },
         { label: 'Wystawione', value: 'issued' },
       ],
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
-      name: 'notes',
-      type: 'textarea',
-      label: 'Notatki',
+      name: 'certificateNumber',
+      type: 'text',
+      required: true,
+      unique: true,
+      label: 'Numer certyfikatu',
       admin: {
-        description: 'Dodatkowe uwagi',
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Unikalny numer zaświadczenia',
+      },
+    },
+    {
+      name: 'issueDate',
+      type: 'date',
+      required: true,
+      label: 'Data wystawienia',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Data wystawienia',
       },
     },
   ],
   access: {
-    // Organizations and coordinators can create certificates
-    create: ({ req: { user } }) => {
-      if (!user) return false
-      return ['organization', 'coordinator', 'superadmin'].includes(user.role)
-    },
-    // Volunteers see their own, organizations see their certificates
-    read: ({ req: { user } }) => {
-      if (!user) return false
-      if (user.role === 'superadmin') return true
-      if (user.role === 'volunteer') {
-        return {
-          volunteer: { equals: user.id },
-        }
-      }
-      if (user.role === 'organization') {
-        return {
-          organization: { equals: user.id },
-        }
-      }
-      if (user.role === 'coordinator') {
-        // Coordinators can see all certificates (for their school - simplified for hackathon)
-        return true
-      }
-      return false
-    },
-    // Organizations and coordinators can update
-    update: ({ req: { user } }) => {
-      if (!user) return false
-      if (user.role === 'superadmin') return true
-      if (user.role === 'organization' || user.role === 'coordinator') {
-        return true
-      }
-      return false
-    },
-    // Only superadmin can delete
-    delete: ({ req: { user } }) => {
-      return user?.role === 'superadmin'
-    },
+    create: () => true,
+    read: () => true,
+    update: () => true,
+    delete: () => true,
   },
   hooks: {
     beforeChange: [

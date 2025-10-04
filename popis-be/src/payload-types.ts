@@ -162,6 +162,14 @@ export interface User {
    */
   birthDate: string;
   /**
+   * Czy użytkownik jest uczniem szkoły
+   */
+  isStudent?: boolean | null;
+  /**
+   * Szkoła ucznia (wymagane jeśli isStudent=true)
+   */
+  school?: (number | null) | School;
+  /**
    * Zatwierdzenie wieku
    */
   isAgeIsVerified?: boolean | null;
@@ -173,14 +181,6 @@ export interface User {
    * Automatycznie wyliczane - czy osoba jest pełnoletnia (>= 18 lat)
    */
   isAdult?: boolean | null;
-  /**
-   * Czy użytkownik jest uczniem szkoły
-   */
-  isStudent?: boolean | null;
-  /**
-   * Szkoła ucznia (wymagane jeśli isStudent=true)
-   */
-  school?: (number | null) | School;
   /**
    * Stream Chat user ID (auto-generated)
    */
@@ -212,10 +212,6 @@ export interface User {
 export interface School {
   id: number;
   /**
-   * ID szkoły z zewnętrznego API (np. RSPO)
-   */
-  externalId: string;
-  /**
    * Nazwa szkoły
    */
   name: string;
@@ -235,6 +231,10 @@ export interface School {
    * Typ szkoły
    */
   type?: ('liceum' | 'technikum' | 'branzowa' | 'other') | null;
+  /**
+   * ID szkoły z zewnętrznego API (np. RSPO)
+   */
+  externalId: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -244,14 +244,9 @@ export interface School {
  */
 export interface Admin {
   id: number;
-  role: 'organization' | 'coordinator' | 'superadmin';
   firstName: string;
   lastName: string;
   phone?: string | null;
-  /**
-   * Konto zatwierdzone przez superadmina
-   */
-  verified?: boolean | null;
   organizationName?: string | null;
   organizationDescription?: string | null;
   nip?: string | null;
@@ -262,6 +257,11 @@ export interface Admin {
   };
   schoolName?: string | null;
   schoolAddress?: string | null;
+  role: 'organization' | 'coordinator' | 'superadmin';
+  /**
+   * Konto zatwierdzone przez superadmina
+   */
+  verified?: boolean | null;
   /**
    * Stream Chat user ID (auto-generated)
    */
@@ -325,10 +325,8 @@ export interface Event {
     };
     [k: string]: unknown;
   };
-  /**
-   * Organizacja odpowiedzialna za wydarzenie
-   */
-  organization: number | Admin;
+  category: 'education' | 'environment' | 'social' | 'health' | 'animals' | 'culture' | 'sport' | 'other';
+  size: 'small' | 'medium' | 'large';
   /**
    * Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)
    */
@@ -337,8 +335,10 @@ export interface Event {
    * Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)
    */
   targetSchool?: (number | null) | School;
-  category: 'education' | 'environment' | 'social' | 'health' | 'animals' | 'culture' | 'sport' | 'other';
-  size: 'small' | 'medium' | 'large';
+  /**
+   * Główne zdjęcie wydarzenia
+   */
+  image?: (number | null) | Media;
   location: {
     address: string;
     city: string;
@@ -375,9 +375,9 @@ export interface Event {
   additionalInfo?: string | null;
   status: 'draft' | 'published' | 'completed' | 'cancelled';
   /**
-   * Główne zdjęcie wydarzenia
+   * Organizacja odpowiedzialna za wydarzenie
    */
-  image?: (number | null) | Media;
+  organization: number | Admin;
   /**
    * Użytkownik który stworzył wydarzenie
    */
@@ -393,7 +393,6 @@ export interface Application {
   id: number;
   event: number | Event;
   volunteer: number | User;
-  status: 'pending' | 'accepted' | 'rejected' | 'completed';
   /**
    * Wiadomość od wolontariusza
    */
@@ -406,6 +405,7 @@ export interface Application {
    * Notatki organizacji (widoczne tylko dla organizacji i superadmina)
    */
   organizationNotes?: string | null;
+  status: 'pending' | 'accepted' | 'rejected' | 'completed';
   appliedAt?: string | null;
   /**
    * Data ukończenia wolontariatu
@@ -447,18 +447,18 @@ export interface Certificate {
    */
   approvedBy?: (number | null) | Admin;
   /**
-   * Data wystawienia
+   * Dodatkowe uwagi
    */
-  issueDate: string;
+  notes?: string | null;
+  status: 'pending' | 'issued';
   /**
    * Unikalny numer zaświadczenia
    */
   certificateNumber: string;
-  status: 'pending' | 'issued';
   /**
-   * Dodatkowe uwagi
+   * Data wystawienia
    */
-  notes?: string | null;
+  issueDate: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -477,14 +477,14 @@ export interface Invitation {
    */
   volunteer: number | User;
   /**
-   * Kto wysłał zaproszenie (organizacja lub koordynator)
-   */
-  invitedBy: number | Admin;
-  status: 'pending' | 'accepted' | 'declined';
-  /**
    * Wiadomość dla wolontariusza (opcjonalne)
    */
   message?: string | null;
+  status: 'pending' | 'accepted' | 'declined';
+  /**
+   * Kto wysłał zaproszenie (organizacja lub koordynator)
+   */
+  invitedBy: number | Admin;
   /**
    * Data wysłania zaproszenia
    */
@@ -596,11 +596,11 @@ export interface UsersSelect<T extends boolean = true> {
   lastName?: T;
   phone?: T;
   birthDate?: T;
+  isStudent?: T;
+  school?: T;
   isAgeIsVerified?: T;
   isMinor?: T;
   isAdult?: T;
-  isStudent?: T;
-  school?: T;
   streamUserId?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -624,11 +624,9 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "admins_select".
  */
 export interface AdminsSelect<T extends boolean = true> {
-  role?: T;
   firstName?: T;
   lastName?: T;
   phone?: T;
-  verified?: T;
   organizationName?: T;
   organizationDescription?: T;
   nip?: T;
@@ -641,6 +639,8 @@ export interface AdminsSelect<T extends boolean = true> {
       };
   schoolName?: T;
   schoolAddress?: T;
+  role?: T;
+  verified?: T;
   streamUserId?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -684,11 +684,11 @@ export interface MediaSelect<T extends boolean = true> {
 export interface EventsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
-  organization?: T;
-  eventType?: T;
-  targetSchool?: T;
   category?: T;
   size?: T;
+  eventType?: T;
+  targetSchool?: T;
+  image?: T;
   location?:
     | T
     | {
@@ -705,7 +705,7 @@ export interface EventsSelect<T extends boolean = true> {
   requirements?: T;
   additionalInfo?: T;
   status?: T;
-  image?: T;
+  organization?: T;
   createdBy?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -717,10 +717,10 @@ export interface EventsSelect<T extends boolean = true> {
 export interface ApplicationsSelect<T extends boolean = true> {
   event?: T;
   volunteer?: T;
-  status?: T;
   message?: T;
   hoursWorked?: T;
   organizationNotes?: T;
+  status?: T;
   appliedAt?: T;
   completedAt?: T;
   chatChannelId?: T;
@@ -739,10 +739,10 @@ export interface CertificatesSelect<T extends boolean = true> {
   hoursWorked?: T;
   issuedBy?: T;
   approvedBy?: T;
-  issueDate?: T;
-  certificateNumber?: T;
-  status?: T;
   notes?: T;
+  status?: T;
+  certificateNumber?: T;
+  issueDate?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -751,12 +751,12 @@ export interface CertificatesSelect<T extends boolean = true> {
  * via the `definition` "schools_select".
  */
 export interface SchoolsSelect<T extends boolean = true> {
-  externalId?: T;
   name?: T;
   address?: T;
   city?: T;
   postalCode?: T;
   type?: T;
+  externalId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -767,9 +767,9 @@ export interface SchoolsSelect<T extends boolean = true> {
 export interface InvitationsSelect<T extends boolean = true> {
   event?: T;
   volunteer?: T;
-  invitedBy?: T;
-  status?: T;
   message?: T;
+  status?: T;
+  invitedBy?: T;
   invitedAt?: T;
   respondedAt?: T;
   updatedAt?: T;

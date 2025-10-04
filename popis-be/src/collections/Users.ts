@@ -16,33 +16,65 @@ export const Users: CollectionConfig = {
   },
   auth: true,
   fields: [
-    // Volunteers only - no role field needed
-    // Basic Info
     {
-      name: 'firstName',
-      type: 'text',
-      required: true,
-      label: 'Imię',
+      type: 'row',
+      fields: [
+        {
+          name: 'firstName',
+          type: 'text',
+          required: true,
+          label: 'Imię',
+        },
+        {
+          name: 'lastName',
+          type: 'text',
+          required: true,
+          label: 'Nazwisko',
+        },
+      ],
     },
     {
-      name: 'lastName',
-      type: 'text',
-      required: true,
-      label: 'Nazwisko',
+      type: 'row',
+      fields: [
+        {
+          name: 'phone',
+          type: 'text',
+          label: 'Telefon',
+        },
+        {
+          name: 'birthDate',
+          type: 'date',
+          required: true,
+          label: 'Data urodzenia',
+          admin: {
+            description: 'Wymagane do określenia czy osoba jest małoletnia',
+          },
+        },
+      ],
     },
     {
-      name: 'phone',
-      type: 'text',
-      label: 'Telefon',
-    },
-    {
-      name: 'birthDate',
-      type: 'date',
-      required: true,
-      label: 'Data urodzenia',
-      admin: {
-        description: 'Wymagane do określenia czy osoba jest małoletnia',
-      },
+      type: 'row',
+      fields: [
+        {
+          name: 'isStudent',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Uczeń',
+          admin: {
+            description: 'Czy użytkownik jest uczniem szkoły',
+          },
+        },
+        {
+          name: 'school',
+          type: 'relationship',
+          relationTo: 'schools',
+          label: 'Szkoła',
+          admin: {
+            description: 'Szkoła ucznia (wymagane jeśli isStudent=true)',
+            condition: (data: any) => data.isStudent === true,
+          },
+        },
+      ],
     },
     {
       name: 'isAgeIsVerified',
@@ -50,6 +82,7 @@ export const Users: CollectionConfig = {
       defaultValue: false,
       label: 'Wiek zweryfikowany',
       admin: {
+        position: 'sidebar',
         description: 'Zatwierdzenie wieku',
         readOnly: true,
       },
@@ -60,6 +93,7 @@ export const Users: CollectionConfig = {
       defaultValue: false,
       label: 'Małoletni',
       admin: {
+        position: 'sidebar',
         description: 'Automatycznie wyliczane na podstawie daty urodzenia',
         readOnly: true,
       },
@@ -70,68 +104,27 @@ export const Users: CollectionConfig = {
       defaultValue: false,
       label: 'Pełnoletni',
       admin: {
+        position: 'sidebar',
         description: 'Automatycznie wyliczane - czy osoba jest pełnoletnia (>= 18 lat)',
         readOnly: true,
       },
     },
-    // Student fields
-    {
-      name: 'isStudent',
-      type: 'checkbox',
-      defaultValue: false,
-      label: 'Uczeń',
-      admin: {
-        description: 'Czy użytkownik jest uczniem szkoły',
-      },
-    },
-    {
-      name: 'school',
-      type: 'relationship',
-      relationTo: 'schools',
-      label: 'Szkoła',
-      admin: {
-        description: 'Szkoła ucznia (wymagane jeśli isStudent=true)',
-        condition: (data: any) => data.isStudent === true,
-      },
-    },
-    // Volunteers are auto-verified
-    // Volunteers don't need organization/coordinator fields
-    // Stream Chat ID
     {
       name: 'streamUserId',
       type: 'text',
       label: 'ID użytkownika Stream',
       admin: {
+        position: 'sidebar',
         description: 'Stream Chat user ID (auto-generated)',
         readOnly: true,
       },
     },
   ],
   access: {
-    // Anyone can create volunteer account (public registration)
     create: () => true,
-    // Volunteers can read other volunteers (basic info only)
-    read: ({ req: { user } }: { req: { user: any } }) => {
-      if (!user) return false
-      // Volunteers can read other volunteers
-      return true
-    },
-    // Volunteers can update their own profile
-    update: ({ req: { user } }: { req: { user: any } }) => {
-      if (!user) return false
-      // Volunteers can only update themselves
-      return {
-        id: { equals: user.id },
-      }
-    },
-    // Volunteers can delete their own account
-    delete: ({ req: { user } }: { req: { user: any } }) => {
-      if (!user) return false
-      // Volunteers can only delete themselves
-      return {
-        id: { equals: user.id },
-      }
-    },
+    read: () => true,
+    update: () => true,
+    delete: () => true,
   },
   hooks: {
     beforeChange: [

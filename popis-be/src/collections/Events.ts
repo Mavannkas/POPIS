@@ -16,180 +16,221 @@ export const Events: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      label: 'Tytuł',
-    },
-    {
-      name: 'description',
-      type: 'richText',
-      required: true,
-      label: 'Opis',
-    },
-    {
-      name: 'organization',
-      type: 'relationship',
-      relationTo: 'admins',
-      required: true,
-      filterOptions: {
-        role: { equals: 'organization' },
-      },
-      label: 'Organizacja',
-      admin: {
-        description: 'Organizacja odpowiedzialna za wydarzenie',
-      },
-    },
-    {
-      name: 'eventType',
-      type: 'select',
-      required: true,
-      defaultValue: 'public',
-      label: 'Typ wydarzenia',
-      options: [
-        { label: 'Wydarzenie publiczne', value: 'public' },
-        { label: 'Wydarzenie szkolne', value: 'school' },
-      ],
-      admin: {
-        description: 'Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)',
-      },
-    },
-    {
-      name: 'targetSchool',
-      type: 'relationship',
-      relationTo: 'schools',
-      label: 'Szkoła docelowa',
-      admin: {
-        description: 'Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)',
-        condition: (data: any) => data.eventType === 'school',
-      },
-    },
-    {
-      name: 'category',
-      type: 'select',
-      required: true,
-      label: 'Kategoria',
-      options: [
-        { label: 'Edukacja', value: 'education' },
-        { label: 'Środowisko', value: 'environment' },
-        { label: 'Pomoc społeczna', value: 'social' },
-        { label: 'Zdrowie', value: 'health' },
-        { label: 'Zwierzęta', value: 'animals' },
-        { label: 'Kultura', value: 'culture' },
-        { label: 'Sport', value: 'sport' },
-        { label: 'Inne', value: 'other' },
-      ],
-    },
-    {
-      name: 'size',
-      type: 'select',
-      required: true,
-      label: 'Rozmiar',
-      options: [
-        { label: 'Małe', value: 'small' },
-        { label: 'Średnie', value: 'medium' },
-        { label: 'Duże', value: 'large' },
-      ],
-    },
-    {
-      name: 'location',
-      type: 'group',
-      label: 'Lokalizacja',
-      fields: [
+      type: 'tabs',
+      tabs: [
         {
-          name: 'address',
-          type: 'text',
-          required: true,
-          label: 'Adres',
-        },
-        {
-          name: 'city',
-          type: 'text',
-          required: true,
-          label: 'Miasto',
+          label: 'Podstawowe informacje',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              label: 'Tytuł',
+            },
+            {
+              name: 'description',
+              type: 'richText',
+              required: true,
+              label: 'Opis',
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'category',
+                  type: 'select',
+                  required: true,
+                  label: 'Kategoria',
+                  options: [
+                    { label: 'Edukacja', value: 'education' },
+                    { label: 'Środowisko', value: 'environment' },
+                    { label: 'Pomoc społeczna', value: 'social' },
+                    { label: 'Zdrowie', value: 'health' },
+                    { label: 'Zwierzęta', value: 'animals' },
+                    { label: 'Kultura', value: 'culture' },
+                    { label: 'Sport', value: 'sport' },
+                    { label: 'Inne', value: 'other' },
+                  ],
+                },
+                {
+                  name: 'size',
+                  type: 'select',
+                  required: true,
+                  label: 'Rozmiar',
+                  options: [
+                    { label: 'Małe', value: 'small' },
+                    { label: 'Średnie', value: 'medium' },
+                    { label: 'Duże', value: 'large' },
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'eventType',
+                  type: 'select',
+                  required: true,
+                  defaultValue: 'public',
+                  label: 'Typ wydarzenia',
+                  options: [
+                    { label: 'Wydarzenie publiczne', value: 'public' },
+                    { label: 'Wydarzenie szkolne', value: 'school' },
+                  ],
+                  admin: {
+                    description: 'Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)',
+                  },
+                },
+                {
+                  name: 'targetSchool',
+                  type: 'relationship',
+                  relationTo: 'schools',
+                  label: 'Szkoła docelowa',
+                  admin: {
+                    description: 'Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)',
+                    condition: (data: any) => data.eventType === 'school',
+                  },
+                },
+              ],
+            },
+            {
+              name: 'image',
+              type: 'relationship',
+              relationTo: 'media',
+              label: 'Zdjęcie',
+              admin: {
+                description: 'Główne zdjęcie wydarzenia',
+              },
+            },
+          ],
         },
         {
-          name: 'lat',
-          type: 'number',
-          label: 'Szerokość geograficzna',
-          admin: {
-            description: 'Szerokość geograficzna (dla mapy)',
-          },
+          label: 'Lokalizacja i terminy',
+          fields: [
+            {
+              name: 'location',
+              type: 'group',
+              label: 'Lokalizacja',
+              fields: [
+                {
+                  name: 'address',
+                  type: 'text',
+                  required: true,
+                  label: 'Adres',
+                },
+                {
+                  name: 'city',
+                  type: 'text',
+                  required: true,
+                  label: 'Miasto',
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'lat',
+                      type: 'number',
+                      label: 'Szerokość geograficzna',
+                      admin: {
+                        description: 'Szerokość geograficzna (dla mapy)',
+                      },
+                    },
+                    {
+                      name: 'lng',
+                      type: 'number',
+                      label: 'Długość geograficzna',
+                      admin: {
+                        description: 'Długość geograficzna (dla mapy)',
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'startDate',
+                  type: 'date',
+                  required: true,
+                  label: 'Data rozpoczęcia',
+                  admin: {
+                    date: {
+                      pickerAppearance: 'dayAndTime',
+                    },
+                  },
+                },
+                {
+                  name: 'endDate',
+                  type: 'date',
+                  label: 'Data zakończenia',
+                  admin: {
+                    date: {
+                      pickerAppearance: 'dayAndTime',
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              name: 'duration',
+              type: 'number',
+              required: true,
+              label: 'Czas trwania (w godzinach)',
+              admin: {
+                description: 'Przewidywana liczba godzin wolontariatu',
+              },
+            },
+          ],
         },
         {
-          name: 'lng',
-          type: 'number',
-          label: 'Długość geograficzna',
-          admin: {
-            description: 'Długość geograficzna (dla mapy)',
-          },
+          label: 'Wymagania',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'minAge',
+                  type: 'number',
+                  min: 13,
+                  defaultValue: 13,
+                  required: true,
+                  label: 'Minimalny wiek',
+                  admin: {
+                    description: 'Minimalny wiek uczestnika',
+                  },
+                },
+                {
+                  name: 'maxVolunteers',
+                  type: 'number',
+                  label: 'Maksymalna liczba wolontariuszy',
+                  admin: {
+                    description: 'Maksymalna liczba wolontariuszy (opcjonalne)',
+                  },
+                },
+              ],
+            },
+            {
+              name: 'requirements',
+              type: 'textarea',
+              label: 'Wymagania',
+              admin: {
+                description: 'Wymagania dla wolontariuszy',
+              },
+            },
+            {
+              name: 'additionalInfo',
+              type: 'textarea',
+              label: 'Dodatkowe informacje',
+              admin: {
+                description: 'Dodatkowe informacje o wydarzeniu (opcjonalne)',
+              },
+            },
+          ],
         },
       ],
-    },
-    {
-      name: 'startDate',
-      type: 'date',
-      required: true,
-      label: 'Data rozpoczęcia',
-      admin: {
-        date: {
-          pickerAppearance: 'dayAndTime',
-        },
-      },
-    },
-    {
-      name: 'endDate',
-      type: 'date',
-      label: 'Data zakończenia',
-      admin: {
-        date: {
-          pickerAppearance: 'dayAndTime',
-        },
-      },
-    },
-    {
-      name: 'duration',
-      type: 'number',
-      required: true,
-      label: 'Czas trwania (w godzinach)',
-      admin: {
-        description: 'Przewidywana liczba godzin wolontariatu',
-      },
-    },
-    {
-      name: 'minAge',
-      type: 'number',
-      min: 13,
-      defaultValue: 13,
-      required: true,
-      label: 'Minimalny wiek',
-      admin: {
-        description: 'Minimalny wiek uczestnika',
-      },
-    },
-    {
-      name: 'maxVolunteers',
-      type: 'number',
-      label: 'Maksymalna liczba wolontariuszy',
-      admin: {
-        description: 'Maksymalna liczba wolontariuszy (opcjonalne)',
-      },
-    },
-    {
-      name: 'requirements',
-      type: 'textarea',
-      label: 'Wymagania',
-      admin: {
-        description: 'Wymagania dla wolontariuszy',
-      },
-    },
-    {
-      name: 'additionalInfo',
-      type: 'textarea',
-      label: 'Dodatkowe informacje',
-      admin: {
-        description: 'Dodatkowe informacje o wydarzeniu (opcjonalne)',
-      },
     },
     {
       name: 'status',
@@ -203,14 +244,22 @@ export const Events: CollectionConfig = {
         { label: 'Zakończone', value: 'completed' },
         { label: 'Anulowane', value: 'cancelled' },
       ],
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
-      name: 'image',
+      name: 'organization',
       type: 'relationship',
-      relationTo: 'media',
-      label: 'Zdjęcie',
+      relationTo: 'admins',
+      required: true,
+      filterOptions: {
+        role: { equals: 'organization' },
+      },
+      label: 'Organizacja',
       admin: {
-        description: 'Główne zdjęcie wydarzenia',
+        position: 'sidebar',
+        description: 'Organizacja odpowiedzialna za wydarzenie',
       },
     },
     {
@@ -219,85 +268,17 @@ export const Events: CollectionConfig = {
       relationTo: 'admins',
       label: 'Utworzone przez',
       admin: {
+        position: 'sidebar',
         readOnly: true,
         description: 'Użytkownik który stworzył wydarzenie',
       },
     },
   ],
   access: {
-    // Organizations and coordinators can create events
-    create: ({ req: { user } }: { req: { user: any } }) => {
-      if (!user) return false
-      return ['organization', 'coordinator', 'superadmin'].includes(user.role)
-    },
-    // Published events are public, others only for owner and superadmin
-    read: ({ req: { user } }: { req: { user: any } }) => {
-      if (!user) {
-        // Public can see only published public events
-        return {
-          and: [{ status: { equals: 'published' } }, { eventType: { equals: 'public' } }],
-        }
-      }
-      if (user.role === 'superadmin') return true
-
-      if (user.role === 'volunteer') {
-        // Volunteers see published events based on their student status
-        const conditions: any = {
-          status: { equals: 'published' },
-        }
-
-        // If not a student, can only see public events
-        if (!user.isStudent) {
-          conditions.eventType = { equals: 'public' }
-        } else {
-          // Students can see:
-          // 1. All public events
-          // 2. School events for their school (or without targetSchool)
-          conditions.or = [
-            { eventType: { equals: 'public' } },
-            {
-              and: [
-                { eventType: { equals: 'school' } },
-                {
-                  or: [
-                    { targetSchool: { exists: false } },
-                    { targetSchool: { equals: null } },
-                    { targetSchool: { equals: user.school } },
-                  ],
-                },
-              ],
-            },
-          ]
-        }
-
-        return conditions
-      }
-
-      // Organization/coordinator can see their own events
-      return {
-        or: [
-          { status: { equals: 'published' } },
-          { createdBy: { equals: user.id } },
-          { organization: { equals: user.id } },
-        ],
-      }
-    },
-    // Only owner and superadmin can update
-    update: ({ req: { user } }: { req: { user: any } }) => {
-      if (!user) return false
-      if (user.role === 'superadmin') return true
-      return {
-        or: [{ createdBy: { equals: user.id } }, { organization: { equals: user.id } }],
-      }
-    },
-    // Only owner and superadmin can delete
-    delete: ({ req: { user } }: { req: { user: any } }) => {
-      if (!user) return false
-      if (user.role === 'superadmin') return true
-      return {
-        or: [{ createdBy: { equals: user.id } }, { organization: { equals: user.id } }],
-      }
-    },
+    create: () => true,
+    read: () => true,
+    update: () => true,
+    delete: () => true,
   },
   hooks: {
     beforeChange: [

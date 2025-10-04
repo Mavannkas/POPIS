@@ -15,34 +15,36 @@ export const Invitations: CollectionConfig = {
   },
   fields: [
     {
-      name: 'event',
-      type: 'relationship',
-      relationTo: 'events',
-      required: true,
-      label: 'Wydarzenie',
-      admin: {
-        description: 'Wydarzenie do którego zapraszamy',
-      },
+      type: 'row',
+      fields: [
+        {
+          name: 'event',
+          type: 'relationship',
+          relationTo: 'events',
+          required: true,
+          label: 'Wydarzenie',
+          admin: {
+            description: 'Wydarzenie do którego zapraszamy',
+          },
+        },
+        {
+          name: 'volunteer',
+          type: 'relationship',
+          relationTo: 'users',
+          required: true,
+          label: 'Wolontariusz',
+          admin: {
+            description: 'Zaproszony wolontariusz',
+          },
+        },
+      ],
     },
     {
-      name: 'volunteer',
-      type: 'relationship',
-      relationTo: 'users',
-      required: true,
-      label: 'Wolontariusz',
+      name: 'message',
+      type: 'textarea',
+      label: 'Wiadomość',
       admin: {
-        description: 'Zaproszony wolontariusz',
-      },
-    },
-    {
-      name: 'invitedBy',
-      type: 'relationship',
-      relationTo: 'admins',
-      required: true,
-      label: 'Zaproszony przez',
-      admin: {
-        description: 'Kto wysłał zaproszenie (organizacja lub koordynator)',
-        readOnly: true,
+        description: 'Wiadomość dla wolontariusza (opcjonalne)',
       },
     },
     {
@@ -56,13 +58,20 @@ export const Invitations: CollectionConfig = {
         { label: 'Zaakceptowane', value: 'accepted' },
         { label: 'Odrzucone', value: 'declined' },
       ],
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
-      name: 'message',
-      type: 'textarea',
-      label: 'Wiadomość',
+      name: 'invitedBy',
+      type: 'relationship',
+      relationTo: 'admins',
+      required: true,
+      label: 'Zaproszony przez',
       admin: {
-        description: 'Wiadomość dla wolontariusza (opcjonalne)',
+        position: 'sidebar',
+        description: 'Kto wysłał zaproszenie (organizacja lub koordynator)',
+        readOnly: true,
       },
     },
     {
@@ -71,6 +80,7 @@ export const Invitations: CollectionConfig = {
       required: true,
       label: 'Data zaproszenia',
       admin: {
+        position: 'sidebar',
         readOnly: true,
         description: 'Data wysłania zaproszenia',
       },
@@ -80,59 +90,17 @@ export const Invitations: CollectionConfig = {
       type: 'date',
       label: 'Data odpowiedzi',
       admin: {
+        position: 'sidebar',
         readOnly: true,
         description: 'Data odpowiedzi na zaproszenie',
       },
     },
   ],
   access: {
-    // Organizations and coordinators can create invitations
-    create: ({ req: { user } }) => {
-      if (!user) return false
-      return ['organization', 'coordinator', 'superadmin'].includes(user.role)
-    },
-    // Volunteers see their own, organizations/coordinators see invitations they sent
-    read: ({ req: { user } }) => {
-      if (!user) return false
-      if (user.role === 'superadmin') return true
-
-      if (user.role === 'volunteer') {
-        return {
-          volunteer: { equals: user.id },
-        }
-      }
-
-      if (user.role === 'organization' || user.role === 'coordinator') {
-        return {
-          invitedBy: { equals: user.id },
-        }
-      }
-
-      return false
-    },
-    // Only volunteers can update (respond to) invitations
-    update: ({ req: { user } }) => {
-      if (!user) return false
-      if (user.role === 'superadmin') return true
-
-      if (user.role === 'volunteer') {
-        return {
-          volunteer: { equals: user.id },
-          status: { equals: 'pending' }, // Can only respond to pending invitations
-        }
-      }
-
-      return false
-    },
-    // Only creator and superadmin can delete
-    delete: ({ req: { user } }) => {
-      if (!user) return false
-      if (user.role === 'superadmin') return true
-
-      return {
-        invitedBy: { equals: user.id },
-      }
-    },
+    create: () => true,
+    read: () => true,
+    update: () => true,
+    delete: () => true,
   },
   hooks: {
     beforeChange: [

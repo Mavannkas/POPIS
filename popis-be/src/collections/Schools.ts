@@ -13,16 +13,6 @@ export const Schools: CollectionConfig = {
   },
   fields: [
     {
-      name: 'externalId',
-      type: 'text',
-      required: true,
-      unique: true,
-      label: 'ID zewnętrzne',
-      admin: {
-        description: 'ID szkoły z zewnętrznego API (np. RSPO)',
-      },
-    },
-    {
       name: 'name',
       type: 'text',
       required: true,
@@ -40,21 +30,26 @@ export const Schools: CollectionConfig = {
       },
     },
     {
-      name: 'city',
-      type: 'text',
-      required: true,
-      label: 'Miasto',
-      admin: {
-        description: 'Miasto',
-      },
-    },
-    {
-      name: 'postalCode',
-      type: 'text',
-      label: 'Kod pocztowy',
-      admin: {
-        description: 'Kod pocztowy',
-      },
+      type: 'row',
+      fields: [
+        {
+          name: 'city',
+          type: 'text',
+          required: true,
+          label: 'Miasto',
+          admin: {
+            description: 'Miasto',
+          },
+        },
+        {
+          name: 'postalCode',
+          type: 'text',
+          label: 'Kod pocztowy',
+          admin: {
+            description: 'Kod pocztowy',
+          },
+        },
+      ],
     },
     {
       name: 'type',
@@ -67,20 +62,27 @@ export const Schools: CollectionConfig = {
         { label: 'Inna', value: 'other' },
       ],
       admin: {
+        position: 'sidebar',
         description: 'Typ szkoły',
+      },
+    },
+    {
+      name: 'externalId',
+      type: 'text',
+      required: true,
+      unique: true,
+      label: 'ID zewnętrzne',
+      admin: {
+        position: 'sidebar',
+        description: 'ID szkoły z zewnętrznego API (np. RSPO)',
       },
     },
   ],
   access: {
-    // Anyone authenticated can read schools
-    create: () => true, // Backend API will create schools
-    read: () => true, // Public read access
-    update: ({ req: { user } }) => {
-      return user?.role === 'superadmin'
-    },
-    delete: ({ req: { user } }) => {
-      return user?.role === 'superadmin'
-    },
+    create: () => true,
+    read: () => true,
+    update: () => true,
+    delete: () => true,
   },
 }
 
