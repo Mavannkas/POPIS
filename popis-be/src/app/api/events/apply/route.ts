@@ -32,6 +32,14 @@ export const POST = async (request: NextRequest) => {
         { status: 400 }
       )
     }
+
+    // Require application message (why the user should be selected)
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return Response.json(
+        { success: false, error: 'Application message is required' },
+        { status: 400 }
+      )
+    }
     
     // Check if event exists and is published
     const event = await payload.findByID({
@@ -104,7 +112,7 @@ export const POST = async (request: NextRequest) => {
       data: {
         event: eventId,
         volunteer: user.id,
-        message: message || '',
+        message: message.trim(),
         status: 'pending',
       },
     })

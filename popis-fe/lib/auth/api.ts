@@ -36,10 +36,35 @@ export async function me(): Promise<AuthUser | null> {
 			email: 'user@example.com',
 		};
 	}
-	return apiFetch<AuthUser | null>('/api/users/me', { method: 'GET' });
+  return apiFetch<AuthUser | null>('/api/users/me', { method: 'GET', credentials: 'include' });
 }
 
 export async function signOut(): Promise<void> {
 	if (!API_URL) return; // nothing to do in stub
-	await apiFetch<void>('/api/users/logout', { method: 'POST' });
+  await apiFetch<void>('/api/users/logout', { method: 'POST', credentials: 'include' });
+}
+
+export type UpdateMePayload = {
+  firstName?: string;
+  lastName?: string;
+  isStudent?: boolean;
+  school?: string | null;
+};
+
+export async function updateMe(payload: UpdateMePayload): Promise<AuthUser> {
+  if (!API_URL) {
+    await wait(200);
+    return {
+      id: 'stub_user',
+      email: 'user@example.com',
+      ...payload,
+    } as AuthUser;
+  }
+  // Update current user via Payload REST
+  const updated = await apiFetch<{ doc: AuthUser }>(`/api/users/me`, {
+    method: 'PATCH',
+    credentials: 'include',
+    json: payload,
+  });
+  return (updated as any).doc || (updated as any);
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl } from 'react-native';
 import { TopBar } from '@/components/ui/top-bar';
 import { Card, Chip } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -8,20 +8,29 @@ import { getCategoryEmoji, getCategoryLabel, getMyApplications, type Application
 export default function CalendarScreen() {
 	const [applications, setApplications] = useState<Application[]>([]);
 	const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+	const loadData = async () => {
+		try {
+			setLoading(true);
+			const res = await getMyApplications();
+			setApplications(res.applications || []);
+		} catch (e) {
+			console.error('Failed to load my applications', e);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	useEffect(() => {
-		(async () => {
-			try {
-				setLoading(true);
-				const res = await getMyApplications();
-				setApplications(res.applications || []);
-			} catch (e) {
-				console.error('Failed to load my applications', e);
-			} finally {
-				setLoading(false);
-			}
-		})();
+		loadData();
 	}, []);
+
+	const onRefresh = async () => {
+		setRefreshing(true);
+		await loadData();
+		setRefreshing(false);
+	};
 
 	const groupedByMonth = useMemo(() => {
 		const map = new Map<string, { label: string; items: { app: Application; event: Event }[] }>();
@@ -66,7 +75,7 @@ export default function CalendarScreen() {
 		<View className="flex-1 bg-white">
 			<TopBar showSearch={true} />
 			
-			<ScrollView className="flex-1 px-4 py-4">
+			<ScrollView className="flex-1 px-4 py-4" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				{loading && (
 					<View className="flex-row items-center mb-4">
 						<ActivityIndicator />

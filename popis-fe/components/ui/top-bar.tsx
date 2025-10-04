@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Modal, Pressable, Animated } from 'react-
 import { IconSymbol } from './icon-symbol';
 import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
+import { Linking } from 'react-native';
 import { useAuth } from '@/lib/auth/context';
 
 interface TopBarProps {
@@ -11,7 +12,7 @@ interface TopBarProps {
 
 export function TopBar({ showSearch = true }: TopBarProps) {
 	const colors = Colors;
-	const { signOut } = useAuth();
+	const { signOut, user } = useAuth();
 	const [profileSidebarVisible, setProfileSidebarVisible] = useState(false);
 	const slideAnim = useRef(new Animated.Value(-320)).current; // Start off-screen to the left
 
@@ -61,20 +62,22 @@ export function TopBar({ showSearch = true }: TopBarProps) {
 		router.replace('/auth/login');
 	};
 
-	const handleAccountPress = () => {
+const handleAccountPress = () => {
 		closeSidebar();
-		// TODO: Navigate to account page when created
-		console.log('Navigate to account page');
+	router.push('/account' as any);
 	};
 
 	return (
 		<>
 			<View className="bg-white px-4 pt-16 pb-4 shadow-sm">
 				<View className="flex-row items-center justify-between mb-4">
-					{/* Logo/Brand */}
+					{/* Profile button with initials */}
 					<TouchableOpacity onPress={handleProfilePress} className="flex-row items-center">
 						<View className="w-8 h-8 bg-primary rounded-full items-center justify-center">
-							<Text className="text-white font-bold text-lg">P</Text>
+							<Text className="text-white font-bold text-lg">
+								{/* Initials */}
+								{(((user?.firstName?.[0] || '') + (user?.lastName?.[0] || '')).toUpperCase() || 'U')}
+							</Text>
 						</View>
 					</TouchableOpacity>
 
@@ -111,13 +114,15 @@ export function TopBar({ showSearch = true }: TopBarProps) {
 							{/* Header */}
 							<View className="pt-16 pb-6 px-6 border-b border-gray-200">
 								<View className="flex-row items-center mb-4">
-									<View className="w-12 h-12 bg-primary rounded-full items-center justify-center mr-4">
-										<Text className="text-white font-bold text-xl">P</Text>
-									</View>
-									<View>
-										<Text className="text-lg font-semibold text-gray-900">Profil użytkownika</Text>
-										<Text className="text-sm text-gray-500">Zarządzaj swoim kontem</Text>
-									</View>
+								<View className="w-12 h-12 bg-primary rounded-full items-center justify-center mr-4">
+									<Text className="text-white font-bold text-xl">
+									{(((user?.firstName?.[0] || '') + (user?.lastName?.[0] || '')).toUpperCase() || 'U')}
+									</Text>
+								</View>
+								<View>
+									<Text className="text-lg font-semibold text-gray-900">{(`${user?.firstName || ''} ${user?.lastName || ''}`).trim() || user?.email || 'Użytkownik'}</Text>
+									<Text className="text-sm text-gray-500">Zarządzaj swoim kontem</Text>
+								</View>
 								</View>
 							</View>
 
@@ -130,37 +135,16 @@ export function TopBar({ showSearch = true }: TopBarProps) {
 									<Text className="ml-4 text-base text-gray-900">Ustawienia konta</Text>
 								</TouchableOpacity>
 
-								<TouchableOpacity
-									onPress={() => {
-										closeSidebar();
-										router.push('/notifications' as any);
-									}}
-									className="flex-row items-center px-6 py-4 hover:bg-gray-50">
-									<IconSymbol name="bell" size={24} color={colors.icon} />
-									<Text className="ml-4 text-base text-gray-900">Powiadomienia</Text>
-								</TouchableOpacity>
-
-								<TouchableOpacity
-									onPress={() => {
-										closeSidebar();
-										// TODO: Navigate to help page
-										console.log('Navigate to help');
-									}}
-									className="flex-row items-center px-6 py-4 hover:bg-gray-50">
-									<IconSymbol name="questionmark.circle" size={24} color={colors.icon} />
-									<Text className="ml-4 text-base text-gray-900">Pomoc i wsparcie</Text>
-								</TouchableOpacity>
-
-								<TouchableOpacity
-									onPress={() => {
-										closeSidebar();
-										// TODO: Navigate to settings
-										console.log('Navigate to settings');
-									}}
-									className="flex-row items-center px-6 py-4 hover:bg-gray-50">
-									<IconSymbol name="gearshape" size={24} color={colors.icon} />
-									<Text className="ml-4 text-base text-gray-900">Ustawienia aplikacji</Text>
-								</TouchableOpacity>
+							{/* Help opens mailto */}
+							<TouchableOpacity
+								onPress={() => {
+									closeSidebar();
+									Linking.openURL('mailto:support@popis.app');
+								}}
+								className="flex-row items-center px-6 py-4 hover:bg-gray-50">
+								<IconSymbol name="questionmark.circle" size={24} color={colors.icon} />
+								<Text className="ml-4 text-base text-gray-900">Pomoc i wsparcie</Text>
+							</TouchableOpacity>
 							</View>
 
 							{/* Logout Button */}
