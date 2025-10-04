@@ -24,8 +24,10 @@ export function TopBar({ showSearch = true }: TopBarProps) {
     router.push("/search" as any);
   };
 
-  const handleProfilePress = () => {
-    signOut();
+  const handleProfilePress = async () => {
+    console.log("Profile pressed, signing out...");
+    await signOut();
+    router.replace("/auth/login");
   };
 
   return (
