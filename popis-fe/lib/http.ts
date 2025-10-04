@@ -9,6 +9,7 @@ export async function apiFetch<T>(path: string, options: HttpOptions = {}): Prom
 	};
 
 	const response = await fetch(`${API_URL}${path}`.replace(/\/$/, ''), {
+		credentials: 'include', // Include cookies for authentication
 		...options,
 		headers,
 		body: options.json !== undefined ? JSON.stringify(options.json) : options.body,

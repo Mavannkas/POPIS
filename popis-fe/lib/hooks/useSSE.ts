@@ -22,7 +22,7 @@ export function useSSE(endpoint: string, options: UseSSEOptions = {}) {
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 5;
 
@@ -46,6 +46,7 @@ export function useSSE(endpoint: string, options: UseSSEOptions = {}) {
                 'Accept': 'text/event-stream',
                 'Cache-Control': 'no-cache',
               },
+              credentials: 'include', // Include cookies for authentication
             });
 
             if (!response.ok) {
