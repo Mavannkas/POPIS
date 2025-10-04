@@ -5,6 +5,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Stack } from 'expo-router';
 
 export default function SearchScreen() {
   const colorScheme = useColorScheme();
@@ -74,46 +75,43 @@ export default function SearchScreen() {
   });
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="bg-white px-4 pt-12 pb-4 shadow-sm">
-        <View className="flex-row items-center justify-between mb-4">
-          <TouchableOpacity 
-            onPress={() => router.back()}
-            className="p-2"
-          >
-            <IconSymbol 
-              name="chevron.left" 
-              size={24} 
-              color={colors.primary} 
-            />
-          </TouchableOpacity>
-          
-          <Text className="text-xl font-bold text-gray-800">
-            Szukaj wydarzeń
-          </Text>
-          
-          <TouchableOpacity onPress={clearFilters} className="p-2">
-            <Text className="text-primary font-medium">Wyczyść</Text>
-          </TouchableOpacity>
-        </View>
-
+    <>
+      <Stack.Screen
+        options={{
+          title: 'Szukaj wydarzeń',
+          headerStyle: {
+            backgroundColor: 'white',
+          },
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: '',
+          headerRight: () => (
+            <TouchableOpacity onPress={clearFilters} className="p-2">
+              <Text className="text-primary font-medium">Wyczyść</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <View className="flex-1 bg-white">
         {/* Search Bar */}
-        <Searchbar
-          placeholder="Szukaj wydarzeń..."
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          style={{
-            backgroundColor: '#F5F5F5',
-            elevation: 0,
-            borderRadius: 25,
-          }}
-          inputStyle={{
-            fontSize: 16,
-          }}
-          iconColor={colors.primary}
-        />
-      </View>
+        <View className="px-4 py-4 bg-white shadow-sm">
+          <Searchbar
+            placeholder="Szukaj wydarzeń..."
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={{
+              backgroundColor: '#F5F5F5',
+              elevation: 0,
+              borderRadius: 25,
+            }}
+            inputStyle={{
+              fontSize: 16,
+            }}
+            iconColor={colors.primary}
+          />
+        </View>
 
       <ScrollView className="flex-1 px-4 py-4">
         {/* Filters Section */}
@@ -220,5 +218,6 @@ export default function SearchScreen() {
         <View className="h-20" />
       </ScrollView>
     </View>
+    </>
   );
 }

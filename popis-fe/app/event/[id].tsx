@@ -5,6 +5,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Stack } from 'expo-router';
 
 export default function EventDetailScreen() {
   const colorScheme = useColorScheme();
@@ -51,34 +52,30 @@ export default function EventDetailScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="bg-white px-4 pt-12 pb-4 shadow-sm relative z-10">
-        <View className="flex-row items-center justify-between">
-          <TouchableOpacity 
-            onPress={() => router.back()}
-            className="p-2"
-          >
-            <IconSymbol 
-              name="chevron.left" 
-              size={24} 
-              color={colors.primary} 
-            />
-          </TouchableOpacity>
-          
-          <Text className="text-xl font-bold text-gray-800 flex-1 text-center">
-            Szczegóły wydarzenia
-          </Text>
-          
-          <TouchableOpacity onPress={handleShareEvent} className="p-2">
-            <IconSymbol 
-              name="square.and.arrow.up" 
-              size={24} 
-              color={colors.primary} 
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
+    <>
+      <Stack.Screen
+        options={{
+          title: 'Szczegóły wydarzenia',
+          headerStyle: {
+            backgroundColor: 'white',
+          },
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: '',
+          headerRight: () => (
+            <TouchableOpacity onPress={handleShareEvent} className="p-2">
+              <IconSymbol
+                name="square.and.arrow.up"
+                size={24}
+                color={colors.primary}
+              />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <View className="flex-1 bg-white">
 
       <ScrollView className="flex-1">
         {/* Event Image */}
@@ -231,5 +228,6 @@ export default function EventDetailScreen() {
         </Button>
       </View>
     </View>
+    </>
   );
 }

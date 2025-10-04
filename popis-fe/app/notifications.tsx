@@ -5,6 +5,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Stack } from 'expo-router';
 
 export default function NotificationsScreen() {
   const colorScheme = useColorScheme();
@@ -67,34 +68,30 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="bg-white px-4 pt-12 pb-4 shadow-sm">
-        <View className="flex-row items-center justify-between">
-          <TouchableOpacity 
-            onPress={() => router.back()}
-            className="p-2"
-          >
-            <IconSymbol 
-              name="chevron.left" 
-              size={24} 
-              color={colors.primary} 
-            />
-          </TouchableOpacity>
-          
-          <Text className="text-xl font-bold text-gray-800">
-            Powiadomienia
-          </Text>
-          
-          <TouchableOpacity className="p-2">
-            <IconSymbol 
-              name="checkmark.circle" 
-              size={24} 
-              color={colors.primary} 
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
+    <>
+      <Stack.Screen
+        options={{
+          title: 'Powiadomienia',
+          headerStyle: {
+            backgroundColor: 'white',
+          },
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerBackTitle: '',
+          headerRight: () => (
+            <TouchableOpacity className="p-2">
+              <IconSymbol
+                name="checkmark.circle"
+                size={24}
+                color={colors.primary}
+              />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <View className="flex-1 bg-white">
 
       <ScrollView className="flex-1 px-4 py-4">
         {mockNotifications.map((notification) => (
@@ -160,5 +157,6 @@ export default function NotificationsScreen() {
         <View className="h-20" />
       </ScrollView>
     </View>
+    </>
   );
 }
