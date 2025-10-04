@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { Image, ScrollView, View, TouchableOpacity } from 'react-native';
+import { Image, View, TouchableOpacity } from 'react-native';
 import { Button, Checkbox, Switch, Text, TextInput, ActivityIndicator } from 'react-native-paper';
 import { useAuth } from '@/lib/auth/context';
 import { Colors } from '@/constants/theme';
 import { getSchools, type School } from '@/lib/schools';
+import { KeyboardAwareScrollView, Input } from '@/components/ui';
 
 export default function RegisterScreen() {
   const { signUp } = useAuth();
@@ -55,7 +56,10 @@ export default function RegisterScreen() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: 'white' }} contentContainerStyle={{ paddingLeft: 16, paddingRight: 16 }}>
+    <KeyboardAwareScrollView
+      style={{ flex: 1, backgroundColor: 'white' }}
+      contentContainerStyle={{ paddingLeft: 16, paddingRight: 16 }}
+    >
       <View style={{ alignItems: 'center' }}>
         <Image source={require('@/assets/images/icon.png')} style={{ width: 200, objectFit: 'contain' }} />
       </View>
@@ -63,11 +67,54 @@ export default function RegisterScreen() {
       <Text style={{ textAlign: 'center', fontSize: 24, marginBottom: 12, color: 'black' }}>Zarejestruj się</Text>
       <View style={{ height: 1, backgroundColor: '#E5E5E5', marginHorizontal: 40, marginBottom: 32 }} />
 
-      <TextInput label="Adres e-mail" value={email} onChangeText={setEmail} mode="outlined" autoCapitalize="none" keyboardType="email-address" style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Hasło" value={password} onChangeText={setPassword} mode="outlined" secureTextEntry style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Imię" value={firstName} onChangeText={setFirstName} mode="outlined" style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Nazwisko" value={lastName} onChangeText={setLastName} mode="outlined" style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Data urodzin" value={birthDate} onChangeText={setBirthDate} mode="outlined" placeholder="MM/DD/YYYY" style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <View style={{ marginBottom: 16 }}>
+        <Input
+          label="Adres e-mail"
+          value={email}
+          onChangeText={setEmail}
+          variant="outlined"
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+      </View>
+      
+      <View style={{ marginBottom: 16 }}>
+        <Input
+          label="Hasło"
+          value={password}
+          onChangeText={setPassword}
+          variant="outlined"
+          secureTextEntry
+        />
+      </View>
+      
+      <View style={{ marginBottom: 16 }}>
+        <Input
+          label="Imię"
+          value={firstName}
+          onChangeText={setFirstName}
+          variant="outlined"
+        />
+      </View>
+      
+      <View style={{ marginBottom: 16 }}>
+        <Input
+          label="Nazwisko"
+          value={lastName}
+          onChangeText={setLastName}
+          variant="outlined"
+        />
+      </View>
+      
+      <View style={{ marginBottom: 16 }}>
+        <Input
+          label="Data urodzin"
+          value={birthDate}
+          onChangeText={setBirthDate}
+          variant="outlined"
+          placeholder="MM/DD/YYYY"
+        />
+      </View>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, marginTop: 8 }}>
         <Text style={{ color: 'black', fontSize: 16 }}>Jestem studentem</Text>
@@ -185,6 +232,6 @@ export default function RegisterScreen() {
         ZALOGUJ SIĘ
       </Button>
 
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }

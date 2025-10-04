@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Card, Button, Chip } from 'react-native-paper';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { CategoryIcon } from '@/components/ui/category-icon';
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
+import { TextArea } from '@/components/ui/textarea';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -54,8 +56,7 @@ export default function EventDetailScreen() {
 
   return (
     <View className="flex-1 bg-white">
-
-      <ScrollView className="flex-1">
+      <KeyboardAwareScrollView className="flex-1">
         {/* Event Image */}
         <View className="h-48 bg-gray-200">
           <Image 
@@ -186,25 +187,16 @@ export default function EventDetailScreen() {
 
           {/* Recommendation Textarea */}
           <View className="mb-8">
-            <Text className="text-lg font-semibold text-gray-800 mb-3">
-              Dlaczego powinieneś zostać wybrany?
-            </Text>
-            <Text className="text-gray-600 text-sm mb-3">
-              Opisz swoje doświadczenie, motywację lub powody, dla których chcesz uczestniczyć w tym wydarzeniu.
-            </Text>
-            <TextInput
-              style={styles.textArea}
-              multiline
-              numberOfLines={6}
+            <TextArea
+              label="Dlaczego powinieneś zostać wybrany?"
+              description="Opisz swoje doświadczenie, motywację lub powody, dla których chcesz uczestniczyć w tym wydarzeniu."
               value={recommendation}
               onChangeText={setRecommendation}
               placeholder="Napisz swoją rekomendację..."
-              placeholderTextColor="#999"
-              textAlignVertical="top"
             />
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Bottom Action Bar */}
       <View className="bg-white px-4 py-4 border-t border-gray-200">
@@ -242,16 +234,5 @@ const styles = StyleSheet.create({
   },
   iconEmoji: {
     fontSize: 18,
-  },
-  textArea: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#FAFAFA',
-    minHeight: 120,
-    maxHeight: 200,
   },
 });
