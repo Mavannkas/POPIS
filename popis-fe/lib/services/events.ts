@@ -32,6 +32,22 @@ export interface EventsResponse {
   page: number;
 }
 
+export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'completed';
+
+export interface Application {
+  id: string;
+  event: Event | string;
+  volunteer: any;
+  status: ApplicationStatus;
+  appliedAt?: string;
+}
+
+export interface MyApplicationsResponse {
+  success: boolean;
+  applications: Application[];
+  totalDocs: number;
+}
+
 export interface EventFilters {
   category?: string | string[];
   city?: string;
@@ -39,6 +55,7 @@ export interface EventFilters {
   search?: string;
   eventType?: 'public' | 'school';
   size?: ('small' | 'medium' | 'large')[] | 'small' | 'medium' | 'large';
+  limit?: number;
 }
 
 // Mock data for development - replace with real API later
@@ -164,6 +181,7 @@ export async function getAvailableEvents(filters?: EventFilters): Promise<Events
     const sizes = Array.isArray(filters.size) ? filters.size : [filters.size];
     sizes.forEach(s => params.append('size', s));
   }
+  if (filters?.limit) params.append('limit', String(filters.limit));
   const queryString = params.toString();
   const path = `/api/events/available${queryString ? `?${queryString}` : ''}`;
 
@@ -191,6 +209,43 @@ export async function getAvailableEvents(filters?: EventFilters): Promise<Events
   }
 
   return apiFetch<EventsResponse>(path);
+}
+
+export async function getEventById(id: string): Promise<Event | null> {
+  if (!id) return null;
+  if (!API_URL) {
+    // Stub mode: return from mock list
+    const found = MOCK_EVENTS.find(e => e.id === id);
+    // Fallback: sometimes ids are numeric in mock
+    return found || MOCK_EVENTS.find(e => e.id === String(id)) || null;
+  }
+  // Fetch a single event from Payload REST API (proxied under Next)
+  // Depth 2 to populate relationships like image/organization if needed
+  return apiFetch<Event>(`/api/events/${encodeURIComponent(id)}?depth=2`);
+}
+
+export async function getMyApplications(): Promise<MyApplicationsResponse> {
+  if (!API_URL) {
+    // Stub: take a subset of mock events as if applied
+    const apps: Application[] = [
+      {
+        id: 'a1',
+        event: MOCK_EVENTS[0],
+        volunteer: { id: 'stub_user' },
+        status: 'accepted',
+        appliedAt: new Date().toISOString(),
+      },
+      {
+        id: 'a2',
+        event: MOCK_EVENTS[2],
+        volunteer: { id: 'stub_user' },
+        status: 'pending',
+        appliedAt: new Date().toISOString(),
+      },
+    ];
+    return { success: true, applications: apps, totalDocs: apps.length };
+  }
+  return apiFetch<MyApplicationsResponse>(`/api/my/applications`, { method: 'GET', credentials: 'include' });
 }
 
 export function getCategoryLabel(category: string): string {
