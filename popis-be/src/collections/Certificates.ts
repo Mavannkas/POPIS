@@ -10,6 +10,10 @@ export const Certificates: CollectionConfig = {
       return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
     },
   },
+  labels: {
+    singular: 'Certyfikat',
+    plural: 'Certyfikaty',
+  },
   fields: [
     {
       name: 'application',
@@ -17,6 +21,7 @@ export const Certificates: CollectionConfig = {
       relationTo: 'applications',
       required: true,
       unique: true,
+      label: 'Zgłoszenie',
       admin: {
         description: 'Powiązane zgłoszenie',
       },
@@ -26,12 +31,14 @@ export const Certificates: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      label: 'Wolontariusz',
     },
     {
       name: 'event',
       type: 'relationship',
       relationTo: 'events',
       required: true,
+      label: 'Wydarzenie',
     },
     {
       name: 'organization',
@@ -40,6 +47,7 @@ export const Certificates: CollectionConfig = {
       filterOptions: {
         role: { equals: 'organization' },
       },
+      label: 'Organizacja',
       admin: {
         description: 'Wypełniane automatycznie z wydarzenia',
       },
@@ -48,6 +56,7 @@ export const Certificates: CollectionConfig = {
       name: 'hoursWorked',
       type: 'number',
       required: true,
+      label: 'Przepracowane godziny',
       admin: {
         description: 'Liczba przepracowanych godzin',
       },
@@ -56,6 +65,7 @@ export const Certificates: CollectionConfig = {
       name: 'issuedBy',
       type: 'relationship',
       relationTo: 'admins',
+      label: 'Wystawione przez',
       admin: {
         description: 'Kto wystawił zaświadczenie (organizacja lub koordynator)',
       },
@@ -67,6 +77,7 @@ export const Certificates: CollectionConfig = {
       filterOptions: {
         role: { equals: 'coordinator' },
       },
+      label: 'Zatwierdzone przez',
       admin: {
         description: 'Koordynator który zatwierdził (opcjonalne)',
       },
@@ -75,6 +86,7 @@ export const Certificates: CollectionConfig = {
       name: 'issueDate',
       type: 'date',
       required: true,
+      label: 'Data wystawienia',
       admin: {
         readOnly: true,
         description: 'Data wystawienia',
@@ -85,6 +97,7 @@ export const Certificates: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      label: 'Numer certyfikatu',
       admin: {
         readOnly: true,
         description: 'Unikalny numer zaświadczenia',
@@ -95,6 +108,7 @@ export const Certificates: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'pending',
+      label: 'Status',
       options: [
         { label: 'Oczekujące', value: 'pending' },
         { label: 'Wystawione', value: 'issued' },
@@ -103,6 +117,7 @@ export const Certificates: CollectionConfig = {
     {
       name: 'notes',
       type: 'textarea',
+      label: 'Notatki',
       admin: {
         description: 'Dodatkowe uwagi',
       },
@@ -178,4 +193,3 @@ export const Certificates: CollectionConfig = {
     ],
   },
 }
-

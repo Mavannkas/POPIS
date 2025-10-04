@@ -10,16 +10,22 @@ export const Events: CollectionConfig = {
       return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
     },
   },
+  labels: {
+    singular: 'Wydarzenie',
+    plural: 'Wydarzenia',
+  },
   fields: [
     {
       name: 'title',
       type: 'text',
       required: true,
+      label: 'Tytuł',
     },
     {
       name: 'description',
       type: 'richText',
       required: true,
+      label: 'Opis',
     },
     {
       name: 'organization',
@@ -29,6 +35,7 @@ export const Events: CollectionConfig = {
       filterOptions: {
         role: { equals: 'organization' },
       },
+      label: 'Organizacja',
       admin: {
         description: 'Organizacja odpowiedzialna za wydarzenie',
       },
@@ -38,6 +45,7 @@ export const Events: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'public',
+      label: 'Typ wydarzenia',
       options: [
         { label: 'Wydarzenie publiczne', value: 'public' },
         { label: 'Wydarzenie szkolne', value: 'school' },
@@ -50,6 +58,7 @@ export const Events: CollectionConfig = {
       name: 'targetSchool',
       type: 'relationship',
       relationTo: 'schools',
+      label: 'Szkoła docelowa',
       admin: {
         description: 'Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)',
         condition: (data: any) => data.eventType === 'school',
@@ -59,6 +68,7 @@ export const Events: CollectionConfig = {
       name: 'category',
       type: 'select',
       required: true,
+      label: 'Kategoria',
       options: [
         { label: 'Edukacja', value: 'education' },
         { label: 'Środowisko', value: 'environment' },
@@ -74,6 +84,7 @@ export const Events: CollectionConfig = {
       name: 'size',
       type: 'select',
       required: true,
+      label: 'Rozmiar',
       options: [
         { label: 'Małe', value: 'small' },
         { label: 'Średnie', value: 'medium' },
@@ -83,20 +94,24 @@ export const Events: CollectionConfig = {
     {
       name: 'location',
       type: 'group',
+      label: 'Lokalizacja',
       fields: [
         {
           name: 'address',
           type: 'text',
           required: true,
+          label: 'Adres',
         },
         {
           name: 'city',
           type: 'text',
           required: true,
+          label: 'Miasto',
         },
         {
           name: 'lat',
           type: 'number',
+          label: 'Szerokość geograficzna',
           admin: {
             description: 'Szerokość geograficzna (dla mapy)',
           },
@@ -104,6 +119,7 @@ export const Events: CollectionConfig = {
         {
           name: 'lng',
           type: 'number',
+          label: 'Długość geograficzna',
           admin: {
             description: 'Długość geograficzna (dla mapy)',
           },
@@ -114,6 +130,7 @@ export const Events: CollectionConfig = {
       name: 'startDate',
       type: 'date',
       required: true,
+      label: 'Data rozpoczęcia',
       admin: {
         date: {
           pickerAppearance: 'dayAndTime',
@@ -123,6 +140,7 @@ export const Events: CollectionConfig = {
     {
       name: 'endDate',
       type: 'date',
+      label: 'Data zakończenia',
       admin: {
         date: {
           pickerAppearance: 'dayAndTime',
@@ -133,6 +151,7 @@ export const Events: CollectionConfig = {
       name: 'duration',
       type: 'number',
       required: true,
+      label: 'Czas trwania (w godzinach)',
       admin: {
         description: 'Przewidywana liczba godzin wolontariatu',
       },
@@ -143,6 +162,7 @@ export const Events: CollectionConfig = {
       min: 13,
       defaultValue: 13,
       required: true,
+      label: 'Minimalny wiek',
       admin: {
         description: 'Minimalny wiek uczestnika',
       },
@@ -150,6 +170,7 @@ export const Events: CollectionConfig = {
     {
       name: 'maxVolunteers',
       type: 'number',
+      label: 'Maksymalna liczba wolontariuszy',
       admin: {
         description: 'Maksymalna liczba wolontariuszy (opcjonalne)',
       },
@@ -157,6 +178,7 @@ export const Events: CollectionConfig = {
     {
       name: 'requirements',
       type: 'textarea',
+      label: 'Wymagania',
       admin: {
         description: 'Wymagania dla wolontariuszy',
       },
@@ -164,6 +186,7 @@ export const Events: CollectionConfig = {
     {
       name: 'additionalInfo',
       type: 'textarea',
+      label: 'Dodatkowe informacje',
       admin: {
         description: 'Dodatkowe informacje o wydarzeniu (opcjonalne)',
       },
@@ -173,6 +196,7 @@ export const Events: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'draft',
+      label: 'Status',
       options: [
         { label: 'Wersja robocza', value: 'draft' },
         { label: 'Opublikowane', value: 'published' },
@@ -184,6 +208,7 @@ export const Events: CollectionConfig = {
       name: 'image',
       type: 'relationship',
       relationTo: 'media',
+      label: 'Zdjęcie',
       admin: {
         description: 'Główne zdjęcie wydarzenia',
       },
@@ -192,6 +217,7 @@ export const Events: CollectionConfig = {
       name: 'createdBy',
       type: 'relationship',
       relationTo: 'admins',
+      label: 'Utworzone przez',
       admin: {
         readOnly: true,
         description: 'Użytkownik który stworzył wydarzenie',

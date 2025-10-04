@@ -6,6 +6,10 @@ export const Admins: CollectionConfig = {
     useAsTitle: 'email',
     defaultColumns: ['email', 'role', 'firstName', 'lastName', 'verified'],
   },
+  labels: {
+    singular: 'Administrator',
+    plural: 'Administratorzy',
+  },
   auth: true,
   fields: [
     // Role field - tylko organizatorzy i koordynatorzy
@@ -13,6 +17,7 @@ export const Admins: CollectionConfig = {
       name: 'role',
       type: 'select',
       required: true,
+      label: 'Rola',
       options: [
         { label: 'Organizacja', value: 'organization' },
         { label: 'Koordynator', value: 'coordinator' },
@@ -30,21 +35,25 @@ export const Admins: CollectionConfig = {
       name: 'firstName',
       type: 'text',
       required: true,
+      label: 'Imię',
     },
     {
       name: 'lastName',
       type: 'text',
       required: true,
+      label: 'Nazwisko',
     },
     {
       name: 'phone',
       type: 'text',
+      label: 'Telefon',
     },
     // Account verification
     {
       name: 'verified',
       type: 'checkbox',
       defaultValue: false,
+      label: 'Zweryfikowany',
       admin: {
         description: 'Konto zatwierdzone przez superadmina',
       },
@@ -58,6 +67,7 @@ export const Admins: CollectionConfig = {
     {
       name: 'organizationName',
       type: 'text',
+      label: 'Nazwa organizacji',
       admin: {
         condition: (data: any) => data.role === 'organization',
       },
@@ -65,6 +75,7 @@ export const Admins: CollectionConfig = {
     {
       name: 'organizationDescription',
       type: 'textarea',
+      label: 'Opis organizacji',
       admin: {
         condition: (data: any) => data.role === 'organization',
       },
@@ -72,6 +83,7 @@ export const Admins: CollectionConfig = {
     {
       name: 'nip',
       type: 'text',
+      label: 'NIP',
       admin: {
         condition: (data: any) => data.role === 'organization',
       },
@@ -79,6 +91,7 @@ export const Admins: CollectionConfig = {
     {
       name: 'address',
       type: 'group',
+      label: 'Adres',
       admin: {
         condition: (data: any) => data.role === 'organization',
       },
@@ -86,14 +99,17 @@ export const Admins: CollectionConfig = {
         {
           name: 'street',
           type: 'text',
+          label: 'Ulica',
         },
         {
           name: 'city',
           type: 'text',
+          label: 'Miasto',
         },
         {
           name: 'postalCode',
           type: 'text',
+          label: 'Kod pocztowy',
         },
       ],
     },
@@ -101,6 +117,7 @@ export const Admins: CollectionConfig = {
     {
       name: 'schoolName',
       type: 'text',
+      label: 'Nazwa szkoły',
       admin: {
         condition: (data: any) => data.role === 'coordinator',
       },
@@ -108,6 +125,7 @@ export const Admins: CollectionConfig = {
     {
       name: 'schoolAddress',
       type: 'text',
+      label: 'Adres szkoły',
       admin: {
         condition: (data: any) => data.role === 'coordinator',
       },
@@ -116,6 +134,7 @@ export const Admins: CollectionConfig = {
     {
       name: 'streamUserId',
       type: 'text',
+      label: 'ID użytkownika Stream',
       admin: {
         description: 'Stream Chat user ID (auto-generated)',
         readOnly: true,
@@ -152,7 +171,10 @@ export const Admins: CollectionConfig = {
     beforeChange: [
       ({ data, req, operation }: { data: any; req: any; operation: string }) => {
         // Set verified to false for new organizations and coordinators
-        if (operation === 'create' && (data.role === 'organization' || data.role === 'coordinator')) {
+        if (
+          operation === 'create' &&
+          (data.role === 'organization' || data.role === 'coordinator')
+        ) {
           data.verified = false
         }
 

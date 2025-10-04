@@ -10,24 +10,31 @@ export const Applications: CollectionConfig = {
       return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
     },
   },
+  labels: {
+    singular: 'Aplikacja',
+    plural: 'Aplikacje',
+  },
   fields: [
     {
       name: 'event',
       type: 'relationship',
       relationTo: 'events',
       required: true,
+      label: 'Wydarzenie',
     },
     {
       name: 'volunteer',
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      label: 'Wolontariusz',
     },
     {
       name: 'status',
       type: 'select',
       required: true,
       defaultValue: 'pending',
+      label: 'Status',
       options: [
         { label: 'Oczekujące', value: 'pending' },
         { label: 'Zaakceptowane', value: 'accepted' },
@@ -38,6 +45,7 @@ export const Applications: CollectionConfig = {
     {
       name: 'message',
       type: 'textarea',
+      label: 'Wiadomość',
       admin: {
         description: 'Wiadomość od wolontariusza',
       },
@@ -45,6 +53,7 @@ export const Applications: CollectionConfig = {
     {
       name: 'hoursWorked',
       type: 'number',
+      label: 'Przepracowane godziny',
       admin: {
         description: 'Liczba przepracowanych godzin (wypełnia organizacja)',
       },
@@ -52,6 +61,7 @@ export const Applications: CollectionConfig = {
     {
       name: 'organizationNotes',
       type: 'textarea',
+      label: 'Notatki organizacji',
       admin: {
         description: 'Notatki organizacji (widoczne tylko dla organizacji i superadmina)',
       },
@@ -59,6 +69,7 @@ export const Applications: CollectionConfig = {
     {
       name: 'appliedAt',
       type: 'date',
+      label: 'Data zgłoszenia',
       admin: {
         readOnly: true,
       },
@@ -66,6 +77,7 @@ export const Applications: CollectionConfig = {
     {
       name: 'completedAt',
       type: 'date',
+      label: 'Data ukończenia',
       admin: {
         description: 'Data ukończenia wolontariatu',
       },
@@ -73,6 +85,7 @@ export const Applications: CollectionConfig = {
     {
       name: 'chatChannelId',
       type: 'text',
+      label: 'ID kanału czatu',
       admin: {
         description: 'Stream Chat channel ID (auto-generated po akceptacji)',
         readOnly: true,

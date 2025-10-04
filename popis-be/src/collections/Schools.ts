@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload'
 
 export const Schools: CollectionConfig = {
   slug: 'schools',
+  labels: {
+    singular: 'Szkoła',
+    plural: 'Szkoły',
+  },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'city', 'type'],
@@ -13,6 +17,7 @@ export const Schools: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      label: 'ID zewnętrzne',
       admin: {
         description: 'ID szkoły z zewnętrznego API (np. RSPO)',
       },
@@ -21,6 +26,7 @@ export const Schools: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+      label: 'Nazwa',
       admin: {
         description: 'Nazwa szkoły',
       },
@@ -28,6 +34,7 @@ export const Schools: CollectionConfig = {
     {
       name: 'address',
       type: 'text',
+      label: 'Adres',
       admin: {
         description: 'Adres szkoły',
       },
@@ -36,6 +43,7 @@ export const Schools: CollectionConfig = {
       name: 'city',
       type: 'text',
       required: true,
+      label: 'Miasto',
       admin: {
         description: 'Miasto',
       },
@@ -43,6 +51,7 @@ export const Schools: CollectionConfig = {
     {
       name: 'postalCode',
       type: 'text',
+      label: 'Kod pocztowy',
       admin: {
         description: 'Kod pocztowy',
       },
@@ -50,6 +59,7 @@ export const Schools: CollectionConfig = {
     {
       name: 'type',
       type: 'select',
+      label: 'Typ szkoły',
       options: [
         { label: 'Liceum Ogólnokształcące', value: 'liceum' },
         { label: 'Technikum', value: 'technikum' },

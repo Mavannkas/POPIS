@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload'
 
 export const Users: CollectionConfig = {
   slug: 'users',
+  labels: {
+    singular: 'Wolontariusz',
+    plural: 'Wolontariusze',
+  },
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['email', 'role', 'firstName', 'lastName', 'verified'],
@@ -18,20 +22,24 @@ export const Users: CollectionConfig = {
       name: 'firstName',
       type: 'text',
       required: true,
+      label: 'Imię',
     },
     {
       name: 'lastName',
       type: 'text',
       required: true,
+      label: 'Nazwisko',
     },
     {
       name: 'phone',
       type: 'text',
+      label: 'Telefon',
     },
     {
       name: 'birthDate',
       type: 'date',
       required: true,
+      label: 'Data urodzenia',
       admin: {
         description: 'Wymagane do określenia czy osoba jest małoletnia',
       },
@@ -40,6 +48,7 @@ export const Users: CollectionConfig = {
       name: 'isAgeIsVerified',
       type: 'checkbox',
       defaultValue: false,
+      label: 'Wiek zweryfikowany',
       admin: {
         description: 'Zatwierdzenie wieku',
         readOnly: true,
@@ -49,6 +58,7 @@ export const Users: CollectionConfig = {
       name: 'isMinor',
       type: 'checkbox',
       defaultValue: false,
+      label: 'Małoletni',
       admin: {
         description: 'Automatycznie wyliczane na podstawie daty urodzenia',
         readOnly: true,
@@ -58,6 +68,7 @@ export const Users: CollectionConfig = {
       name: 'isAdult',
       type: 'checkbox',
       defaultValue: false,
+      label: 'Pełnoletni',
       admin: {
         description: 'Automatycznie wyliczane - czy osoba jest pełnoletnia (>= 18 lat)',
         readOnly: true,
@@ -68,6 +79,7 @@ export const Users: CollectionConfig = {
       name: 'isStudent',
       type: 'checkbox',
       defaultValue: false,
+      label: 'Uczeń',
       admin: {
         description: 'Czy użytkownik jest uczniem szkoły',
       },
@@ -76,6 +88,7 @@ export const Users: CollectionConfig = {
       name: 'school',
       type: 'relationship',
       relationTo: 'schools',
+      label: 'Szkoła',
       admin: {
         description: 'Szkoła ucznia (wymagane jeśli isStudent=true)',
         condition: (data: any) => data.isStudent === true,
@@ -87,6 +100,7 @@ export const Users: CollectionConfig = {
     {
       name: 'streamUserId',
       type: 'text',
+      label: 'ID użytkownika Stream',
       admin: {
         description: 'Stream Chat user ID (auto-generated)',
         readOnly: true,

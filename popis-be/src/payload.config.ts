@@ -6,6 +6,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { pl } from '@payloadcms/translations/languages/pl'
 
 import { Users } from './collections/Users'
 import { Admins } from './collections/Admins'
@@ -34,6 +35,12 @@ export default buildConfig({
     theme: 'light',
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+  },
+  i18n: {
+    fallbackLanguage: 'pl',
+    supportedLanguages: {
+      pl,
     },
   },
   collections: [Users, Admins, Media, Events, Applications, Certificates, Schools, Invitations],

@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload'
 
 export const Invitations: CollectionConfig = {
   slug: 'invitations',
+  labels: {
+    singular: 'Zaproszenie',
+    plural: 'Zaproszenia',
+  },
   admin: {
     useAsTitle: 'id',
     defaultColumns: ['event', 'volunteer', 'invitedBy', 'status', 'invitedAt'],
@@ -15,6 +19,7 @@ export const Invitations: CollectionConfig = {
       type: 'relationship',
       relationTo: 'events',
       required: true,
+      label: 'Wydarzenie',
       admin: {
         description: 'Wydarzenie do którego zapraszamy',
       },
@@ -24,6 +29,7 @@ export const Invitations: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      label: 'Wolontariusz',
       admin: {
         description: 'Zaproszony wolontariusz',
       },
@@ -33,6 +39,7 @@ export const Invitations: CollectionConfig = {
       type: 'relationship',
       relationTo: 'admins',
       required: true,
+      label: 'Zaproszony przez',
       admin: {
         description: 'Kto wysłał zaproszenie (organizacja lub koordynator)',
         readOnly: true,
@@ -43,6 +50,7 @@ export const Invitations: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'pending',
+      label: 'Status',
       options: [
         { label: 'Oczekujące', value: 'pending' },
         { label: 'Zaakceptowane', value: 'accepted' },
@@ -52,6 +60,7 @@ export const Invitations: CollectionConfig = {
     {
       name: 'message',
       type: 'textarea',
+      label: 'Wiadomość',
       admin: {
         description: 'Wiadomość dla wolontariusza (opcjonalne)',
       },
@@ -60,6 +69,7 @@ export const Invitations: CollectionConfig = {
       name: 'invitedAt',
       type: 'date',
       required: true,
+      label: 'Data zaproszenia',
       admin: {
         readOnly: true,
         description: 'Data wysłania zaproszenia',
@@ -68,6 +78,7 @@ export const Invitations: CollectionConfig = {
     {
       name: 'respondedAt',
       type: 'date',
+      label: 'Data odpowiedzi',
       admin: {
         readOnly: true,
         description: 'Data odpowiedzi na zaproszenie',
@@ -84,40 +95,40 @@ export const Invitations: CollectionConfig = {
     read: ({ req: { user } }) => {
       if (!user) return false
       if (user.role === 'superadmin') return true
-      
+
       if (user.role === 'volunteer') {
         return {
           volunteer: { equals: user.id },
         }
       }
-      
+
       if (user.role === 'organization' || user.role === 'coordinator') {
         return {
           invitedBy: { equals: user.id },
         }
       }
-      
+
       return false
     },
     // Only volunteers can update (respond to) invitations
     update: ({ req: { user } }) => {
       if (!user) return false
       if (user.role === 'superadmin') return true
-      
+
       if (user.role === 'volunteer') {
         return {
           volunteer: { equals: user.id },
           status: { equals: 'pending' }, // Can only respond to pending invitations
         }
       }
-      
+
       return false
     },
     // Only creator and superadmin can delete
     delete: ({ req: { user } }) => {
       if (!user) return false
       if (user.role === 'superadmin') return true
-      
+
       return {
         invitedBy: { equals: user.id },
       }
@@ -142,10 +153,7 @@ export const Invitations: CollectionConfig = {
           const existingApplication = await req.payload.find({
             collection: 'applications',
             where: {
-              and: [
-                { event: { equals: data.event } },
-                { volunteer: { equals: data.volunteer } },
-              ],
+              and: [{ event: { equals: data.event } }, { volunteer: { equals: data.volunteer } }],
             },
           })
 
@@ -188,7 +196,7 @@ export const Invitations: CollectionConfig = {
                 message: `Zaakceptowano zaproszenie od ${req.user?.firstName || 'organizatora'}`,
               },
             })
-            
+
             console.log('Auto-created application for accepted invitation:', doc.id)
           } catch (error) {
             console.error('Error auto-creating application:', error)
@@ -199,4 +207,3 @@ export const Invitations: CollectionConfig = {
     ],
   },
 }
-
