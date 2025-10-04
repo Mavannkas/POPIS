@@ -30,7 +30,11 @@ export async function signUp(payload: SignUpPayload): Promise<AuthUser> {
 export async function me(): Promise<AuthUser | null> {
   if (!API_URL) {
     await wait(200);
-    return null; // no persisted session in stub
+    // Simulate a logged-in user in stub mode
+    return {
+      id: 'stub_user',
+      email: 'user@example.com',
+    };
   }
   return apiFetch<AuthUser | null>('/auth/me', { method: 'GET' });
 }
