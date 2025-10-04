@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a React Native [Expo](https://expo.dev) project.
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then run the development server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This will open Expo DevTools in your browser. From there you can:
+
+- Press `a` to open on Android emulator
+- Press `i` to open on iOS simulator
+- Press `w` to open in web browser
+- Scan QR code with Expo Go app on your physical device
+
+You can start editing the app by modifying `App.tsx`. The app will automatically reload as you save changes.
+
+## Connecting to Backend
+
+The app connects to the backend API at `http://localhost:3001`. 
+
+**Important:** The localhost URL works differently on different platforms:
+- **iOS Simulator**: Use `http://localhost:3001` ✓
+- **Android Emulator**: Use `http://10.0.2.2:3001`
+- **Physical Device**: Use your computer's local IP (e.g., `http://192.168.1.x:3001`)
+
+You may need to update the URL in `App.tsx` depending on your platform.
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about React Native and Expo:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [React Native Documentation](https://reactnative.dev/docs/getting-started)
+- [Expo Documentation](https://docs.expo.dev/)
+- [Learn React Native](https://reactnative.dev/docs/tutorial)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Running on Different Platforms
 
-## Deploy on Vercel
+### Android
+```bash
+npm run android
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### iOS
+```bash
+npm run ios
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Web
+```bash
+npm run web
+```

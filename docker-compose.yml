@@ -24,14 +24,16 @@ services:
       dockerfile: Dockerfile.dev
     container_name: hackathon-frontend
     ports:
-      - "3000:3000"
+      - "19000:19000"  # Expo Metro bundler
+      - "19001:19001"  # Expo DevTools
+      - "19002:19002"  # Expo web
+      - "8081:8081"    # Metro bundler alternative
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - /app/.next
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - REACT_NATIVE_PACKAGER_HOSTNAME=localhost
     depends_on:
       - backend
     restart: unless-stopped
