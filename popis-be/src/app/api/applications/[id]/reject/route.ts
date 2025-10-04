@@ -23,7 +23,7 @@ export const POST = async (
     
     if (!['organization', 'coordinator', 'superadmin'].includes((user as any).role)) {
       return Response.json(
-        { success: false, error: 'Only organizations and coordinators can accept applications' },
+        { success: false, error: 'Only organizations and coordinators can reject applications' },
         { status: 403 }
       )
     }
@@ -47,7 +47,7 @@ export const POST = async (
       const event: any = application.event
       if (event.organization !== user.id && event.organization?.id !== user.id) {
         return Response.json(
-          { success: false, error: 'You can only accept applications to your own events' },
+          { success: false, error: 'You can only reject applications to your own events' },
           { status: 403 }
         )
       }
@@ -58,11 +58,11 @@ export const POST = async (
       collection: 'applications',
       id,
       data: {
-        status: 'accepted',
+        status: 'rejected',
       },
     })
 
-    // Send notification to the volunteer about acceptance
+    // Send notification to the volunteer about rejection
     try {
       const event: any = application.event
       const volunteerId = typeof application.volunteer === 'object' ? application.volunteer.id : application.volunteer
@@ -70,14 +70,14 @@ export const POST = async (
       const notification = await payload.create({
         collection: 'notifications',
         data: {
-          type: 'join_request_accepted',
+          type: 'join_request_rejected',
           recipient: volunteerId,
           event: event.id,
-          message: `Twoje zgłoszenie do wydarzenia "${event.title}" zostało zaakceptowane!`,
+          message: `Twoje zgłoszenie do wydarzenia "${event.title}" zostało odrzucone.`,
           read: false,
           metadata: {
             applicationId: id,
-            acceptedBy: user.id,
+            rejectedBy: user.id,
           },
         },
       })
@@ -85,15 +85,15 @@ export const POST = async (
       // Send real-time notification
       NotificationService.sendNotification(volunteerId, {
         id: notification.id,
-        type: 'join_request_accepted',
+        type: 'join_request_rejected',
         event: event,
         message: notification.message,
         read: false,
         createdAt: notification.createdAt,
       })
     } catch (notificationError: any) {
-      console.error('Failed to send acceptance notification:', notificationError)
-      // Don't fail the acceptance if notification fails
+      console.error('Failed to send rejection notification:', notificationError)
+      // Don't fail the rejection if notification fails
     }
     
     return Response.json({
@@ -101,11 +101,10 @@ export const POST = async (
       application: updatedApplication,
     })
   } catch (error: any) {
-    console.error('Error accepting application:', error)
+    console.error('Error rejecting application:', error)
     return Response.json(
       { success: false, error: error.message },
       { status: 500 }
     )
   }
 }
-

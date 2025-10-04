@@ -104,6 +104,7 @@ export default function NotificationsScreen() {
               key={notification.id}
               className="mb-3"
               onPress={() => handleNotificationPress(notification.id, notification.read, eventId)}
+              style={{ opacity: notification.read ? 0.6 : 1 }}
             >
               <Card className={`bg-white ${!notification.read ? 'border-l-4 border-primary' : ''}`}>
                 <Card.Content className="p-4">
@@ -111,19 +112,22 @@ export default function NotificationsScreen() {
                     <View className="mr-3 mt-1">
                       <View
                         className="w-10 h-10 rounded-full items-center justify-center"
-                        style={{ backgroundColor: `${getNotificationColor(notification.type)}20` }}
+                        style={{
+                          backgroundColor: `${getNotificationColor(notification.type)}${notification.read ? '15' : '20'}`
+                        }}
                       >
                         <IconSymbol
                           name={getNotificationIcon(notification.type)}
                           size={20}
                           color={getNotificationColor(notification.type)}
+                          style={{ opacity: notification.read ? 0.7 : 1 }}
                         />
                       </View>
                     </View>
 
                     <View className="flex-1">
                       <View className="flex-row justify-between items-start mb-1">
-                        <Text className={`text-base font-semibold ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                        <Text className={`text-base font-semibold ${!notification.read ? 'text-gray-900' : 'text-gray-600'}`}>
                           {getNotificationTitle(notification.type)}
                         </Text>
                         {!notification.read && (

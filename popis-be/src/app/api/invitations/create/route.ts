@@ -21,7 +21,7 @@ export const POST = async (request: NextRequest) => {
       )
     }
     
-    if (!['organization', 'coordinator', 'superadmin'].includes(user.role)) {
+    if (!['organization', 'coordinator', 'superadmin'].includes((user as any).role)) {
       return Response.json(
         { success: false, error: 'Only organizations and coordinators can invite volunteers' },
         { status: 403 }
@@ -51,9 +51,9 @@ export const POST = async (request: NextRequest) => {
     }
     
     // Check if coordinator - verify volunteers are from their school
-    if (user.role === 'coordinator') {
+    if ((user as any).role === 'coordinator') {
       // Get coordinator's school
-      const coordinatorSchool = user.schoolName
+      const coordinatorSchool = (user as any).schoolName
       
       if (!coordinatorSchool) {
         return Response.json(
@@ -113,9 +113,11 @@ export const POST = async (request: NextRequest) => {
             invitedBy: user.id,
             message: message || '',
             status: 'pending',
+            invitedAt: new Date().toISOString(),
           },
         })
         createdInvitations.push(invitation)
+        // Note: Notification sending is handled by the Invitations collection afterChange hook
       } catch (error: any) {
         errors.push({
           volunteerId,
