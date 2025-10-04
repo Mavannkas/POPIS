@@ -16,6 +16,9 @@ export default function App() {
   const fetchMessage = async () => {
     setLoading(true);
     try {
+      // Note: For Android emulator, use http://10.0.2.2:3001
+      // For iOS simulator, use http://localhost:3001
+      // For physical device, use your computer's local IP (e.g., http://192.168.1.x:3001)
       const response = await fetch('http://localhost:3001');
       const data = await response.text();
       setMessage(data);
