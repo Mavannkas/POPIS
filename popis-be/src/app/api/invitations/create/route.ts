@@ -117,7 +117,6 @@ export const POST = async (request: NextRequest) => {
           },
         })
         createdInvitations.push(invitation)
-        // Note: Notification sending is handled by the Invitations collection afterChange hook
       } catch (error: any) {
         errors.push({
           volunteerId,

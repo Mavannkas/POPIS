@@ -1,7 +1,6 @@
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { NextRequest } from 'next/server'
-import NotificationService from '@/services/NotificationService'
 
 export const POST = async (
   request: NextRequest,
@@ -61,40 +60,6 @@ export const POST = async (
         status: 'accepted',
       },
     })
-
-    // Send notification to the volunteer about acceptance
-    try {
-      const event: any = application.event
-      const volunteerId = typeof application.volunteer === 'object' ? application.volunteer.id : application.volunteer
-
-      const notification = await payload.create({
-        collection: 'notifications',
-        data: {
-          type: 'join_request_accepted',
-          recipient: volunteerId,
-          event: event.id,
-          message: `Twoje zgłoszenie do wydarzenia "${event.title}" zostało zaakceptowane!`,
-          read: false,
-          metadata: {
-            applicationId: id,
-            acceptedBy: user.id,
-          },
-        },
-      })
-
-      // Send real-time notification
-      NotificationService.sendNotification(volunteerId, {
-        id: notification.id,
-        type: 'join_request_accepted',
-        event: event,
-        message: notification.message,
-        read: false,
-        createdAt: notification.createdAt,
-      })
-    } catch (notificationError: any) {
-      console.error('Failed to send acceptance notification:', notificationError)
-      // Don't fail the acceptance if notification fails
-    }
     
     return Response.json({
       success: true,
