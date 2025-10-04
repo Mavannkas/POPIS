@@ -2,12 +2,15 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
-import { useAuth } from "./context";
-import { c } from "@/constants/theme";
+import { useAuth } from "@/lib/auth-context";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +34,7 @@ export default function LoginScreen() {
     <View
       style={{
         flex: 1,
-        backgroundColor: c.white,
+        backgroundColor: 'white',
         paddingHorizontal: 32,
         paddingTop: 64,
       }}
@@ -48,7 +51,7 @@ export default function LoginScreen() {
           textAlign: "center",
           fontSize: 24,
           marginBottom: 8,
-          color: c.black,
+          color: 'black',
         }}
       >
         Zaloguj się
@@ -69,7 +72,7 @@ export default function LoginScreen() {
         mode="outlined"
         autoCapitalize="none"
         keyboardType="email-address"
-        style={{ marginBottom: 16, backgroundColor: c.white, paddingLeft: 10 }}
+        style={{ marginBottom: 16, backgroundColor: 'white', paddingLeft: 10 }}
         outlineStyle={{ borderRadius: 25 }}
       />
 
@@ -79,7 +82,7 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         mode="outlined"
         secureTextEntry
-        style={{ marginBottom: 24, backgroundColor: c.white, paddingLeft: 10 }}
+        style={{ marginBottom: 24, backgroundColor: 'white', paddingLeft: 10 }}
         outlineStyle={{ borderRadius: 25 }}
       />
 
@@ -94,7 +97,7 @@ export default function LoginScreen() {
         onPress={onSubmit}
         loading={loading}
         style={{
-          backgroundColor: c.magenta,
+          backgroundColor: colors.primary,
           borderRadius: 50,
           marginBottom: 16,
         }}
@@ -108,7 +111,7 @@ export default function LoginScreen() {
         mode="outlined"
         onPress={() => router.push("/auth/register")}
         style={{
-          borderColor: c.magenta,
+          borderColor: colors.primary,
           borderWidth: 2,
           borderRadius: 50,
           marginBottom: 24,
@@ -118,7 +121,7 @@ export default function LoginScreen() {
           fontSize: 15,
           fontWeight: "600",
           letterSpacing: 0.5,
-          color: c.magenta,
+          color: colors.primary,
         }}
       >
         ZAREJESTRUJ SIĘ

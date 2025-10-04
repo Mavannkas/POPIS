@@ -68,30 +68,7 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: 'Powiadomienia',
-          headerStyle: {
-            backgroundColor: 'white',
-          },
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-          headerBackTitle: '',
-          headerRight: () => (
-            <TouchableOpacity className="p-2">
-              <IconSymbol
-                name="checkmark.circle"
-                size={24}
-                color={colors.primary}
-              />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
 
       <ScrollView className="flex-1 px-4 py-4">
         {mockNotifications.map((notification) => (
@@ -157,6 +134,5 @@ export default function NotificationsScreen() {
         <View className="h-20" />
       </ScrollView>
     </View>
-    </>
   );
 }

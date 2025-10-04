@@ -2,13 +2,16 @@ import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { Image, ScrollView, View, TouchableOpacity, FlatList } from 'react-native';
 import { Button, Checkbox, Switch, Text, TextInput, Menu, ActivityIndicator } from 'react-native-paper';
-import { useAuth } from './context';
-import { c } from '@/constants/theme';
-import { getSchools, type School } from '@/app/services/schools';
+import { useAuth } from '@/lib/auth-context';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { getSchools, type School } from '@/lib/schools';
 
 export default function RegisterScreen() {
   const { signUp } = useAuth();
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -58,19 +61,19 @@ export default function RegisterScreen() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: c.white }} contentContainerStyle={{ padding: 32, paddingTop: 64 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: 'white' }} contentContainerStyle={{ padding: 32, paddingTop: 64 }}>
       <View style={{ alignItems: 'center' }}>
         <Image source={require('@/assets/images/icon.png')} style={{ width: 240, objectFit: 'contain' }} />
       </View>
 
-      <Text style={{ textAlign: 'center', fontSize: 24, marginBottom: 8, color: c.black }}>Zarejestruj się</Text>
+      <Text style={{ textAlign: 'center', fontSize: 24, marginBottom: 8, color: 'black' }}>Zarejestruj się</Text>
       <View style={{ height: 1, backgroundColor: '#E5E5E5', marginHorizontal: 40, marginBottom: 32 }} />
 
-      <TextInput label="Adres e-mail" value={email} onChangeText={setEmail} mode="outlined" autoCapitalize="none" keyboardType="email-address" style={{ marginBottom: 12, backgroundColor: c.white }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Hasło" value={password} onChangeText={setPassword} mode="outlined" secureTextEntry style={{ marginBottom: 12, backgroundColor: c.white }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Imię" value={firstName} onChangeText={setFirstName} mode="outlined" style={{ marginBottom: 12, backgroundColor: c.white }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Nazwisko" value={lastName} onChangeText={setLastName} mode="outlined" style={{ marginBottom: 12, backgroundColor: c.white }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Data urodzin" value={birthDate} onChangeText={setBirthDate} mode="outlined" placeholder="MM/DD/YYYY" style={{ marginBottom: 12, backgroundColor: c.white }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Adres e-mail" value={email} onChangeText={setEmail} mode="outlined" autoCapitalize="none" keyboardType="email-address" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Hasło" value={password} onChangeText={setPassword} mode="outlined" secureTextEntry style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Imię" value={firstName} onChangeText={setFirstName} mode="outlined" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Nazwisko" value={lastName} onChangeText={setLastName} mode="outlined" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Data urodzin" value={birthDate} onChangeText={setBirthDate} mode="outlined" placeholder="MM/DD/YYYY" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
 
       <Menu
         visible={accountMenuVisible}
@@ -84,7 +87,7 @@ export default function RegisterScreen() {
                 mode="outlined"
                 editable={false}
                 right={<TextInput.Icon icon="chevron-down" />}
-                style={{ marginBottom: 12, backgroundColor: c.white }}
+                style={{ marginBottom: 12, backgroundColor: 'white' }}
                 outlineStyle={{ borderRadius: 25 }}
               />
             </View>
@@ -104,14 +107,14 @@ export default function RegisterScreen() {
       </Menu>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Text style={{ color: c.black, fontSize: 16 }}>Jestem studentem</Text>
-        <Switch value={isStudent} onValueChange={setIsStudent} color={c.magenta} />
+        <Text style={{ color: 'black', fontSize: 16 }}>Jestem studentem</Text>
+        <Switch value={isStudent} onValueChange={setIsStudent} color={colors.primary} />
       </View>
 
       {isStudent && (
         schoolsLoading ? (
           <View style={{ alignItems: 'center', marginBottom: 16 }}>
-            <ActivityIndicator color={c.magenta} />
+            <ActivityIndicator color={colors.primary} />
           </View>
         ) : (
           <View style={{ marginBottom: 16 }}>
@@ -128,7 +131,7 @@ export default function RegisterScreen() {
               }}
               mode="outlined"
               placeholder="Wpisz nazwę szkoły..."
-              style={{ marginBottom: 8, backgroundColor: c.white }}
+              style={{ marginBottom: 8, backgroundColor: 'white' }}
               outlineStyle={{ borderRadius: 25 }}
               right={
                 schoolName ? (
@@ -154,7 +157,7 @@ export default function RegisterScreen() {
                   borderWidth: 1,
                   borderColor: '#E5E5E5',
                   borderRadius: 8,
-                  backgroundColor: c.white,
+                  backgroundColor: 'white',
                   marginBottom: 8,
                 }}
               >
@@ -174,7 +177,7 @@ export default function RegisterScreen() {
                         setSchoolSearchTerm('');
                       }}
                     >
-                      <Text style={{ color: c.black, fontSize: 14 }}>
+                      <Text style={{ color: 'black', fontSize: 14 }}>
                         {item.name}
                       </Text>
                     </TouchableOpacity>
@@ -193,7 +196,7 @@ export default function RegisterScreen() {
 
             {/* Show selected school */}
             {schoolName && (
-              <Text style={{ color: c.magenta, fontSize: 14, fontWeight: '600' }}>
+              <Text style={{ color: colors.primary, fontSize: 14, fontWeight: '600' }}>
                 Wybrana szkoła: {schoolName}
               </Text>
             )}
@@ -207,7 +210,7 @@ export default function RegisterScreen() {
         mode="contained"
         onPress={onSubmit}
         loading={loading}
-        style={{ backgroundColor: c.magenta, borderRadius: 50, marginBottom: 16 }}
+        style={{ backgroundColor: colors.primary, borderRadius: 50, marginBottom: 16 }}
         contentStyle={{ paddingVertical: 8 }}
         labelStyle={{ fontSize: 15, fontWeight: '600', letterSpacing: 0.5 }}
       >
@@ -218,7 +221,7 @@ export default function RegisterScreen() {
         mode="outlined"
         onPress={() => router.push('/auth/login')}
         style={{
-          borderColor: c.magenta,
+          borderColor: colors.primary,
           borderWidth: 2,
           borderRadius: 50,
           marginBottom: 24,
@@ -228,15 +231,15 @@ export default function RegisterScreen() {
           fontSize: 15,
           fontWeight: '600',
           letterSpacing: 0.5,
-          color: c.magenta,
+          color: colors.primary,
         }}
       >
         ZALOGUJ SIĘ
       </Button>
 
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Checkbox status={accept ? 'checked' : 'unchecked'} onPress={() => setAccept(!accept)} color={c.magenta} />
-        <Text style={{ color: c.black, fontSize: 14 }}>Akceptuję regulamin aplikacji</Text>
+        <Checkbox status={accept ? 'checked' : 'unchecked'} onPress={() => setAccept(!accept)} color={colors.primary} />
+        <Text style={{ color: 'black', fontSize: 14 }}>Akceptuję regulamin aplikacji</Text>
       </View>
     </ScrollView>
   );

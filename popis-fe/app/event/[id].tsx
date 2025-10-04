@@ -52,30 +52,7 @@ export default function EventDetailScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: 'Szczegóły wydarzenia',
-          headerStyle: {
-            backgroundColor: 'white',
-          },
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-          headerBackTitle: '',
-          headerRight: () => (
-            <TouchableOpacity onPress={handleShareEvent} className="p-2">
-              <IconSymbol
-                name="square.and.arrow.up"
-                size={24}
-                color={colors.primary}
-              />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
 
       <ScrollView className="flex-1">
         {/* Event Image */}
@@ -228,6 +205,5 @@ export default function EventDetailScreen() {
         </Button>
       </View>
     </View>
-    </>
   );
 }

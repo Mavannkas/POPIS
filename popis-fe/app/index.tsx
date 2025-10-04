@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/app/auth/context';
+import { useAuth } from '@/lib/auth-context';
 import { View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { useEffect } from 'react';

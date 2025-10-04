@@ -4,7 +4,7 @@ import { IconSymbol } from "./icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { router } from "expo-router";
-import { useAuth } from "@/app/auth/context";
+import { useAuth } from "@/lib/auth-context";
 
 interface TopBarProps {
   showSearch?: boolean;
