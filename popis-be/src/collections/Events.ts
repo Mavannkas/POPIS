@@ -295,7 +295,7 @@ export const Events: CollectionConfig = {
     beforeChange: [
       ({ data, req, operation }: { data: any; req: any; operation: string }) => {
         // Auto-set createdBy on create
-        if (operation === 'create' && req.user) {
+        if (operation === 'create' && req.user && !data.createdBy) {
           data.createdBy = req.user.id
         }
 

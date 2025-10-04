@@ -154,11 +154,17 @@ export const Certificates: CollectionConfig = {
       async ({ data, req, operation }) => {
         // Generate certificate number on create
         if (operation === 'create') {
-          const year = new Date().getFullYear()
-          const randomId = Math.random().toString(36).substring(2, 8).toUpperCase()
-          data.certificateNumber = `CERT-${year}-${randomId}`
-          data.issueDate = new Date().toISOString()
-          data.issuedBy = req.user?.id
+          if (!data.certificateNumber) {
+            const year = new Date().getFullYear()
+            const randomId = Math.random().toString(36).substring(2, 8).toUpperCase()
+            data.certificateNumber = `CERT-${year}-${randomId}`
+          }
+          if (!data.issueDate) {
+            data.issueDate = new Date().toISOString()
+          }
+          if (!data.issuedBy) {
+            data.issuedBy = req.user?.id
+          }
         }
 
         // Get organization from event if not set

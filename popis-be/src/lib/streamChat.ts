@@ -36,8 +36,9 @@ export const createChatChannel = async (
       name: eventTitle,
       members: [volunteerStreamId, organizationStreamId],
       application_id: applicationId,
+      created_by_id: organizationStreamId,
     })
-    
+
     await channel.create()
     
     return channelId
