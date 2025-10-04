@@ -25,6 +25,7 @@ export function TopBar({ showSearch = true }: TopBarProps) {
   };
 
   const handleProfilePress = () => {
+    console.log('Profile pressed, signing out...');
     signOut();
   };
 
