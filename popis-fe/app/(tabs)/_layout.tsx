@@ -1,40 +1,13 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { c } from '@/constants/theme';
+import { useAuth } from '@/app/auth/context';
+import { Button } from 'react-native-paper';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-
+  const { signOut } = useAuth();
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.tabIconDefault,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarStyle: {
-          backgroundColor: colors.bg1,
-          borderTopWidth: 0,
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          height: 80,
-          paddingBottom: 20,
-          paddingTop: 10,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-          marginTop: 4,
-        },
-      }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: c.magenta, headerShown: false }}>
       <Tabs.Screen
         name="index"
         options={{
@@ -46,6 +19,8 @@ export default function TabLayout() {
               color={color}
             />
           ),
+          headerShown: true,
+          headerRight: () => <Button onPress={signOut}>Wyloguj</Button>,
         }}
       />
       <Tabs.Screen

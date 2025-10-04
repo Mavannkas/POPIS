@@ -11,7 +11,9 @@
 		"lint": "expo lint"
 	},
 	"dependencies": {
+		"@expo-google-fonts/roboto": "^0.4.1",
 		"@expo/vector-icons": "^15.0.2",
+		"@radix-ui/react-dialog": "^1.1.15",
 		"@react-native-vector-icons/material-design-icons": "^12.3.0",
 		"@react-navigation/bottom-tabs": "^7.4.0",
 		"@react-navigation/elements": "^2.6.3",
