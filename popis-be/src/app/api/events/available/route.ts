@@ -11,9 +11,13 @@ export const GET = async (request: NextRequest) => {
     const { user } = await payload.auth({ headers: request.headers })
     
     // Get filters from query params
-    const category = searchParams.get('category')
+    // Support multi-select via repeated params and comma-separated values
+    const categoryParams = searchParams.getAll('category')
+    const category = categoryParams.length > 0 ? categoryParams : (searchParams.get('category')?.split(',').filter(Boolean) || [])
     const city = searchParams.get('city')
     const minAge = searchParams.get('minAge')
+    const sizeParams = searchParams.getAll('size')
+    const size = sizeParams.length > 0 ? sizeParams : (searchParams.get('size')?.split(',').filter(Boolean) || [])
     const search = searchParams.get('search')
     const eventType = searchParams.get('eventType') // 'public' or 'school'
     
@@ -53,8 +57,12 @@ export const GET = async (request: NextRequest) => {
       where.eventType = { equals: 'public' }
     }
     
-    if (category) {
-      where.category = { equals: category }
+    if (category && category.length > 0) {
+      if (category.length === 1) {
+        where.category = { equals: category[0] }
+      } else {
+        where.category = { in: category }
+      }
     }
     
     if (city) {
@@ -63,6 +71,14 @@ export const GET = async (request: NextRequest) => {
     
     if (minAge) {
       where.minAge = { less_than_or_equal: parseInt(minAge) }
+    }
+    
+    if (size && size.length > 0) {
+      if (size.length === 1) {
+        where.size = { equals: size[0] }
+      } else {
+        where.size = { in: size }
+      }
     }
     
     if (search) {
