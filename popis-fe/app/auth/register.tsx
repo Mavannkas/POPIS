@@ -10,8 +10,7 @@ import { getSchools, type School } from '@/lib/schools';
 export default function RegisterScreen() {
   const { signUp } = useAuth();
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');

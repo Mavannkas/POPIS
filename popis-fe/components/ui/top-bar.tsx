@@ -11,8 +11,7 @@ interface TopBarProps {
 }
 
 export function TopBar({ showSearch = true }: TopBarProps) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
+  const colors = Colors;
   const { signOut } = useAuth();
 
   const handleNotificationPress = () => {

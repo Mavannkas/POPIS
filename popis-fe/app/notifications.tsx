@@ -8,8 +8,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Stack } from 'expo-router';
 
 export default function NotificationsScreen() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors;
 
   // Mock notifications data
   const mockNotifications = [

@@ -9,8 +9,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 export default function LoginScreen() {
   const { signIn } = useAuth();
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

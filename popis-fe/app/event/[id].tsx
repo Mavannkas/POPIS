@@ -8,8 +8,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Stack } from 'expo-router';
 
 export default function EventDetailScreen() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors;
   const { id } = useLocalSearchParams();
 
   // Mock event data - in real app this would be fetched based on ID
