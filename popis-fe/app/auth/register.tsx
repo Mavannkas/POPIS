@@ -55,21 +55,21 @@ export default function RegisterScreen() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: 'white' }} contentContainerStyle={{ padding: 32, paddingTop: 20 }}>
-      <View style={{ alignItems: 'center', marginBottom: 20 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: 'white' }} contentContainerStyle={{ paddingLeft: 16, paddingRight: 16 }}>
+      <View style={{ alignItems: 'center' }}>
         <Image source={require('@/assets/images/icon.png')} style={{ width: 200, objectFit: 'contain' }} />
       </View>
 
-      <Text style={{ textAlign: 'center', fontSize: 24, marginBottom: 8, color: 'black' }}>Zarejestruj się</Text>
+      <Text style={{ textAlign: 'center', fontSize: 24, marginBottom: 12, color: 'black' }}>Zarejestruj się</Text>
       <View style={{ height: 1, backgroundColor: '#E5E5E5', marginHorizontal: 40, marginBottom: 32 }} />
 
-      <TextInput label="Adres e-mail" value={email} onChangeText={setEmail} mode="outlined" autoCapitalize="none" keyboardType="email-address" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Hasło" value={password} onChangeText={setPassword} mode="outlined" secureTextEntry style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Imię" value={firstName} onChangeText={setFirstName} mode="outlined" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Nazwisko" value={lastName} onChangeText={setLastName} mode="outlined" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
-      <TextInput label="Data urodzin" value={birthDate} onChangeText={setBirthDate} mode="outlined" placeholder="MM/DD/YYYY" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Adres e-mail" value={email} onChangeText={setEmail} mode="outlined" autoCapitalize="none" keyboardType="email-address" style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Hasło" value={password} onChangeText={setPassword} mode="outlined" secureTextEntry style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Imię" value={firstName} onChangeText={setFirstName} mode="outlined" style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Nazwisko" value={lastName} onChangeText={setLastName} mode="outlined" style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
+      <TextInput label="Data urodzin" value={birthDate} onChangeText={setBirthDate} mode="outlined" placeholder="MM/DD/YYYY" style={{ marginBottom: 16, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, marginTop: 8 }}>
         <Text style={{ color: 'black', fontSize: 16 }}>Jestem studentem</Text>
         <Switch value={isStudent} onValueChange={setIsStudent} color={colors.primary} />
       </View>
@@ -80,7 +80,7 @@ export default function RegisterScreen() {
             <ActivityIndicator color={colors.primary} />
           </View>
         ) : (
-          <View style={{ marginBottom: 16 }}>
+          <View style={{ marginBottom: 20 }}>
             <TextInput
               label="Szkoła"
               value={schoolName || schoolSearchTerm}
@@ -149,6 +149,11 @@ export default function RegisterScreen() {
 
       {error ? <Text style={{ color: 'red', textAlign: 'center', marginBottom: 12 }}>{error}</Text> : null}
 
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
+        <Checkbox status={accept ? 'checked' : 'unchecked'} onPress={() => setAccept(!accept)} color={colors.primary} />
+        <Text style={{ color: 'black', fontSize: 14 }}>Akceptuję regulamin aplikacji</Text>
+      </View>
+
       <Button
         mode="contained"
         onPress={onSubmit}
@@ -180,10 +185,6 @@ export default function RegisterScreen() {
         ZALOGUJ SIĘ
       </Button>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Checkbox status={accept ? 'checked' : 'unchecked'} onPress={() => setAccept(!accept)} color={colors.primary} />
-        <Text style={{ color: 'black', fontSize: 14 }}>Akceptuję regulamin aplikacji</Text>
-      </View>
     </ScrollView>
   );
 }
