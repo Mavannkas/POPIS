@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { Card, Chip } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import { TopBar } from '@/components/ui/top-bar';
 import { router } from 'expo-router';
 
