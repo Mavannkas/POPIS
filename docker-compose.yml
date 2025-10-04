@@ -11,7 +11,6 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-      - ./backend/database.sqlite:/app/database.sqlite
     environment:
       - NODE_ENV=development
       - PORT=3001

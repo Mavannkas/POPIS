@@ -12,7 +12,7 @@ import { ItemsModule } from './items/items.module';
     }),
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'database.sqlite',
+      database: 'data/database.sqlite',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // Auto-create database schema (disable in production)
     }),
