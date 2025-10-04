@@ -24,8 +24,9 @@ export default function NotificationsScreen() {
       await markAsRead(notificationId);
     }
 
-    // Navigate to event details
+    // Navigate to event details and dismiss the modal
     if (eventId) {
+      router.dismiss(); // Close the notifications modal
       router.push(`/event/${eventId}`);
     }
   };
@@ -79,15 +80,6 @@ export default function NotificationsScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Connection status indicator */}
-      {!connected && (
-        <View className="bg-yellow-100 px-4 py-2">
-          <Text className="text-yellow-800 text-sm text-center">
-            Reconnecting to notification service...
-          </Text>
-        </View>
-      )}
-
       <ScrollView
         className="flex-1 px-4 py-4"
         refreshControl={
