@@ -20,6 +20,8 @@ export const GET = async (request: NextRequest) => {
     const size = sizeParams.length > 0 ? sizeParams : (searchParams.get('size')?.split(',').filter(Boolean) || [])
     const search = searchParams.get('search')
     const eventType = searchParams.get('eventType') // 'public' or 'school'
+    const limitParam = searchParams.get('limit')
+    const limit = limitParam ? parseInt(limitParam) : undefined
     
     // Build where query
     const where: any = {
@@ -102,17 +104,51 @@ export const GET = async (request: NextRequest) => {
     
     const events = await payload.find({
       collection: 'events',
-      where,
+      where: {
+        and: [
+          where,
+          { startDate: { greater_than_or_equal: new Date().toISOString() } },
+        ],
+      },
       limit: 100,
-      sort: '-startDate',
+      sort: 'startDate',
       depth: 2,
     })
-    
+
+    // Filter by available spots: accepted applications < maxVolunteers (if set)
+    const filteredDocs: any[] = []
+    for (const ev of events.docs as any[]) {
+      if (!ev.maxVolunteers) {
+        filteredDocs.push(ev)
+        continue
+      }
+      try {
+        const apps = await payload.find({
+          collection: 'applications',
+          where: {
+            and: [
+              { event: { equals: ev.id } },
+              { status: { equals: 'accepted' } },
+            ],
+          },
+          limit: 1, // we only need totalDocs
+        })
+        const acceptedCount = apps.totalDocs || 0
+        if (acceptedCount < (ev.maxVolunteers as number)) {
+          filteredDocs.push(ev)
+        }
+      } catch (e) {
+        // If counting fails, be permissive and include the event
+        filteredDocs.push(ev)
+      }
+      if (limit && filteredDocs.length >= limit) break
+    }
+
     return Response.json({
       success: true,
-      events: events.docs,
-      totalDocs: events.totalDocs,
-      page: events.page,
+      events: filteredDocs,
+      totalDocs: filteredDocs.length,
+      page: 1,
     })
   } catch (error: any) {
     return Response.json(
