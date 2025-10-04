@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { Searchbar } from "react-native-paper";
 import { IconSymbol } from "./icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -24,8 +23,10 @@ export function TopBar({ showSearch = true }: TopBarProps) {
     router.push("/search" as any);
   };
 
-  const handleProfilePress = () => {
-    signOut();
+  const handleProfilePress = async () => {
+    console.log("Profile pressed, signing out...");
+    await signOut();
+    router.replace("/auth/login");
   };
 
   return (

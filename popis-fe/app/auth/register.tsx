@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { Image, ScrollView, View, TouchableOpacity } from 'react-native';
+import { Image, ScrollView, View, TouchableOpacity, FlatList } from 'react-native';
 import { Button, Checkbox, Switch, Text, TextInput, Menu, ActivityIndicator } from 'react-native-paper';
 import { useAuth } from './context';
 import { c } from '@/constants/theme';
@@ -18,11 +18,11 @@ export default function RegisterScreen() {
   const [isStudent, setIsStudent] = useState(false);
   const [schoolId, setSchoolId] = useState('');
   const [schoolName, setSchoolName] = useState('');
+  const [schoolSearchTerm, setSchoolSearchTerm] = useState('');
   const [accept, setAccept] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
-  const [schoolMenuVisible, setSchoolMenuVisible] = useState(false);
   const [schools, setSchools] = useState<School[]>([]);
   const [schoolsLoading, setSchoolsLoading] = useState(false);
 
@@ -36,7 +36,12 @@ export default function RegisterScreen() {
         .catch(() => setError('Nie udało się pobrać szkół'))
         .finally(() => setSchoolsLoading(false));
     }
-  }, [isStudent]);
+  }, [isStudent, schools.length]);
+
+  // Filter schools based on search term
+  const filteredSchools = schools.filter(school =>
+    school.name.toLowerCase().includes(schoolSearchTerm.toLowerCase())
+  );
 
   async function onSubmit() {
     if (!accept) return setError('Zaznacz akceptację regulaminu');
@@ -109,38 +114,90 @@ export default function RegisterScreen() {
             <ActivityIndicator color={c.magenta} />
           </View>
         ) : (
-          <Menu
-            visible={schoolMenuVisible}
-            onDismiss={() => setSchoolMenuVisible(false)}
-            anchor={
-              <TouchableOpacity onPress={() => setSchoolMenuVisible(true)}>
-                <View pointerEvents="none">
-                  <TextInput
-                    label="Szkoła"
-                    value={schoolName}
-                    mode="outlined"
-                    placeholder="Select"
-                    editable={false}
-                    right={<TextInput.Icon icon="chevron-down" />}
-                    style={{ marginBottom: 16, backgroundColor: c.white }}
-                    outlineStyle={{ borderRadius: 25 }}
+          <View style={{ marginBottom: 16 }}>
+            <TextInput
+              label="Szkoła"
+              value={schoolName || schoolSearchTerm}
+              onChangeText={(text) => {
+                setSchoolSearchTerm(text);
+                // Clear selection if user starts typing
+                if (schoolName && text !== schoolName) {
+                  setSchoolName('');
+                  setSchoolId('');
+                }
+              }}
+              mode="outlined"
+              placeholder="Wpisz nazwę szkoły..."
+              style={{ marginBottom: 8, backgroundColor: c.white }}
+              outlineStyle={{ borderRadius: 25 }}
+              right={
+                schoolName ? (
+                  <TextInput.Icon
+                    icon="close"
+                    onPress={() => {
+                      setSchoolName('');
+                      setSchoolId('');
+                      setSchoolSearchTerm('');
+                    }}
                   />
-                </View>
-              </TouchableOpacity>
-            }
-          >
-            {schools.map((s) => (
-              <Menu.Item
-                key={s.id}
-                onPress={() => {
-                  setSchoolId(s.id);
-                  setSchoolName(s.name);
-                  setSchoolMenuVisible(false);
+                ) : (
+                  <TextInput.Icon icon="school" />
+                )
+              }
+            />
+
+            {/* Show filtered results when searching */}
+            {schoolSearchTerm && filteredSchools.length > 0 && !schoolName && (
+              <View
+                style={{
+                  maxHeight: 200,
+                  borderWidth: 1,
+                  borderColor: '#E5E5E5',
+                  borderRadius: 8,
+                  backgroundColor: c.white,
+                  marginBottom: 8,
                 }}
-                title={s.name}
-              />
-            ))}
-          </Menu>
+              >
+                <FlatList
+                  data={filteredSchools.slice(0, 10)} // Limit to first 10 results
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={{
+                        padding: 12,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#F0F0F0',
+                      }}
+                      onPress={() => {
+                        setSchoolId(item.id);
+                        setSchoolName(item.name);
+                        setSchoolSearchTerm('');
+                      }}
+                    >
+                      <Text style={{ color: c.black, fontSize: 14 }}>
+                        {item.name}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  showsVerticalScrollIndicator={false}
+                />
+              </View>
+            )}
+
+            {/* Show message when no results */}
+            {schoolSearchTerm && filteredSchools.length === 0 && (
+              <Text style={{ color: '#666', fontSize: 14, marginBottom: 8 }}>
+                Brak szkół pasujących do wyszukiwania
+              </Text>
+            )}
+
+            {/* Show selected school */}
+            {schoolName && (
+              <Text style={{ color: c.magenta, fontSize: 14, fontWeight: '600' }}>
+                Wybrana szkoła: {schoolName}
+              </Text>
+            )}
+          </View>
         )
       )}
 
