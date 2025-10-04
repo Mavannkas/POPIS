@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { Card, Button, Chip } from 'react-native-paper';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { CategoryIcon } from '@/components/ui/category-icon';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { TextArea } from '@/components/ui/textarea';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Stack } from 'expo-router';
+import { getCategoryEmoji, getCategoryLabel, applyToEvent } from '@/lib/services/events';
 
 export default function EventDetailScreen() {
   const colors = Colors;
@@ -44,15 +42,27 @@ export default function EventDetailScreen() {
     level: 'Początkujący',
   };
 
-  const handleJoinEvent = () => {
-    // TODO: Implement join event logic
-    console.log('Joining event:', mockEvent.id);
+  const [joining, setJoining] = useState(false);
+  const handleJoinEvent = async () => {
+    if (!id) return;
+    try {
+      setJoining(true);
+      const res = await applyToEvent({ eventId: String(id), message: recommendation.trim() || undefined });
+      if (res.success) {
+        // Navigate back or show success toast
+        console.log('Applied successfully');
+        router.back();
+      } else {
+        console.warn('Apply failed', res.error);
+      }
+    } catch (e) {
+      console.error('Apply error', e);
+    } finally {
+      setJoining(false);
+    }
   };
 
-  const handleShareEvent = () => {
-    // TODO: Implement share event logic
-    console.log('Sharing event:', mockEvent.id);
-  };
+  // Share action can be implemented later if needed
 
   return (
     <View className="flex-1 bg-white">
@@ -67,14 +77,23 @@ export default function EventDetailScreen() {
         </View>
 
         <View className="px-4 py-6">
-          {/* Title and Organizer */}
-          <View className="mb-4">
-            <Text className="text-2xl font-bold text-gray-800 mb-2">
-              {mockEvent.title}
-            </Text>
-            <Text className="text-primary font-medium text-base" style={{ marginLeft: 2 }}>
-              👤 {mockEvent.organizer} 
-            </Text>
+          {/* Title and Category */}
+          <View className="flex-row justify-between items-start mb-4">
+            <View className="flex-1 mr-3">
+              <Text className="text-2xl font-bold text-gray-800 mb-2">
+                {mockEvent.title}
+              </Text>
+              <Text className="text-primary font-medium text-base">
+                👤 {mockEvent.organizer}
+              </Text>
+            </View>
+            <Chip
+              style={{ backgroundColor: colors.primary + '20' }}
+              textStyle={{ color: colors.primary, fontWeight: '600' }}
+            >
+              <Text className="mr-1">{getCategoryEmoji(mockEvent.category)}</Text>
+              {getCategoryLabel(mockEvent.category)}
+            </Chip>
           </View>
 
           {/* Event Details */}
@@ -215,6 +234,8 @@ export default function EventDetailScreen() {
             fontSize: 14,
             fontWeight: '600',
           }}
+          loading={joining}
+          disabled={joining}
         >
           Dołącz do wydarzenia
         </Button>

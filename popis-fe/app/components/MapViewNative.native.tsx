@@ -40,6 +40,11 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 	const [initialRegion, setInitialRegion] = useState(DEFAULT_LOCATION);
 	const mapRef = useRef<MapView>(null);
 
+	// Only use events that have valid coordinates
+	const eventsWithCoords = (events || []).filter(e =>
+		e && e.location && typeof e.location.lat === 'number' && typeof e.location.lng === 'number' && !Number.isNaN(e.location.lat) && !Number.isNaN(e.location.lng)
+	);
+
 	useEffect(() => {
 		getUserLocation()
 			.then(location => {
@@ -57,10 +62,10 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 	}, []);
 
 	useEffect(() => {
-		if (events?.length > 0 && mapRef.current) {
-			const coordinates = events.map(e => ({
-				latitude: e.location.lat!,
-				longitude: e.location.lng!,
+		if (eventsWithCoords.length > 0 && mapRef.current) {
+			const coordinates = eventsWithCoords.map(e => ({
+				latitude: e.location.lat as number,
+				longitude: e.location.lng as number,
 			}));
 
 			if (userLocation) {
@@ -70,14 +75,16 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 				});
 			}
 
-			setTimeout(() => {
-				mapRef.current?.fitToCoordinates(coordinates, {
-					edgePadding: { top: 100, right: 50, bottom: 100, left: 50 },
-					animated: true,
-				});
-			}, 1000);
+			if (coordinates.length > 0) {
+				setTimeout(() => {
+					mapRef.current?.fitToCoordinates(coordinates, {
+						edgePadding: { top: 100, right: 50, bottom: 100, left: 50 },
+						animated: true,
+					});
+				}, 800);
+			}
 		}
-	}, [events, userLocation]);
+	}, [eventsWithCoords, userLocation]);
 
 	const centerOnUser = async () => {
 		let location = userLocation;
@@ -110,15 +117,15 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 	const handleMarkerPress = (event: Event) => {
 		setSelectedMarker(event.id);
 
-		// Center map on marker with offset for popup
-		if (mapRef.current && event.location.lat && event.location.lng) {
-			// Calculate offset to center marker in visible area (above popup)
-			const latOffset = LATITUDE_DELTA * 0.25; // Shift up by 25% of visible area
-
+		// Center map on marker with offset for popup (guard coordinates)
+		const lat = event.location?.lat;
+		const lng = event.location?.lng;
+		if (mapRef.current && typeof lat === 'number' && typeof lng === 'number' && !Number.isNaN(lat) && !Number.isNaN(lng)) {
+			const latOffset = LATITUDE_DELTA * 0.25;
 			mapRef.current.animateToRegion(
 				{
-					latitude: event.location.lat - latOffset,
-					longitude: event.location.lng,
+					latitude: lat - latOffset,
+					longitude: lng,
 					latitudeDelta: LATITUDE_DELTA,
 					longitudeDelta: LONGITUDE_DELTA,
 				},
@@ -146,12 +153,12 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 					initialRegion={initialRegion}
 					showsUserLocation={true}
 					showsMyLocationButton={false}>
-					{events?.map(event => (
+					{eventsWithCoords.map(event => (
 						<Marker
 							key={event.id}
 							coordinate={{
-								latitude: event.location.lat!,
-								longitude: event.location.lng!,
+								latitude: event.location.lat as number,
+								longitude: event.location.lng as number,
 							}}
 							onPress={() => handleMarkerPress(event)}>
 							<View style={styles.markerContainer}>
