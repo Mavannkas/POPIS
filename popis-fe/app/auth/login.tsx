@@ -2,9 +2,8 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/lib/auth/context";
 import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();

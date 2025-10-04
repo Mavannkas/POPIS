@@ -1,10 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { Image, ScrollView, View, TouchableOpacity, FlatList } from 'react-native';
-import { Button, Checkbox, Switch, Text, TextInput, Menu, ActivityIndicator } from 'react-native-paper';
-import { useAuth } from '@/lib/auth-context';
+import { Image, ScrollView, View, TouchableOpacity } from 'react-native';
+import { Button, Checkbox, Switch, Text, TextInput, ActivityIndicator } from 'react-native-paper';
+import { useAuth } from '@/lib/auth/context';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { getSchools, type School } from '@/lib/schools';
 
 export default function RegisterScreen() {
@@ -16,7 +15,6 @@ export default function RegisterScreen() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthDate, setBirthDate] = useState('');
-  const [accountType, setAccountType] = useState('Wybierz');
   const [isStudent, setIsStudent] = useState(false);
   const [schoolId, setSchoolId] = useState('');
   const [schoolName, setSchoolName] = useState('');
@@ -24,11 +22,8 @@ export default function RegisterScreen() {
   const [accept, setAccept] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [accountMenuVisible, setAccountMenuVisible] = useState(false);
   const [schools, setSchools] = useState<School[]>([]);
   const [schoolsLoading, setSchoolsLoading] = useState(false);
-
-  const accountTypes = ['Wolontariusz', 'Organizacja'];
 
   useEffect(() => {
     if (isStudent && schools.length === 0) {
@@ -74,37 +69,6 @@ export default function RegisterScreen() {
       <TextInput label="Nazwisko" value={lastName} onChangeText={setLastName} mode="outlined" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
       <TextInput label="Data urodzin" value={birthDate} onChangeText={setBirthDate} mode="outlined" placeholder="MM/DD/YYYY" style={{ marginBottom: 12, backgroundColor: 'white' }} outlineStyle={{ borderRadius: 25 }} />
 
-      <Menu
-        visible={accountMenuVisible}
-        onDismiss={() => setAccountMenuVisible(false)}
-        anchor={
-          <TouchableOpacity onPress={() => setAccountMenuVisible(true)}>
-            <View pointerEvents="none">
-              <TextInput
-                label="Typ konta"
-                value={accountType}
-                mode="outlined"
-                editable={false}
-                right={<TextInput.Icon icon="chevron-down" />}
-                style={{ marginBottom: 12, backgroundColor: 'white' }}
-                outlineStyle={{ borderRadius: 25 }}
-              />
-            </View>
-          </TouchableOpacity>
-        }
-      >
-        {accountTypes.map((type) => (
-          <Menu.Item
-            key={type}
-            onPress={() => {
-              setAccountType(type);
-              setAccountMenuVisible(false);
-            }}
-            title={type}
-          />
-        ))}
-      </Menu>
-
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <Text style={{ color: 'black', fontSize: 16 }}>Jestem studentem</Text>
         <Switch value={isStudent} onValueChange={setIsStudent} color={colors.primary} />
@@ -149,55 +113,35 @@ export default function RegisterScreen() {
             />
 
             {/* Show filtered results when searching */}
-            {schoolSearchTerm && filteredSchools.length > 0 && !schoolName && (
-              <View
-                style={{
-                  maxHeight: 200,
-                  borderWidth: 1,
-                  borderColor: '#E5E5E5',
-                  borderRadius: 8,
-                  backgroundColor: 'white',
-                  marginBottom: 8,
-                }}
-              >
-                <FlatList
-                  data={filteredSchools.slice(0, 10)} // Limit to first 10 results
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => (
+            {schoolSearchTerm && !schoolName && (
+              <View style={{ marginBottom: 8 }}>
+                {filteredSchools.length > 0 ? (
+                  filteredSchools.slice(0, 5).map((school) => (
                     <TouchableOpacity
+                      key={school.id}
                       style={{
                         padding: 12,
                         borderBottomWidth: 1,
-                        borderBottomColor: '#F0F0F0',
+                        borderBottomColor: '#E5E5E5',
+                        backgroundColor: 'white',
                       }}
                       onPress={() => {
-                        setSchoolId(item.id);
-                        setSchoolName(item.name);
+                        setSchoolId(school.id);
+                        setSchoolName(school.name);
                         setSchoolSearchTerm('');
                       }}
                     >
                       <Text style={{ color: 'black', fontSize: 14 }}>
-                        {item.name}
+                        {school.name}
                       </Text>
                     </TouchableOpacity>
-                  )}
-                  showsVerticalScrollIndicator={false}
-                />
+                  ))
+                ) : (
+                  <Text style={{ color: '#666', fontSize: 14, paddingVertical: 8 }}>
+                    Brak szkół pasujących do wyszukiwania
+                  </Text>
+                )}
               </View>
-            )}
-
-            {/* Show message when no results */}
-            {schoolSearchTerm && filteredSchools.length === 0 && (
-              <Text style={{ color: '#666', fontSize: 14, marginBottom: 8 }}>
-                Brak szkół pasujących do wyszukiwania
-              </Text>
-            )}
-
-            {/* Show selected school */}
-            {schoolName && (
-              <Text style={{ color: colors.primary, fontSize: 14, fontWeight: '600' }}>
-                Wybrana szkoła: {schoolName}
-              </Text>
             )}
           </View>
         )
@@ -243,4 +187,3 @@ export default function RegisterScreen() {
     </ScrollView>
   );
 }
-
