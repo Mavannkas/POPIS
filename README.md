@@ -4,7 +4,7 @@ A **minimal, fast** full-stack boilerplate for 24-hour hackathons. Get from zero
 
 ## Stack
 
-**Frontend:** Next.js 15 + React 19 + TypeScript + Tailwind CSS + shadcn/ui  
+**Frontend:** React Native + Expo + TypeScript  
 **Backend:** NestJS + TypeScript + SQLite + TypeORM  
 **Dev:** Docker Compose with hot reload
 
@@ -18,18 +18,16 @@ cd POPIS
 
 **That's it!** 
 
-- Frontend: http://localhost:3000
+- Frontend: http://localhost:19000 (Expo DevTools)
 - Backend: http://localhost:3001
 
 ## Project Structure
 
 ```
 POPIS/
-├── frontend/          # Next.js app
-│   └── src/
-│       ├── app/       # Pages
-│       ├── components/# UI components
-│       └── lib/       # Utils
+├── frontend/          # React Native Expo app
+│   ├── App.tsx        # Main app component
+│   └── assets/        # Images and other assets
 │
 └── backend/           # NestJS API
     └── src/
@@ -56,9 +54,9 @@ docker-compose logs -f   # Logs
 ## Adding Features
 
 ### Frontend
-- Add pages in `frontend/src/app/`
-- Add components in `frontend/src/components/`
-- Use shadcn/ui: Button, Card components included
+- Edit `App.tsx` to modify the main screen
+- Add components in the root directory or create a `components/` folder
+- Use React Native built-in components or add libraries like React Navigation
 
 ### Backend
 - Create modules in `backend/src/`

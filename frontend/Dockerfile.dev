@@ -12,8 +12,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Expose port
-EXPOSE 3000
+# Expose Expo ports (19000 for Metro bundler, 19001 for DevTools, 19002 for web)
+EXPOSE 19000 19001 19002 8081
 
-# Start development server with hot reload
-CMD ["npm", "run", "dev"]
+# Start Expo development server
+CMD ["npm", "start"]
