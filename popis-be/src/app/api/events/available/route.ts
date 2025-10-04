@@ -31,6 +31,17 @@ export const GET = async (request: NextRequest) => {
     // Filter by event type
     if (eventType) {
       where.eventType = { equals: eventType }
+      // If user is a student and explicitly filters for school events,
+      // require events to be from the student's own school
+      if (
+        eventType === 'school' &&
+        user &&
+        user.role === 'volunteer' &&
+        user.isStudent &&
+        user.school
+      ) {
+        where.targetSchool = { equals: user.school }
+      }
     } else if (user && user.role === 'volunteer') {
       // Auto-filter based on student status if not explicitly specified
       if (!user.isStudent) {
