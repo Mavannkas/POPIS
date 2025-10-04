@@ -69,6 +69,9 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    events: Event;
+    applications: Application;
+    certificates: Certificate;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,6 +80,9 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
+    certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -119,6 +125,36 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  role: 'superadmin' | 'volunteer' | 'organization' | 'coordinator';
+  firstName: string;
+  lastName: string;
+  phone?: string | null;
+  /**
+   * Wymagane do określenia czy osoba jest małoletnia
+   */
+  birthDate: string;
+  /**
+   * Automatycznie wyliczane na podstawie daty urodzenia
+   */
+  isMinor?: boolean | null;
+  /**
+   * Konto zatwierdzone przez superadmina (dotyczy organizacji i koordynatorów)
+   */
+  verified?: boolean | null;
+  organizationName?: string | null;
+  organizationDescription?: string | null;
+  nip?: string | null;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    postalCode?: string | null;
+  };
+  schoolName?: string | null;
+  schoolAddress?: string | null;
+  /**
+   * Stream Chat user ID (auto-generated)
+   */
+  streamUserId?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -158,6 +194,157 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Organizacja odpowiedzialna za wydarzenie
+   */
+  organization: number | User;
+  category: 'education' | 'environment' | 'social' | 'health' | 'animals' | 'culture' | 'sport' | 'other';
+  size: 'small' | 'medium' | 'large';
+  location: {
+    address: string;
+    city: string;
+    /**
+     * Szerokość geograficzna (dla mapy)
+     */
+    lat?: number | null;
+    /**
+     * Długość geograficzna (dla mapy)
+     */
+    lng?: number | null;
+  };
+  startDate: string;
+  endDate?: string | null;
+  /**
+   * Przewidywana liczba godzin wolontariatu
+   */
+  duration: number;
+  /**
+   * Minimalny wiek uczestnika
+   */
+  minAge: number;
+  /**
+   * Maksymalna liczba wolontariuszy (opcjonalne)
+   */
+  maxVolunteers?: number | null;
+  /**
+   * Wymagania dla wolontariuszy
+   */
+  requirements?: string | null;
+  /**
+   * Dodatkowe informacje o wydarzeniu (opcjonalne)
+   */
+  additionalInfo?: string | null;
+  status: 'draft' | 'published' | 'completed' | 'cancelled';
+  /**
+   * Główne zdjęcie wydarzenia
+   */
+  image?: (number | null) | Media;
+  /**
+   * Użytkownik który stworzył wydarzenie
+   */
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications".
+ */
+export interface Application {
+  id: number;
+  event: number | Event;
+  volunteer: number | User;
+  status: 'pending' | 'accepted' | 'rejected' | 'completed';
+  /**
+   * Wiadomość od wolontariusza
+   */
+  message?: string | null;
+  /**
+   * Liczba przepracowanych godzin (wypełnia organizacja)
+   */
+  hoursWorked?: number | null;
+  /**
+   * Notatki organizacji (widoczne tylko dla organizacji i superadmina)
+   */
+  organizationNotes?: string | null;
+  appliedAt?: string | null;
+  /**
+   * Data ukończenia wolontariatu
+   */
+  completedAt?: string | null;
+  /**
+   * Stream Chat channel ID (auto-generated po akceptacji)
+   */
+  chatChannelId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates".
+ */
+export interface Certificate {
+  id: number;
+  /**
+   * Powiązane zgłoszenie
+   */
+  application: number | Application;
+  volunteer: number | User;
+  event: number | Event;
+  /**
+   * Wypełniane automatycznie z wydarzenia
+   */
+  organization?: (number | null) | User;
+  /**
+   * Liczba przepracowanych godzin
+   */
+  hoursWorked: number;
+  /**
+   * Kto wystawił zaświadczenie (organizacja lub koordynator)
+   */
+  issuedBy?: (number | null) | User;
+  /**
+   * Koordynator który zatwierdził (opcjonalne)
+   */
+  approvedBy?: (number | null) | User;
+  /**
+   * Data wystawienia
+   */
+  issueDate: string;
+  /**
+   * Unikalny numer zaświadczenia
+   */
+  certificateNumber: string;
+  status: 'pending' | 'issued';
+  /**
+   * Dodatkowe uwagi
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -170,6 +357,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'applications';
+        value: number | Application;
+      } | null)
+    | ({
+        relationTo: 'certificates';
+        value: number | Certificate;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -218,6 +417,26 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
+  firstName?: T;
+  lastName?: T;
+  phone?: T;
+  birthDate?: T;
+  isMinor?: T;
+  verified?: T;
+  organizationName?: T;
+  organizationDescription?: T;
+  nip?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        postalCode?: T;
+      };
+  schoolName?: T;
+  schoolAddress?: T;
+  streamUserId?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -252,6 +471,73 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  organization?: T;
+  category?: T;
+  size?: T;
+  location?:
+    | T
+    | {
+        address?: T;
+        city?: T;
+        lat?: T;
+        lng?: T;
+      };
+  startDate?: T;
+  endDate?: T;
+  duration?: T;
+  minAge?: T;
+  maxVolunteers?: T;
+  requirements?: T;
+  additionalInfo?: T;
+  status?: T;
+  image?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications_select".
+ */
+export interface ApplicationsSelect<T extends boolean = true> {
+  event?: T;
+  volunteer?: T;
+  status?: T;
+  message?: T;
+  hoursWorked?: T;
+  organizationNotes?: T;
+  appliedAt?: T;
+  completedAt?: T;
+  chatChannelId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates_select".
+ */
+export interface CertificatesSelect<T extends boolean = true> {
+  application?: T;
+  volunteer?: T;
+  event?: T;
+  organization?: T;
+  hoursWorked?: T;
+  issuedBy?: T;
+  approvedBy?: T;
+  issueDate?: T;
+  certificateNumber?: T;
+  status?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
