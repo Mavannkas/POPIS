@@ -342,13 +342,7 @@ export interface Event {
   location: {
     address: string;
     city: string;
-    /**
-     * Szerokość geograficzna (dla mapy)
-     */
     lat?: number | null;
-    /**
-     * Długość geograficzna (dla mapy)
-     */
     lng?: number | null;
   };
   startDate: string;
