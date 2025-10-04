@@ -64,14 +64,18 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    admins: AdminAuthOperations;
   };
   blocks: {};
   collections: {
     users: User;
+    admins: Admin;
     media: Media;
     events: Event;
     applications: Application;
     certificates: Certificate;
+    schools: School;
+    invitations: Invitation;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -79,10 +83,13 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    admins: AdminsSelect<false> | AdminsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
+    schools: SchoolsSelect<false> | SchoolsSelect<true>;
+    invitations: InvitationsSelect<false> | InvitationsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -93,9 +100,13 @@ export interface Config {
   globals: {};
   globalsSelect: {};
   locale: null;
-  user: User & {
-    collection: 'users';
-  };
+  user:
+    | (User & {
+        collection: 'users';
+      })
+    | (Admin & {
+        collection: 'admins';
+      });
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -119,13 +130,30 @@ export interface UserAuthOperations {
     password: string;
   };
 }
+export interface AdminAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
-  role: 'superadmin' | 'volunteer' | 'organization' | 'coordinator';
   firstName: string;
   lastName: string;
   phone?: string | null;
@@ -134,11 +162,94 @@ export interface User {
    */
   birthDate: string;
   /**
+   * Zatwierdzenie wieku
+   */
+  isAgeIsVerified?: boolean | null;
+  /**
    * Automatycznie wyliczane na podstawie daty urodzenia
    */
   isMinor?: boolean | null;
   /**
-   * Konto zatwierdzone przez superadmina (dotyczy organizacji i koordynatorów)
+   * Automatycznie wyliczane - czy osoba jest pełnoletnia (>= 18 lat)
+   */
+  isAdult?: boolean | null;
+  /**
+   * Czy użytkownik jest uczniem szkoły
+   */
+  isStudent?: boolean | null;
+  /**
+   * Szkoła ucznia (wymagane jeśli isStudent=true)
+   */
+  school?: (number | null) | School;
+  /**
+   * Stream Chat user ID (auto-generated)
+   */
+  streamUserId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+}
+/**
+ * Cache szkół wybranych przez użytkowników (dane z zewnętrznego API)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "schools".
+ */
+export interface School {
+  id: number;
+  /**
+   * ID szkoły z zewnętrznego API (np. RSPO)
+   */
+  externalId: string;
+  /**
+   * Nazwa szkoły
+   */
+  name: string;
+  /**
+   * Adres szkoły
+   */
+  address?: string | null;
+  /**
+   * Miasto
+   */
+  city: string;
+  /**
+   * Kod pocztowy
+   */
+  postalCode?: string | null;
+  /**
+   * Typ szkoły
+   */
+  type?: ('liceum' | 'technikum' | 'branzowa' | 'other') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admins".
+ */
+export interface Admin {
+  id: number;
+  role: 'organization' | 'coordinator' | 'superadmin';
+  firstName: string;
+  lastName: string;
+  phone?: string | null;
+  /**
+   * Konto zatwierdzone przez superadmina
    */
   verified?: boolean | null;
   organizationName?: string | null;
@@ -217,7 +328,15 @@ export interface Event {
   /**
    * Organizacja odpowiedzialna za wydarzenie
    */
-  organization: number | User;
+  organization: number | Admin;
+  /**
+   * Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)
+   */
+  eventType: 'public' | 'school';
+  /**
+   * Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)
+   */
+  targetSchool?: (number | null) | School;
   category: 'education' | 'environment' | 'social' | 'health' | 'animals' | 'culture' | 'sport' | 'other';
   size: 'small' | 'medium' | 'large';
   location: {
@@ -262,7 +381,7 @@ export interface Event {
   /**
    * Użytkownik który stworzył wydarzenie
    */
-  createdBy?: (number | null) | User;
+  createdBy?: (number | null) | Admin;
   updatedAt: string;
   createdAt: string;
 }
@@ -314,7 +433,7 @@ export interface Certificate {
   /**
    * Wypełniane automatycznie z wydarzenia
    */
-  organization?: (number | null) | User;
+  organization?: (number | null) | Admin;
   /**
    * Liczba przepracowanych godzin
    */
@@ -322,11 +441,11 @@ export interface Certificate {
   /**
    * Kto wystawił zaświadczenie (organizacja lub koordynator)
    */
-  issuedBy?: (number | null) | User;
+  issuedBy?: (number | null) | Admin;
   /**
    * Koordynator który zatwierdził (opcjonalne)
    */
-  approvedBy?: (number | null) | User;
+  approvedBy?: (number | null) | Admin;
   /**
    * Data wystawienia
    */
@@ -345,6 +464,40 @@ export interface Certificate {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invitations".
+ */
+export interface Invitation {
+  id: number;
+  /**
+   * Wydarzenie do którego zapraszamy
+   */
+  event: number | Event;
+  /**
+   * Zaproszony wolontariusz
+   */
+  volunteer: number | User;
+  /**
+   * Kto wysłał zaproszenie (organizacja lub koordynator)
+   */
+  invitedBy: number | Admin;
+  status: 'pending' | 'accepted' | 'declined';
+  /**
+   * Wiadomość dla wolontariusza (opcjonalne)
+   */
+  message?: string | null;
+  /**
+   * Data wysłania zaproszenia
+   */
+  invitedAt: string;
+  /**
+   * Data odpowiedzi na zaproszenie
+   */
+  respondedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -353,6 +506,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'admins';
+        value: number | Admin;
       } | null)
     | ({
         relationTo: 'media';
@@ -369,12 +526,25 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'certificates';
         value: number | Certificate;
+      } | null)
+    | ({
+        relationTo: 'schools';
+        value: number | School;
+      } | null)
+    | ({
+        relationTo: 'invitations';
+        value: number | Invitation;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'admins';
+        value: number | Admin;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -384,10 +554,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'admins';
+        value: number | Admin;
+      };
   key?: string | null;
   value?:
     | {
@@ -417,12 +592,42 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  role?: T;
   firstName?: T;
   lastName?: T;
   phone?: T;
   birthDate?: T;
+  isAgeIsVerified?: T;
   isMinor?: T;
+  isAdult?: T;
+  isStudent?: T;
+  school?: T;
+  streamUserId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admins_select".
+ */
+export interface AdminsSelect<T extends boolean = true> {
+  role?: T;
+  firstName?: T;
+  lastName?: T;
+  phone?: T;
   verified?: T;
   organizationName?: T;
   organizationDescription?: T;
@@ -480,6 +685,8 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
   organization?: T;
+  eventType?: T;
+  targetSchool?: T;
   category?: T;
   size?: T;
   location?:
@@ -536,6 +743,35 @@ export interface CertificatesSelect<T extends boolean = true> {
   certificateNumber?: T;
   status?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "schools_select".
+ */
+export interface SchoolsSelect<T extends boolean = true> {
+  externalId?: T;
+  name?: T;
+  address?: T;
+  city?: T;
+  postalCode?: T;
+  type?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invitations_select".
+ */
+export interface InvitationsSelect<T extends boolean = true> {
+  event?: T;
+  volunteer?: T;
+  invitedBy?: T;
+  status?: T;
+  message?: T;
+  invitedAt?: T;
+  respondedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

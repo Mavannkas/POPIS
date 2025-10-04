@@ -5,6 +5,10 @@ export const Applications: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     defaultColumns: ['event', 'volunteer', 'status', 'appliedAt'],
+    // Tylko organizatorzy i koordynatorzy mają dostęp do admin panelu
+    hidden: ({ user }) => {
+      return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
+    },
   },
   fields: [
     {
@@ -18,9 +22,6 @@ export const Applications: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
-      filterOptions: {
-        role: { equals: 'volunteer' },
-      },
     },
     {
       name: 'status',

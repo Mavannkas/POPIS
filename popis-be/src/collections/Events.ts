@@ -5,6 +5,10 @@ export const Events: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'organization', 'category', 'startDate', 'status'],
+    // Tylko organizatorzy i koordynatorzy mają dostęp do admin panelu
+    hidden: ({ user }: { user: any }) => {
+      return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
+    },
   },
   fields: [
     {
@@ -20,13 +24,35 @@ export const Events: CollectionConfig = {
     {
       name: 'organization',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: 'admins',
       required: true,
       filterOptions: {
         role: { equals: 'organization' },
       },
       admin: {
         description: 'Organizacja odpowiedzialna za wydarzenie',
+      },
+    },
+    {
+      name: 'eventType',
+      type: 'select',
+      required: true,
+      defaultValue: 'public',
+      options: [
+        { label: 'Wydarzenie publiczne', value: 'public' },
+        { label: 'Wydarzenie szkolne', value: 'school' },
+      ],
+      admin: {
+        description: 'Typ wydarzenia: publiczne (dla wszystkich) lub szkolne (tylko dla uczniów)',
+      },
+    },
+    {
+      name: 'targetSchool',
+      type: 'relationship',
+      relationTo: 'schools',
+      admin: {
+        description: 'Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)',
+        condition: (data: any) => data.eventType === 'school',
       },
     },
     {
@@ -165,7 +191,7 @@ export const Events: CollectionConfig = {
     {
       name: 'createdBy',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: 'admins',
       admin: {
         readOnly: true,
         description: 'Użytkownik który stworzył wydarzenie',
@@ -174,24 +200,56 @@ export const Events: CollectionConfig = {
   ],
   access: {
     // Organizations and coordinators can create events
-    create: ({ req: { user } }) => {
+    create: ({ req: { user } }: { req: { user: any } }) => {
       if (!user) return false
       return ['organization', 'coordinator', 'superadmin'].includes(user.role)
     },
     // Published events are public, others only for owner and superadmin
-    read: ({ req: { user } }) => {
+    read: ({ req: { user } }: { req: { user: any } }) => {
       if (!user) {
-        // Public can see only published events
+        // Public can see only published public events
         return {
-          status: { equals: 'published' },
+          and: [
+            { status: { equals: 'published' } },
+            { eventType: { equals: 'public' } },
+          ],
         }
       }
       if (user.role === 'superadmin') return true
+      
       if (user.role === 'volunteer') {
-        return {
+        // Volunteers see published events based on their student status
+        const conditions: any = {
           status: { equals: 'published' },
         }
+        
+        // If not a student, can only see public events
+        if (!user.isStudent) {
+          conditions.eventType = { equals: 'public' }
+        } else {
+          // Students can see:
+          // 1. All public events
+          // 2. School events for their school (or without targetSchool)
+          conditions.or = [
+            { eventType: { equals: 'public' } },
+            {
+              and: [
+                { eventType: { equals: 'school' } },
+                {
+                  or: [
+                    { targetSchool: { exists: false } },
+                    { targetSchool: { equals: null } },
+                    { targetSchool: { equals: user.school } },
+                  ],
+                },
+              ],
+            },
+          ]
+        }
+        
+        return conditions
       }
+      
       // Organization/coordinator can see their own events
       return {
         or: [
@@ -202,7 +260,7 @@ export const Events: CollectionConfig = {
       }
     },
     // Only owner and superadmin can update
-    update: ({ req: { user } }) => {
+    update: ({ req: { user } }: { req: { user: any } }) => {
       if (!user) return false
       if (user.role === 'superadmin') return true
       return {
@@ -210,7 +268,7 @@ export const Events: CollectionConfig = {
       }
     },
     // Only owner and superadmin can delete
-    delete: ({ req: { user } }) => {
+    delete: ({ req: { user } }: { req: { user: any } }) => {
       if (!user) return false
       if (user.role === 'superadmin') return true
       return {
@@ -220,7 +278,7 @@ export const Events: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      ({ data, req, operation }) => {
+      ({ data, req, operation }: { data: any; req: any; operation: string }) => {
         // Auto-set createdBy on create
         if (operation === 'create' && req.user) {
           data.createdBy = req.user.id

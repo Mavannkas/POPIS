@@ -5,6 +5,10 @@ export const Certificates: CollectionConfig = {
   admin: {
     useAsTitle: 'certificateNumber',
     defaultColumns: ['certificateNumber', 'volunteer', 'event', 'status', 'issueDate'],
+    // Tylko organizatorzy i koordynatorzy mają dostęp do admin panelu
+    hidden: ({ user }) => {
+      return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
+    },
   },
   fields: [
     {
@@ -22,9 +26,6 @@ export const Certificates: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
-      filterOptions: {
-        role: { equals: 'volunteer' },
-      },
     },
     {
       name: 'event',
@@ -35,7 +36,7 @@ export const Certificates: CollectionConfig = {
     {
       name: 'organization',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: 'admins',
       filterOptions: {
         role: { equals: 'organization' },
       },
@@ -54,7 +55,7 @@ export const Certificates: CollectionConfig = {
     {
       name: 'issuedBy',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: 'admins',
       admin: {
         description: 'Kto wystawił zaświadczenie (organizacja lub koordynator)',
       },
@@ -62,7 +63,7 @@ export const Certificates: CollectionConfig = {
     {
       name: 'approvedBy',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: 'admins',
       filterOptions: {
         role: { equals: 'coordinator' },
       },
