@@ -51,6 +51,15 @@ export const Users: CollectionConfig = {
       },
     },
     {
+      name: 'isAgeIsVerified',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Zatwierdzenie wieku',
+        readOnly: true,
+      },
+    },
+    {
       name: 'isMinor',
       type: 'checkbox',
       defaultValue: false,
