@@ -75,26 +75,7 @@ export default function SearchScreen() {
   });
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: 'Szukaj wydarzeń',
-          headerStyle: {
-            backgroundColor: 'white',
-          },
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-          headerBackTitle: '',
-          headerRight: () => (
-            <TouchableOpacity onPress={clearFilters} className="p-2">
-              <Text className="text-primary font-medium">Wyczyść</Text>
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
         {/* Search Bar */}
         <View className="px-4 py-4 bg-white shadow-sm">
           <Searchbar
@@ -218,6 +199,5 @@ export default function SearchScreen() {
         <View className="h-20" />
       </ScrollView>
     </View>
-    </>
   );
 }
