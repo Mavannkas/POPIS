@@ -107,8 +107,12 @@ export const Invitations: CollectionConfig = {
       async ({ data, req, operation }) => {
         // Set invitedBy and invitedAt on create
         if (operation === 'create') {
-          data.invitedBy = req.user?.id
-          data.invitedAt = new Date().toISOString()
+          if (!data.invitedBy) {
+            data.invitedBy = req.user?.id
+          }
+          if (!data.invitedAt) {
+            data.invitedAt = new Date().toISOString()
+          }
         }
 
         // Set respondedAt when status changes from pending

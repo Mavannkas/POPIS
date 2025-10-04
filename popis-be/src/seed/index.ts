@@ -7,6 +7,40 @@ export const seed = async (payload: Payload): Promise<void> => {
     // Clear existing data
     payload.logger.info('Clearing existing data...')
 
+    const collections = [
+      'certificates',
+      'applications',
+      'invitations',
+      'events',
+      'users',
+      'admins',
+      'schools',
+      'media',
+    ]
+
+    for (const collection of collections) {
+      try {
+        const { docs } = await payload.find({
+          collection: collection as any,
+          limit: 1000,
+        })
+
+        if (docs.length > 0) {
+          await Promise.all(
+            docs.map((doc) =>
+              payload.delete({
+                collection: collection as any,
+                id: doc.id,
+              }),
+            ),
+          )
+          payload.logger.info(`Cleared ${docs.length} documents from ${collection}`)
+        }
+      } catch (error) {
+        payload.logger.error(`Error clearing ${collection}:`, error)
+      }
+    }
+
     // Seed Schools
     payload.logger.info('Seeding Schools...')
     const schools = await Promise.all([
@@ -48,6 +82,18 @@ export const seed = async (payload: Payload): Promise<void> => {
     // Seed Admins (Organizations and Coordinators)
     payload.logger.info('Seeding Admins...')
     const admins = await Promise.all([
+      payload.create({
+        collection: 'admins',
+        data: {
+          email: 'admin@popis.pl',
+          password: 'zaq1@WSX',
+          role: 'superadmin',
+          firstName: 'Super',
+          lastName: 'Admin',
+          phone: '+48 000 000 000',
+          verified: true,
+        },
+      }),
       payload.create({
         collection: 'admins',
         data: {
@@ -175,7 +221,7 @@ export const seed = async (payload: Payload): Promise<void> => {
               ],
             },
           },
-          organization: admins[0].id,
+          organization: admins[1].id,
           eventType: 'public',
           category: 'animals',
           size: 'medium',
@@ -192,7 +238,7 @@ export const seed = async (payload: Payload): Promise<void> => {
           maxVolunteers: 20,
           requirements: 'Nie wymagamy doświadczenia, tylko chęci do pracy i miłość do zwierząt',
           status: 'published',
-          createdBy: admins[0].id,
+          createdBy: admins[1].id,
         },
       }),
       payload.create({
@@ -220,7 +266,7 @@ export const seed = async (payload: Payload): Promise<void> => {
               ],
             },
           },
-          organization: admins[1].id,
+          organization: admins[2].id,
           eventType: 'school',
           targetSchool: schools[0].id,
           category: 'environment',
@@ -239,7 +285,7 @@ export const seed = async (payload: Payload): Promise<void> => {
           requirements: 'Przynieś własne rękawiczki i workii na śmieci',
           additionalInfo: 'Po akcji organizujemy wspólne ognisko',
           status: 'published',
-          createdBy: admins[1].id,
+          createdBy: admins[2].id,
         },
       }),
       payload.create({
@@ -267,7 +313,7 @@ export const seed = async (payload: Payload): Promise<void> => {
               ],
             },
           },
-          organization: admins[0].id,
+          organization: admins[1].id,
           eventType: 'public',
           category: 'culture',
           size: 'small',
@@ -284,7 +330,7 @@ export const seed = async (payload: Payload): Promise<void> => {
           maxVolunteers: 15,
           requirements: 'Komunikatywność i chęć pracy z dziećmi',
           status: 'published',
-          createdBy: admins[0].id,
+          createdBy: admins[1].id,
         },
       }),
     ])
@@ -308,9 +354,11 @@ export const seed = async (payload: Payload): Promise<void> => {
         data: {
           event: events[1].id,
           volunteer: users[1].id,
-          status: 'pending',
+          status: 'completed',
           message: 'Chętnie wezmę udział w akcji sprzątania!',
+          hoursWorked: 4,
           appliedAt: new Date('2025-10-05').toISOString(),
+          completedAt: new Date('2025-11-20').toISOString(),
         },
       }),
       payload.create({
@@ -335,7 +383,7 @@ export const seed = async (payload: Payload): Promise<void> => {
         data: {
           event: events[0].id,
           volunteer: users[2].id,
-          invitedBy: admins[0].id,
+          invitedBy: admins[1].id,
           status: 'pending',
           message:
             'Szukamy osób z doświadczeniem w pracy ze zwierzętami. Sądzimy, że będziesz idealną osobą!',
@@ -347,7 +395,7 @@ export const seed = async (payload: Payload): Promise<void> => {
         data: {
           event: events[1].id,
           volunteer: users[0].id,
-          invitedBy: admins[1].id,
+          invitedBy: admins[2].id,
           status: 'accepted',
           message: 'Zapraszamy Cię do udziału w akcji sprzątania parku!',
           invitedAt: new Date('2025-10-08').toISOString(),
@@ -359,7 +407,7 @@ export const seed = async (payload: Payload): Promise<void> => {
         data: {
           event: events[2].id,
           volunteer: users[1].id,
-          invitedBy: admins[0].id,
+          invitedBy: admins[1].id,
           status: 'declined',
           message: 'Mamy wrażenie, że masz świetne podejście do dzieci!',
           invitedAt: new Date('2025-10-01').toISOString(),
@@ -369,53 +417,24 @@ export const seed = async (payload: Payload): Promise<void> => {
     ])
 
     // Seed Certificates
+    // Note: Certificates for applications with status 'completed' are auto-created by hook
+    // We only manually create certificate for application[0] which has status 'accepted'
     payload.logger.info('Seeding Certificates...')
-    await Promise.all([
-      payload.create({
-        collection: 'certificates',
-        data: {
-          application: applications[0].id,
-          volunteer: users[0].id,
-          event: events[0].id,
-          organization: admins[0].id,
-          hoursWorked: 6,
-          issuedBy: admins[0].id,
-          status: 'issued',
-          certificateNumber: 'CERT-2025-001',
-          issueDate: new Date('2025-11-16').toISOString(),
-          notes: 'Wolontariusz bardzo zaangażowany i pomocny',
-        },
-      }),
-      payload.create({
-        collection: 'certificates',
-        data: {
-          application: applications[2].id,
-          volunteer: users[2].id,
-          event: events[2].id,
-          organization: admins[0].id,
-          hoursWorked: 6,
-          issuedBy: admins[0].id,
-          approvedBy: admins[2].id,
-          status: 'issued',
-          certificateNumber: 'CERT-2025-002',
-          issueDate: new Date('2025-12-06').toISOString(),
-          notes: 'Świetna praca z dziećmi podczas festynu',
-        },
-      }),
-      payload.create({
-        collection: 'certificates',
-        data: {
-          application: applications[2].id,
-          volunteer: users[2].id,
-          event: events[2].id,
-          organization: admins[0].id,
-          hoursWorked: 6,
-          status: 'pending',
-          certificateNumber: 'CERT-2025-003',
-          issueDate: new Date('2025-12-07').toISOString(),
-        },
-      }),
-    ])
+    await payload.create({
+      collection: 'certificates',
+      data: {
+        application: applications[0].id,
+        volunteer: users[0].id,
+        event: events[0].id,
+        organization: admins[1].id,
+        hoursWorked: 6,
+        issuedBy: admins[1].id,
+        status: 'issued',
+        certificateNumber: 'CERT-2025-001',
+        issueDate: new Date('2025-11-16').toISOString(),
+        notes: 'Wolontariusz bardzo zaangażowany i pomocny',
+      },
+    })
 
     payload.logger.info('✅ Database seeded successfully!')
   } catch (error) {

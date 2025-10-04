@@ -134,9 +134,10 @@ export const Applications: CollectionConfig = {
             const { createChatChannel } = await import('../lib/streamChat')
 
             // Get full event data
+            const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
             const event = await req.payload.findByID({
               collection: 'events',
-              id: doc.event as string,
+              id: eventId as string,
             })
 
             // Get volunteer and organization IDs
@@ -182,6 +183,15 @@ export const Applications: CollectionConfig = {
             })
 
             if (existingCerts.docs.length === 0) {
+              // Get event to extract organization
+              const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
+              const event = await payload.findByID({
+                collection: 'events',
+                id: eventId as string,
+              })
+              const organizationId =
+                typeof event.organization === 'object' ? event.organization.id : event.organization
+
               // Create certificate
               await payload.create({
                 collection: 'certificates',
@@ -189,6 +199,7 @@ export const Applications: CollectionConfig = {
                   application: doc.id,
                   volunteer: doc.volunteer,
                   event: doc.event,
+                  organization: organizationId,
                   hoursWorked: doc.hoursWorked || 0,
                   status: 'pending',
                   issueDate: new Date().toISOString(),
