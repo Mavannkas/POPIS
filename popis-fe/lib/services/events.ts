@@ -18,6 +18,7 @@ export interface Event {
   duration: number;
   minAge: number;
   maxVolunteers?: number;
+  acceptedCount?: number; // number of accepted applications (server-provided)
   requirements?: string;
   additionalInfo?: string;
   status: 'draft' | 'published' | 'completed' | 'cancelled';

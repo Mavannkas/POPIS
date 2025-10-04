@@ -126,13 +126,10 @@ export const GET = async (request: NextRequest) => {
       depth: 2,
     })
 
-    // Filter by available spots: accepted applications < maxVolunteers (if set)
+    // Filter by available spots and attach acceptedCount to each event
     const filteredDocs: any[] = []
     for (const ev of events.docs as any[]) {
-      if (!ev.maxVolunteers) {
-        filteredDocs.push(ev)
-        continue
-      }
+      let acceptedCount = 0
       try {
         const apps = await payload.find({
           collection: 'applications',
@@ -144,13 +141,14 @@ export const GET = async (request: NextRequest) => {
           },
           limit: 1, // we only need totalDocs
         })
-        const acceptedCount = apps.totalDocs || 0
-        if (acceptedCount < (ev.maxVolunteers as number)) {
-          filteredDocs.push(ev)
-        }
+        acceptedCount = apps.totalDocs || 0
       } catch (e) {
-        // If counting fails, be permissive and include the event
-        filteredDocs.push(ev)
+        // ignore; keep 0
+      }
+
+      // include event if has capacity or no limit
+      if (!ev.maxVolunteers || acceptedCount < (ev.maxVolunteers as number)) {
+        filteredDocs.push({ ...ev, acceptedCount })
       }
       if (limit && filteredDocs.length >= limit) break
     }

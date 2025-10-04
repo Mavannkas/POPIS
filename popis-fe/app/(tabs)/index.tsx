@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { Card, Chip } from 'react-native-paper';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { Card } from 'react-native-paper';
 import { TopBar } from '@/components/ui/top-bar';
-import { CategoryIcon } from '@/components/ui/category-icon';
-import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, applyToEvent, type Event } from '@/lib/services/events';
+import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, applyToEvent, getMyApplications, type Event } from '@/lib/services/events';
 import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [appliedEventIds, setAppliedEventIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     (async () => {
@@ -17,6 +17,20 @@ export default function HomeScreen() {
         setLoading(true);
         const res = await getAvailableEvents({ limit: 5 });
         setEvents(res.events);
+        // Load my applications to show "Zapisano" status on cards
+        try {
+          const apps = await getMyApplications();
+          const ids = new Set<string>();
+          (apps.applications || []).forEach(app => {
+            const ev: any = app.event as any;
+            const eventId = typeof ev === 'object' ? String(ev.id) : String(ev);
+            if (eventId) ids.add(eventId);
+          });
+          setAppliedEventIds(ids);
+        } catch (e) {
+          // non-blocking
+          console.warn('Failed to load my applications', e);
+        }
       } catch (e) {
         console.error('Failed to load home events', e);
       } finally {
@@ -61,82 +75,80 @@ export default function HomeScreen() {
         {events.map((event) => (
           <TouchableOpacity
             key={event.id}
-            className="mb-4"
+            className="mb-6"
             onPress={() => router.push(`/event/${event.id}` as any)}
           >
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-white shadow-sm rounded-2xl overflow-hidden">
+              {/* Image header */}
+              <View className="w-full h-40 bg-gray-200">
+                {event && (event as any).image && typeof (event as any).image === 'object' && (event as any).image?.url ? (
+                  <Image
+                    source={{ uri: (event as any).image.url as string }}
+                    className="w-full h-full"
+                    resizeMode="cover"
+                  />
+                ) : null}
+                {/* Saved badge */}
+                {appliedEventIds.has(String(event.id)) && (
+                  <View className="absolute left-3 bottom-3">
+                    <View style={styles.savedBadge} className="flex-row items-center">
+                      <View style={styles.savedIconCircle} className="items-center justify-center mr-2">
+                        <Text style={styles.savedIcon}>✓</Text>
+                      </View>
+                      <Text style={styles.savedText}>Zapisano</Text>
+                    </View>
+                  </View>
+                )}
+                {/* Top-right category chip */}
+                <View className="absolute right-3 bottom-3">
+                  <View className="px-3 py-1 rounded-full bg-primary/90 flex-row items-center">
+                    <Text className="text-white text-xs mr-1">{getCategoryEmoji(event.category)}</Text>
+                    <Text className="text-white text-xs font-semibold">{getCategoryLabel(event.category)}</Text>
+                  </View>
+                </View>
+              </View>
+
               <Card.Content className="p-4">
+                {/* Title and capacity */}
                 <View className="flex-row justify-between items-start mb-3">
                   <View className="flex-1 mr-3">
-                    <Text className="text-lg font-semibold text-gray-800 mb-1">
+                    <Text className="text-xl font-semibold text-gray-900 mb-1" numberOfLines={2}>
                       {event.title}
                     </Text>
                     {event.organization && (
-                      <Text className="text-primary font-medium text-sm mb-2">
+                      <Text className="text-primary font-medium text-sm">
                         👤 {typeof event.organization === 'object' ? (event.organization.name || 'Organizacja') : 'Organizacja'}
                       </Text>
                     )}
                   </View>
-                  <View className={`px-3 py-1 rounded-full bg-primary/10 flex-row items-center`}>
-                    <Text className="text-xs mr-1">{getCategoryEmoji(event.category)}</Text>
-                    <Text className="text-xs font-medium text-primary">
-                      {getCategoryLabel(event.category)}
+                  {event.maxVolunteers ? (
+                    <View className="items-end">
+                      <Text className="text-blue-600 font-semibold">
+                        {(event.acceptedCount ?? 0)}/{event.maxVolunteers} <Text>👥</Text>
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* Meta row aligned per design */}
+                <View className="flex-row items-center justify-between mt-1">
+                  <View className="flex-row items-center">
+                    <Text style={styles.metaIcon}>📅</Text>
+                    <Text style={styles.metaText}>{new Date(event.startDate).toLocaleDateString('pl-PL')}</Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Text style={styles.metaIcon}>⏰</Text>
+                    <Text style={styles.metaText}>{event.duration}h</Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Text style={styles.metaIcon}>📍</Text>
+                    <Text style={styles.metaText} numberOfLines={1}>
+                      {event.location?.city || event.location?.address || ''}
                     </Text>
                   </View>
                 </View>
 
-                <View className="space-y-2 mb-3">
-                  <View className="flex-row items-center">
-                    <View style={styles.iconCircle}>
-                      <Text style={styles.iconEmoji}>📅</Text>
-                    </View>
-                    <Text className="text-gray-600 text-sm ml-2">{new Date(event.startDate).toLocaleDateString('pl-PL')}</Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <View style={styles.iconCircle}>
-                      <Text style={styles.iconEmoji}>⏰</Text>
-                    </View>
-                    <Text className="text-gray-600 text-sm ml-2">{event.duration}h</Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <View style={styles.iconCircle}>
-                      <Text style={styles.iconEmoji}>📍</Text>
-                    </View>
-                    <Text className="text-gray-600 text-sm ml-2">{event.location?.address || ''} {event.location?.city ? `• ${event.location.city}` : ''}</Text>
-                  </View>
-                </View>
-
-                {/* Tags */}
-                <View className="mb-3">
-                  <View className="flex-row flex-wrap gap-2">
-                    <View className="flex-row items-center">
-                      <CategoryIcon category={event.category} size="small" />
-                      <Chip
-                        style={{ backgroundColor: '#F5F5F5', marginLeft: 4 }}
-                        textStyle={{ color: '#666', fontSize: 12 }}
-                      >
-                        {getCategoryLabel(event.category)}
-                      </Chip>
-                    </View>
-                  </View>
-                </View>
-
-                <View className="flex-row justify-between items-center">
-                  <View className="flex-row items-center">
-                    <Text className="text-gray-500 text-sm">
-                      {event.maxVolunteers ? `👥 miejsca: ${event.maxVolunteers}` : '👥 liczba miejsc n/d'}
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    className="bg-primary px-4 py-2 rounded-full"
-                    onPress={() => onJoin(event.id)}
-                    disabled={joiningId === event.id}
-                  >
-                    <Text className="text-white font-medium text-sm">
-                      {joiningId === event.id ? 'Wysyłanie...' : 'Dołącz'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                {/* Removed bottom category row per new design */}
               </Card.Content>
             </Card>
           </TouchableOpacity>
@@ -160,5 +172,52 @@ const styles = StyleSheet.create({
   },
   iconEmoji: {
     fontSize: 16,
+  },
+  savedBadge: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 18,
+  },
+  savedIconCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: 'white',
+  },
+  savedIcon: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontWeight: '700',
+    lineHeight: 16,
+  },
+  savedText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  infoPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#F5F5F5',
+  },
+  pillEmoji: {
+    fontSize: 13,
+    marginRight: 6,
+  },
+  pillText: {
+    fontSize: 12,
+    color: '#4B5563',
+  },
+  metaIcon: {
+    fontSize: 16,
+    color: '#D17A92',
+    marginRight: 8,
+  },
+  metaText: {
+    fontSize: 14,
+    color: '#D17A92',
+    fontWeight: '600',
   },
 });
