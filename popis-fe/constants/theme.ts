@@ -1,11 +1,17 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+import { MD3LightTheme, configureFonts } from 'react-native-paper';
 
-import { Platform } from 'react-native';
+// Paleta kolorów - zmień tutaj, by zmienić cały motyw
+export const c = {
+  pink: '#D94E73',
+  magenta: '#A61F5E',
+  blue: '#3088BF',
+  green: '#73A641',
+  orange: '#E8A031',
+  white: '#FFFFFF',
+  black: '#11181C',
+};
 
-const primaryColor = '#A61F5E';
+const primaryColor = c.magenta;
 const bg1Color = '#F1DAE5';
 const tintColorLight = primaryColor;
 const tintColorDark = '#fff';
@@ -33,27 +39,14 @@ export const Colors = {
   },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+// Paper theme
+export const theme = {
+  ...MD3LightTheme,
+  fonts: configureFonts({ config: { fontFamily: 'Roboto_400Regular' } }),
+  colors: {
+    ...MD3LightTheme.colors,
+    primary: c.magenta,
+    background: c.white,
+    surface: c.white,
   },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+};

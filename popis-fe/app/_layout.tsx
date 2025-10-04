@@ -1,28 +1,26 @@
-import { DefaultTheme as NavigationDefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { PaperProvider } from 'react-native-paper';
+import { theme } from '@/constants/theme';
+import { AuthProvider } from '@/app/auth/context';
+import { useFonts, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold } from '@expo-google-fonts/roboto';
+import { View } from 'react-native';
 import './globals.css';
-import { PaperProvider, MD3LightTheme } from 'react-native-paper';
-
-export const unstable_settings = {
-	anchor: '(tabs)',
-};
 
 export default function RootLayout() {
-	return (
-		<PaperProvider theme={MD3LightTheme}>
-			<ThemeProvider value={NavigationDefaultTheme}>
-				<Stack
-					screenOptions={{
-						headerBackTitle: '',
-					}}
-				>
-					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-					<Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-				</Stack>
-				<StatusBar style="light" />
-			</ThemeProvider>
-		</PaperProvider>
-	);
+  const [loaded] = useFonts({ Roboto_400Regular, Roboto_500Medium, Roboto_700Bold });
+  if (!loaded) return <View />;
+
+  return (
+    <PaperProvider theme={theme}>
+      <AuthProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="auth" />
+        </Stack>
+        <StatusBar style="dark" />
+      </AuthProvider>
+    </PaperProvider>
+  );
 }
