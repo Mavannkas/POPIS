@@ -1,11 +1,8 @@
 import { Tabs } from 'expo-router';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { c } from '@/constants/theme';
-import { useAuth } from '@/app/auth/context';
-import { Button } from 'react-native-paper';
 
 export default function TabLayout() {
-  const { signOut } = useAuth();
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: c.magenta, headerShown: false }}>
       <Tabs.Screen
@@ -19,8 +16,6 @@ export default function TabLayout() {
               color={color}
             />
           ),
-          headerShown: true,
-          headerRight: () => <Button onPress={signOut}>Wyloguj</Button>,
         }}
       />
       <Tabs.Screen
