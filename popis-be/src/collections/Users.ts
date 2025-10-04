@@ -5,28 +5,14 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['email', 'role', 'firstName', 'lastName', 'verified'],
+    // Wolontariusze nie mają dostępu do admin panelu - używają tylko mobile app
+    hidden: ({ user }: { user: any }) => {
+      return true // Zawsze ukryte - wolontariusze używają tylko mobile app
+    },
   },
   auth: true,
   fields: [
-    // Role field - CRITICAL
-    {
-      name: 'role',
-      type: 'select',
-      required: true,
-      defaultValue: 'volunteer',
-      options: [
-        { label: 'Super Admin', value: 'superadmin' },
-        { label: 'Wolontariusz', value: 'volunteer' },
-        { label: 'Organizacja', value: 'organization' },
-        { label: 'Koordynator', value: 'coordinator' },
-      ],
-      access: {
-        // Only superadmin can change roles
-        update: ({ req: { user } }: { req: { user: any } }) => {
-          return user?.role === 'superadmin'
-        },
-      },
-    },
+    // Volunteers only - no role field needed
     // Basic Info
     {
       name: 'firstName',
@@ -68,78 +54,35 @@ export const Users: CollectionConfig = {
         readOnly: true,
       },
     },
-    // Account verification
     {
-      name: 'verified',
+      name: 'isAdult',
       type: 'checkbox',
       defaultValue: false,
       admin: {
-        description: 'Konto zatwierdzone przez superadmina (dotyczy organizacji i koordynatorów)',
-      },
-      access: {
-        update: ({ req: { user } }: { req: { user: any } }) => {
-          return user?.role === 'superadmin'
-        },
+        description: 'Automatycznie wyliczane - czy osoba jest pełnoletnia (>= 18 lat)',
+        readOnly: true,
       },
     },
-    // Organization fields (conditional)
+    // Student fields
     {
-      name: 'organizationName',
-      type: 'text',
+      name: 'isStudent',
+      type: 'checkbox',
+      defaultValue: false,
       admin: {
-        condition: (data: any) => data.role === 'organization',
+        description: 'Czy użytkownik jest uczniem szkoły',
       },
     },
     {
-      name: 'organizationDescription',
-      type: 'textarea',
+      name: 'school',
+      type: 'relationship',
+      relationTo: 'schools',
       admin: {
-        condition: (data: any) => data.role === 'organization',
+        description: 'Szkoła ucznia (wymagane jeśli isStudent=true)',
+        condition: (data: any) => data.isStudent === true,
       },
     },
-    {
-      name: 'nip',
-      type: 'text',
-      admin: {
-        condition: (data: any) => data.role === 'organization',
-      },
-    },
-    {
-      name: 'address',
-      type: 'group',
-      admin: {
-        condition: (data: any) => data.role === 'organization',
-      },
-      fields: [
-        {
-          name: 'street',
-          type: 'text',
-        },
-        {
-          name: 'city',
-          type: 'text',
-        },
-        {
-          name: 'postalCode',
-          type: 'text',
-        },
-      ],
-    },
-    // Coordinator fields
-    {
-      name: 'schoolName',
-      type: 'text',
-      admin: {
-        condition: (data: any) => data.role === 'coordinator',
-      },
-    },
-    {
-      name: 'schoolAddress',
-      type: 'text',
-      admin: {
-        condition: (data: any) => data.role === 'coordinator',
-      },
-    },
+    // Volunteers are auto-verified
+    // Volunteers don't need organization/coordinator fields
     // Stream Chat ID
     {
       name: 'streamUserId',
@@ -151,60 +94,57 @@ export const Users: CollectionConfig = {
     },
   ],
   access: {
-    // Anyone can create account (public registration)
+    // Anyone can create volunteer account (public registration)
     create: () => true,
-    // Authenticated users can read other users (basic info only)
+    // Volunteers can read other volunteers (basic info only)
     read: ({ req: { user } }: { req: { user: any } }) => {
       if (!user) return false
-      if (user.role === 'superadmin') return true
-      // Others can read verified users
-      return {
-        verified: { equals: true },
-      }
+      // Volunteers can read other volunteers
+      return true
     },
-    // Users can update their own profile, superadmin can update all
+    // Volunteers can update their own profile
     update: ({ req: { user } }: { req: { user: any } }) => {
       if (!user) return false
-      if (user.role === 'superadmin') return true
-      // Users can only update themselves
+      // Volunteers can only update themselves
       return {
         id: { equals: user.id },
       }
     },
-    // Only superadmin can delete
+    // Volunteers can delete their own account
     delete: ({ req: { user } }: { req: { user: any } }) => {
-      return user?.role === 'superadmin'
+      if (!user) return false
+      // Volunteers can only delete themselves
+      return {
+        id: { equals: user.id },
+      }
     },
   },
   hooks: {
     beforeChange: [
       ({ data, req, operation }: { data: any; req: any; operation: string }) => {
-        // Auto-calculate isMinor based on birthDate
+        // Auto-calculate isMinor and isAdult based on birthDate
         if (data.birthDate) {
           const birthDate = new Date(data.birthDate)
           const today = new Date()
           const age = today.getFullYear() - birthDate.getFullYear()
           const monthDiff = today.getMonth() - birthDate.getMonth()
           
+          let actualAge = age
           if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            data.isMinor = age - 1 < 18
-          } else {
-            data.isMinor = age < 18
+            actualAge = age - 1
           }
+          
+          data.isMinor = actualAge < 18
+          data.isAdult = actualAge >= 18
         }
 
-        // Set verified to false for new organizations and coordinators
-        if (operation === 'create' && (data.role === 'organization' || data.role === 'coordinator')) {
-          data.verified = false
-        }
-
-        // Superadmin is always verified
-        if (data.role === 'superadmin') {
-          data.verified = true
+        // Validate: if isStudent=true, school must be provided
+        if (data.isStudent && !data.school) {
+          throw new Error('Szkoła jest wymagana dla uczniów')
         }
 
         // Volunteers are auto-verified
-        if (data.role === 'volunteer') {
+        if (operation === 'create') {
           data.verified = true
         }
 
