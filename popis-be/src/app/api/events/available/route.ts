@@ -168,6 +168,7 @@ export const GET = async (request: NextRequest) => {
       }
 
       // include event if has capacity or no limit
+      // Capacity filter
       if (!ev.maxVolunteers || acceptedCount < (ev.maxVolunteers as number)) {
         // Apply applied/not_applied filter if provided
         if (applied && user) {
