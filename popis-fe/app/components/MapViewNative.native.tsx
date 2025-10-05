@@ -4,7 +4,7 @@ import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import { TopBar } from '@/components/ui/top-bar';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
-import { Event, getCategoryColor, getCategoryLabel, getCategoryEmoji } from '@/lib/services/events';
+import { Event, getCategoryColor, getCategoryLabel, getCategoryEmoji, applyToEvent } from '@/lib/services/events';
 import * as Location from 'expo-location';
 
 const { width, height } = Dimensions.get('window');
@@ -38,6 +38,7 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 	const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
 	const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
 	const [initialRegion, setInitialRegion] = useState(DEFAULT_LOCATION);
+	const [joining, setJoining] = useState(false);
 	const mapRef = useRef<MapView>(null);
 
 	// Only use events that have valid coordinates
@@ -114,6 +115,10 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 		});
 	};
 
+	const formatTime = (dateString: string) => {
+		return new Date(dateString).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+	};
+
 	const handleMarkerPress = (event: Event) => {
 		setSelectedMarker(event.id);
 
@@ -184,10 +189,9 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 											<Text style={styles.popupTitle} numberOfLines={2}>
 												{event.title}
 											</Text>
-											<View style={styles.popupCategoryBadge}>
-												<Text style={styles.popupCategoryEmoji}>{getCategoryEmoji(event.category)}</Text>
-												<Text style={styles.popupCategoryText}>{getCategoryLabel(event.category)}</Text>
-											</View>
+											<Text style={styles.popupOrganizer}>
+												👤 {event && event.organization ? (typeof event.organization === 'object' ? (event.organization.name || 'Organizacja') : 'Organizacja') : 'Organizacja'}
+											</Text>
 										</View>
 										<TouchableOpacity style={styles.popupCloseButton} onPress={() => setSelectedMarker(null)}>
 											<Text style={styles.popupCloseText}>✕</Text>
@@ -195,65 +199,58 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 									</View>
 
 									<ScrollView style={styles.popupScroll} showsVerticalScrollIndicator={false}>
-										<View style={styles.popupDetails}>
-											<View style={styles.popupDetailRow}>
-												<View style={styles.popupIconCircle}>
-													<Text style={styles.popupDetailIcon}>📅</Text>
-												</View>
-												<View style={styles.popupDetailContent}>
-													<Text style={styles.popupDetailLabel}>DATA</Text>
-													<Text style={styles.popupDetailText}>{formatDate(event.startDate)}</Text>
-												</View>
-											</View>
-											<View style={styles.popupDetailRow}>
-												<View style={styles.popupIconCircle}>
-													<Text style={styles.popupDetailIcon}>⏰</Text>
-												</View>
-												<View style={styles.popupDetailContent}>
-													<Text style={styles.popupDetailLabel}>CZAS</Text>
-													<Text style={styles.popupDetailText}>{event.duration}h</Text>
-												</View>
-											</View>
-											<View style={styles.popupDetailRow}>
-												<View style={styles.popupIconCircle}>
-													<Text style={styles.popupDetailIcon}>👤</Text>
-												</View>
-												<View style={styles.popupDetailContent}>
-													<Text style={styles.popupDetailLabel}>WIEK</Text>
-													<Text style={styles.popupDetailText}>{event.minAge}+</Text>
-												</View>
-											</View>
-											{event.maxVolunteers && (
-												<View style={styles.popupDetailRow}>
-													<View style={styles.popupIconCircle}>
-														<Text style={styles.popupDetailIcon}>👥</Text>
+										<View style={styles.detailsCard}>
+											<View style={styles.detailsRowFirst}> 
+												<View style={styles.detailInline}>
+													<View style={styles.iconCircleSmall}> 
+														<Text style={styles.iconEmojiSmall}>👥</Text>
 													</View>
-													<View style={styles.popupDetailContent}>
-														<Text style={styles.popupDetailLabel}>MIEJSCA</Text>
-														<Text style={styles.popupDetailText}>{event.maxVolunteers}</Text>
-													</View>
+													<Text style={styles.detailText}>{(event.acceptedCount || 0)}/{event.maxVolunteers ?? '—'}</Text>
 												</View>
-											)}
-											<View style={[styles.popupDetailRow, styles.popupDetailRowFull]}>
-												<View style={styles.popupIconCircle}>
-													<Text style={styles.popupDetailIcon}>📍</Text>
+												<View style={styles.freePill}>
+													<Text style={styles.freePillText}>{event.eventType === 'school' ? 'Szkolne' : 'Publiczne'}</Text>
 												</View>
-												<View style={styles.popupDetailContent}>
-													<Text style={styles.popupDetailLabel}>LOKALIZACJA</Text>
-													<Text style={styles.popupDetailText}>{event.location.address}</Text>
-													<Text style={styles.popupDetailSubtext}>{event.location.city}</Text>
-												</View>
+											</View>
+
+											<View style={styles.detailInline}>
+												<View style={styles.iconCircleSmall}><Text style={styles.iconEmojiSmall}>📅</Text></View>
+												<Text style={styles.detailText}>{formatDate(event.startDate)}</Text>
+											</View>
+											<View style={styles.detailInline}>
+												<View style={styles.iconCircleSmall}><Text style={styles.iconEmojiSmall}>⏰</Text></View>
+												<Text style={styles.detailText}>{formatTime(event.startDate)}</Text>
+											</View>
+											<View style={styles.detailInline}>
+												<View style={styles.iconCircleSmall}><Text style={styles.iconEmojiSmall}>📍</Text></View>
+												<Text style={styles.detailText}>{event.location.address}</Text>
 											</View>
 										</View>
 
-										<TouchableOpacity
-											style={styles.popupButton}
-											onPress={() => {
-												setSelectedMarker(null);
-												router.push(`/event/${event.id}` as any);
-											}}>
-											<Text style={styles.popupButtonText}>Przejdź do wydarzenia</Text>
-										</TouchableOpacity>
+										<View style={styles.actionsRow}>
+											<TouchableOpacity
+												style={styles.secondaryButton}
+												onPress={() => {
+													setSelectedMarker(null);
+													router.push(`/event/${event.id}` as any);
+												}}>
+												<Text style={styles.secondaryButtonText}>Pokaż</Text>
+											</TouchableOpacity>
+											<TouchableOpacity
+												style={styles.primaryButton}
+												onPress={async () => {
+													try {
+														setJoining(true);
+														await applyToEvent({ eventId: event.id });
+														setSelectedMarker(null);
+														router.push(`/event/${event.id}` as any);
+													} finally {
+														setJoining(false);
+													}
+												}}
+												disabled={joining}>
+												<Text style={styles.primaryButtonText}>{joining ? 'Zapisywanie…' : 'Zapisz się'}</Text>
+											</TouchableOpacity>
+										</View>
 									</ScrollView>
 								</View>
 							</View>
@@ -434,6 +431,12 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 		lineHeight: 24,
 	},
+	popupOrganizer: {
+		color: '#3088BF',
+		fontWeight: '500',
+		fontSize: 14,
+		marginBottom: 8,
+	},
 	popupCategoryBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -473,6 +476,56 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		gap: 8,
+	},
+	// New card-like details similar to Event Details screen
+	detailsCard: {
+		backgroundColor: '#FFFFFF',
+		borderRadius: 16,
+		borderWidth: StyleSheet.hairlineWidth,
+		borderColor: '#E5E7EB',
+		padding: 16,
+		marginBottom: 16,
+	},
+	detailsRowFirst: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginBottom: 8,
+	},
+	iconCircleSmall: {
+		width: 28,
+		height: 28,
+		borderRadius: 14,
+		backgroundColor: '#F1DAE5',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	iconEmojiSmall: {
+		fontSize: 14,
+	},
+	detailInline: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: 8,
+		gap: 12,
+	},
+	detailText: {
+		color: '#374151',
+		fontWeight: '600',
+		fontSize: 14,
+	},
+	freePill: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: '#F5F5F5',
+		paddingHorizontal: 10,
+		paddingVertical: 6,
+		borderRadius: 999,
+	},
+	freePillText: {
+		color: '#6B7280',
+		fontSize: 12,
+		fontWeight: '700',
 	},
 	popupDetailRow: {
 		flexDirection: 'row',
@@ -516,17 +569,32 @@ const styles = StyleSheet.create({
 		color: '#6b7280',
 		marginTop: 2,
 	},
-	popupButton: {
+	actionsRow: {
+		flexDirection: 'row',
+		gap: 12,
+	},
+	secondaryButton: {
+		flex: 1,
+		backgroundColor: '#E9C7D7',
+		paddingVertical: 12,
+		borderRadius: 28,
+		alignItems: 'center',
+	},
+	secondaryButtonText: {
+		color: '#7A1C4B',
+		fontWeight: '700',
+		fontSize: 14,
+	},
+	primaryButton: {
+		flex: 1,
 		backgroundColor: '#A61F5E',
 		paddingVertical: 12,
-		paddingHorizontal: 24,
-		borderRadius: 25,
+		borderRadius: 28,
 		alignItems: 'center',
-		marginBottom: 8,
 	},
-	popupButtonText: {
+	primaryButtonText: {
 		color: 'white',
+		fontWeight: '700',
 		fontSize: 14,
-		fontWeight: '600',
 	},
 });

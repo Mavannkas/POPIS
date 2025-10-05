@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal, Pressable, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Pressable, Animated, Image } from 'react-native';
 import { IconSymbol } from './icon-symbol';
 import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
@@ -68,96 +68,154 @@ const handleAccountPress = () => {
 	};
 
 	return (
-		<>
-			<View className="bg-white px-4 pt-16 pb-4 shadow-sm">
-				<View className="flex-row items-center justify-between mb-4">
-					{/* Profile button with initials */}
-					<TouchableOpacity onPress={handleProfilePress} className="flex-row items-center">
-						<View className="w-8 h-8 bg-primary rounded-full items-center justify-center">
-							<Text className="text-white font-bold text-lg">
-								{/* Initials */}
-								{(((user?.firstName?.[0] || '') + (user?.lastName?.[0] || '')).toUpperCase() || 'U')}
-							</Text>
-						</View>
-					</TouchableOpacity>
+    <>
+      <View className="bg-white px-4 pt-16 pb-4 shadow-sm">
+        <View className="flex-row items-center justify-between mb-4">
+          {/* Left: Profile button */}
+          <TouchableOpacity
+            onPress={handleProfilePress}
+            className="flex-row items-center"
+          >
+            <View className="w-8 h-8 bg-primary rounded-full items-center justify-center">
+              <Text className="text-white font-bold text-lg">
+                {(
+                  (user?.firstName?.[0] || "") + (user?.lastName?.[0] || "")
+                ).toUpperCase() || "U"}
+              </Text>
+            </View>
+          </TouchableOpacity>
 
-					{/* Notification Button */}
-					<TouchableOpacity onPress={handleNotificationPress} className="relative p-2">
-						<IconSymbol name="bell.fill" size={24} color={colors.primary} />
-						{/* Notification Badge */}
-						<View className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full items-center justify-center">
-							<Text className="text-white text-xs font-bold">3</Text>
-						</View>
-					</TouchableOpacity>
-				</View>
+          {/* Center: App logo */}
+          <View className="flex-1 items-center">
+            <Image
+              source={require("@/assets/images/icon.png")}
+              style={{ width: 120, height: 48, resizeMode: "contain" }}
+            />
+          </View>
 
-				{/* Search Bar */}
-				{showSearch && (
-					<TouchableOpacity onPress={handleSearchPress}>
-						<View className="bg-gray-100 rounded-full px-4 py-3 flex-row items-center">
-							<IconSymbol name="magnifyingglass" size={20} color={colors.primary} />
-							<Text className="ml-3 text-gray-500 flex-1">Szukaj wydarzeń...</Text>
-						</View>
-					</TouchableOpacity>
-				)}
-			</View>
+          {/* Right: Notifications */}
+          <TouchableOpacity
+            onPress={handleNotificationPress}
+            className="relative p-2"
+          >
+            <IconSymbol name="bell.fill" size={24} color={colors.primary} />
+            <View className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full items-center justify-center">
+              <Text className="text-white text-xs font-bold">3</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
 
-			{/* Profile Sidebar Modal */}
-			<Modal visible={profileSidebarVisible} transparent={true} animationType="fade" onRequestClose={closeSidebar}>
-				<Pressable className="flex-1 bg-black/50" onPress={closeSidebar}>
-					<Animated.View
-						className="absolute left-0 top-0 bottom-0 w-80 bg-white shadow-lg"
-						style={{
-							transform: [{ translateX: slideAnim }],
-						}}>
-						<Pressable onPress={() => {}}>
-							{/* Header */}
-							<View className="pt-16 pb-6 px-6 border-b border-gray-200">
-								<View className="flex-row items-center mb-4">
-								<View className="w-12 h-12 bg-primary rounded-full items-center justify-center mr-4">
-									<Text className="text-white font-bold text-xl">
-									{(((user?.firstName?.[0] || '') + (user?.lastName?.[0] || '')).toUpperCase() || 'U')}
-									</Text>
-								</View>
-								<View>
-									<Text className="text-lg font-semibold text-gray-900">{(`${user?.firstName || ''} ${user?.lastName || ''}`).trim() || user?.email || 'Użytkownik'}</Text>
-									<Text className="text-sm text-gray-500">Zarządzaj swoim kontem</Text>
-								</View>
-								</View>
-							</View>
+        {/* Search Bar */}
+        {showSearch && (
+          <TouchableOpacity onPress={handleSearchPress}>
+            <View className="bg-gray-100 rounded-full px-4 py-3 flex-row items-center">
+              <IconSymbol
+                name="magnifyingglass"
+                size={20}
+                color={colors.primary}
+              />
+              <Text className="ml-3 text-gray-500 flex-1">
+                Szukaj wydarzeń...
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
 
-							{/* Menu Items */}
-							<View className="py-4">
-								<TouchableOpacity
-									onPress={handleAccountPress}
-									className="flex-row items-center px-6 py-4 hover:bg-gray-50">
-									<IconSymbol name="person.circle" size={24} color={colors.icon} />
-									<Text className="ml-4 text-base text-gray-900">Ustawienia konta</Text>
-								</TouchableOpacity>
+      {/* Profile Sidebar Modal */}
+      <Modal
+        visible={profileSidebarVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeSidebar}
+      >
+        <Pressable className="flex-1 bg-black/50" onPress={closeSidebar}>
+          <Animated.View
+            className="absolute left-0 top-0 bottom-0 w-80 bg-white shadow-lg"
+            style={{
+              transform: [{ translateX: slideAnim }],
+            }}
+          >
+            <Pressable onPress={() => {}}>
+              {/* Header */}
+              <View className="pt-16 pb-6 px-6 border-b border-gray-200">
+                <View className="flex-row items-center mb-4">
+                  <View className="w-12 h-12 bg-primary rounded-full items-center justify-center mr-4">
+                    <Text className="text-white font-bold text-xl">
+                      {(
+                        (user?.firstName?.[0] || "") +
+                        (user?.lastName?.[0] || "")
+                      ).toUpperCase() || "U"}
+                    </Text>
+                  </View>
+                  <View>
+                    <Text className="text-lg font-semibold text-gray-900">
+                      {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+                        user?.email ||
+                        "Użytkownik"}
+                    </Text>
+                    <Text className="text-sm text-gray-500">
+                      Zarządzaj swoim kontem
+                    </Text>
+                  </View>
+                </View>
+              </View>
 
-							{/* Help opens mailto */}
-							<TouchableOpacity
-								onPress={() => {
-									closeSidebar();
-									Linking.openURL('mailto:support@popis.app');
-								}}
-								className="flex-row items-center px-6 py-4 hover:bg-gray-50">
-								<IconSymbol name="questionmark.circle" size={24} color={colors.icon} />
-								<Text className="ml-4 text-base text-gray-900">Pomoc i wsparcie</Text>
-							</TouchableOpacity>
-							</View>
+              {/* Menu Items */}
+              <View className="py-4">
+                <TouchableOpacity
+                  onPress={handleAccountPress}
+                  className="flex-row items-center px-6 py-4 hover:bg-gray-50"
+                >
+                  <IconSymbol
+                    name="person.circle"
+                    size={24}
+                    color={colors.icon}
+                  />
+                  <Text className="ml-4 text-base text-gray-900">
+                    Ustawienia konta
+                  </Text>
+                </TouchableOpacity>
 
-							{/* Logout Button */}
-							<View className="border-t border-gray-200 mt-4">
-								<TouchableOpacity onPress={handleSignOut} className="flex-row items-center px-6 py-4 hover:bg-red-50">
-									<IconSymbol name="arrow.right.square" size={24} color="#EF4444" />
-									<Text className="ml-4 text-base text-red-600 font-medium">Wyloguj się</Text>
-								</TouchableOpacity>
-							</View>
-						</Pressable>
-					</Animated.View>
-				</Pressable>
-			</Modal>
-		</>
-	);
+                {/* Help opens mailto */}
+                <TouchableOpacity
+                  onPress={() => {
+                    closeSidebar();
+                    Linking.openURL("mailto:support@popis.app");
+                  }}
+                  className="flex-row items-center px-6 py-4 hover:bg-gray-50"
+                >
+                  <IconSymbol
+                    name="questionmark.circle"
+                    size={24}
+                    color={colors.icon}
+                  />
+                  <Text className="ml-4 text-base text-gray-900">
+                    Pomoc i wsparcie
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Logout Button */}
+              <View className="border-t border-gray-200 mt-4">
+                <TouchableOpacity
+                  onPress={handleSignOut}
+                  className="flex-row items-center px-6 py-4 hover:bg-red-50"
+                >
+                  <IconSymbol
+                    name="arrow.right.square"
+                    size={24}
+                    color="#EF4444"
+                  />
+                  <Text className="ml-4 text-base text-red-600 font-medium">
+                    Wyloguj się
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Animated.View>
+        </Pressable>
+      </Modal>
+    </>
+  );
 }

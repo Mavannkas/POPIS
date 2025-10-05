@@ -1,29 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { Card, Chip } from 'react-native-paper';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Image, RefreshControl } from 'react-native';
+import { Card } from 'react-native-paper';
 import { TopBar } from '@/components/ui/top-bar';
-import { CategoryIcon } from '@/components/ui/category-icon';
-import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, applyToEvent, type Event } from '@/lib/services/events';
+import { EventCard } from '@/components/ui';
+import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, applyToEvent, getMyApplications, type Event, type ApplicationStatus, type EventFilters } from '@/lib/services/events';
 import { router } from 'expo-router';
+import { API_URL } from '@/lib/http';
+
+const resolveImageUrl = (img: any): string | null => {
+  if (!img) return null;
+  if (typeof img === 'string') {
+    return img.startsWith('http') ? img : (API_URL ? `${API_URL}${img}` : null);
+  }
+  if (typeof img === 'object' && img.url) {
+    const u = String(img.url);
+    return u.startsWith('http') ? u : (API_URL ? `${API_URL}${u}` : u);
+  }
+  return null;
+};
 
 export default function HomeScreen() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [applicationStatusByEvent, setApplicationStatusByEvent] = useState<Record<string, ApplicationStatus>>({});
+  const [filters, setFilters] = useState<EventFilters>({});
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadHomeData = async () => {
+    try {
+      setLoading(true);
+      const res = await getAvailableEvents({ limit: 5, ...filters });
+      setEvents(res.events);
+      try {
+        const apps = await getMyApplications();
+        const map: Record<string, ApplicationStatus> = {};
+        (apps.applications || []).forEach(app => {
+          const ev: any = app.event as any;
+          const eventId = typeof ev === 'object' ? String(ev.id) : String(ev);
+          if (eventId) map[eventId] = app.status as ApplicationStatus;
+        });
+        setApplicationStatusByEvent(map);
+      } catch (e) {
+        console.warn('Failed to load my applications', e);
+      }
+    } catch (e) {
+      console.error('Failed to load home events', e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const res = await getAvailableEvents({ limit: 5 });
-        setEvents(res.events);
-      } catch (e) {
-        console.error('Failed to load home events', e);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    loadHomeData();
+  }, [filters]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadHomeData();
+    setRefreshing(false);
+  };
 
   const onJoin = async (eventId: string) => {
     try {
@@ -46,7 +82,15 @@ export default function HomeScreen() {
     <View className="flex-1 bg-white">
       <TopBar showSearch={true} />
       
-      <ScrollView className="flex-1 px-4 py-4">
+      <ScrollView className="flex-1 px-4 py-4" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        {/* Active filter: My applications */}
+        {filters.applied && (
+          <View className="mb-3">
+            <Text className="text-sm text-gray-600">
+              {filters.applied === 'applied' ? 'Pokazuję tylko zapisane wydarzenia' : 'Pokazuję tylko wydarzenia, na które nie jestem zapisany'}
+            </Text>
+          </View>
+        )}
         <Text className="text-2xl font-bold text-gray-800 mb-6">
           🏠 Nadchodzące wydarzenia
         </Text>
@@ -58,89 +102,21 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {events.map((event) => (
-          <TouchableOpacity
-            key={event.id}
-            className="mb-4"
-            onPress={() => router.push(`/event/${event.id}` as any)}
-          >
-            <Card className="bg-white shadow-sm">
-              <Card.Content className="p-4">
-                <View className="flex-row justify-between items-start mb-3">
-                  <View className="flex-1 mr-3">
-                    <Text className="text-lg font-semibold text-gray-800 mb-1">
-                      {event.title}
-                    </Text>
-                    {event.organization && (
-                      <Text className="text-primary font-medium text-sm mb-2">
-                        👤 {typeof event.organization === 'object' ? (event.organization.name || 'Organizacja') : 'Organizacja'}
-                      </Text>
-                    )}
-                  </View>
-                  <View className={`px-3 py-1 rounded-full bg-primary/10 flex-row items-center`}>
-                    <Text className="text-xs mr-1">{getCategoryEmoji(event.category)}</Text>
-                    <Text className="text-xs font-medium text-primary">
-                      {getCategoryLabel(event.category)}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="space-y-2 mb-3">
-                  <View className="flex-row items-center">
-                    <View style={styles.iconCircle}>
-                      <Text style={styles.iconEmoji}>📅</Text>
-                    </View>
-                    <Text className="text-gray-600 text-sm ml-2">{new Date(event.startDate).toLocaleDateString('pl-PL')}</Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <View style={styles.iconCircle}>
-                      <Text style={styles.iconEmoji}>⏰</Text>
-                    </View>
-                    <Text className="text-gray-600 text-sm ml-2">{event.duration}h</Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <View style={styles.iconCircle}>
-                      <Text style={styles.iconEmoji}>📍</Text>
-                    </View>
-                    <Text className="text-gray-600 text-sm ml-2">{event.location?.address || ''} {event.location?.city ? `• ${event.location.city}` : ''}</Text>
-                  </View>
-                </View>
-
-                {/* Tags */}
-                <View className="mb-3">
-                  <View className="flex-row flex-wrap gap-2">
-                    <View className="flex-row items-center">
-                      <CategoryIcon category={event.category} size="small" />
-                      <Chip
-                        style={{ backgroundColor: '#F5F5F5', marginLeft: 4 }}
-                        textStyle={{ color: '#666', fontSize: 12 }}
-                      >
-                        {getCategoryLabel(event.category)}
-                      </Chip>
-                    </View>
-                  </View>
-                </View>
-
-                <View className="flex-row justify-between items-center">
-                  <View className="flex-row items-center">
-                    <Text className="text-gray-500 text-sm">
-                      {event.maxVolunteers ? `👥 miejsca: ${event.maxVolunteers}` : '👥 liczba miejsc n/d'}
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    className="bg-primary px-4 py-2 rounded-full"
-                    onPress={() => onJoin(event.id)}
-                    disabled={joiningId === event.id}
-                  >
-                    <Text className="text-white font-medium text-sm">
-                      {joiningId === event.id ? 'Wysyłanie...' : 'Dołącz'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
-        ))}
+        {events
+          .filter(e => {
+            if (!filters.applied) return true;
+            const st = applicationStatusByEvent[String(e.id)];
+            if (filters.applied === 'applied') return !!st;
+            if (filters.applied === 'not_applied') return !st;
+            return true;
+          })
+          .map((event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              applicationStatus={applicationStatusByEvent[String(event.id)] || null}
+            />
+          ))}
 
         {/* Add some bottom padding for better scrolling */}
         <View className="h-20" />
@@ -160,5 +136,62 @@ const styles = StyleSheet.create({
   },
   iconEmoji: {
     fontSize: 16,
+  },
+  savedBadge: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 18,
+  },
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+  },
+  statusBadgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  savedIconCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: 'white',
+  },
+  savedIcon: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontWeight: '700',
+    lineHeight: 16,
+  },
+  savedText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  infoPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#F5F5F5',
+  },
+  pillEmoji: {
+    fontSize: 13,
+    marginRight: 6,
+  },
+  pillText: {
+    fontSize: 12,
+    color: '#4B5563',
+  },
+  metaIcon: {
+    fontSize: 16,
+    color: '#D17A92',
+    marginRight: 8,
+  },
+  metaText: {
+    fontSize: 14,
+    color: '#D17A92',
+    fontWeight: '600',
   },
 });
