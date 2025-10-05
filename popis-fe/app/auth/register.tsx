@@ -171,7 +171,7 @@ export default function RegisterScreen() {
       </View>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, marginTop: 8 }}>
-        <Text style={{ color: 'black', fontSize: 16 }}>Jestem studentem</Text>
+        <Text style={{ color: 'black', fontSize: 16 }}>Jestem uczniem</Text>
         <Switch value={isStudent} onValueChange={setIsStudent} color={colors.primary} />
       </View>
 
