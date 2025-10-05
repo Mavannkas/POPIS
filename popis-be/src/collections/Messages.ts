@@ -5,6 +5,7 @@ export const Messages: CollectionConfig = {
   admin: {
     useAsTitle: 'content',
     defaultColumns: ['application', 'sender', 'receiver', 'content', 'createdAt'],
+    hidden: true,
   },
   labels: {
     singular: 'Wiadomość',
@@ -84,7 +85,8 @@ export const Messages: CollectionConfig = {
           const relationTo = Array.isArray(receiver?.relationTo)
             ? receiver.relationTo[0]
             : receiver?.relationTo
-          const receiverId = typeof receiver?.value === 'object' ? receiver.value.id : receiver?.value
+          const receiverId =
+            typeof receiver?.value === 'object' ? receiver.value.id : receiver?.value
           if (!relationTo || !receiverId) return
 
           const receiverDoc = await req.payload.findByID({ collection: relationTo, id: receiverId })
@@ -118,5 +120,3 @@ export const Messages: CollectionConfig = {
     ],
   },
 }
-
-
