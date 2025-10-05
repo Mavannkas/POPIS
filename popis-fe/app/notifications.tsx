@@ -15,7 +15,7 @@ export default function NotificationsScreen() {
   const colors = Colors;
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<AppNotification[]>([]);
-  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { refresh: refreshBadge } = useNotificationsBadge();
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
@@ -125,44 +125,36 @@ export default function NotificationsScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {items.map((n) => (
-          <TouchableOpacity key={n.id} className="mb-3" onPress={() => handlePressNotification(n)}>
-            <Card className={`bg-white ${!n.isRead ? 'border-l-4 border-primary' : ''}`}>
-              <Card.Content className="p-4">
-                <View className="flex-row items-start">
-                  <View className="mr-3 mt-1">
-                    <View 
-                      className="w-10 h-10 rounded-full items-center justify-center"
-                      style={{ backgroundColor: `${getNotificationColor(n.type)}20` }}
+          <TouchableOpacity key={n.id} onPress={() => handlePressNotification(n)} style={{ marginBottom: 14 }}>
+            <Card style={{ backgroundColor: '#EFEFEF', borderRadius: 22, elevation: 0 }}>
+              <Card.Content style={{ padding: 14 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                  <View style={{ marginRight: 12, marginTop: 4 }}>
+                    <View
+                      style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: `${getNotificationColor(n.type)}20` }}
                     >
-                      <IconSymbol 
-                        name={getNotificationIcon(n.type)} 
-                        size={20} 
-                        color={getNotificationColor(n.type)} 
-                      />
+                      <IconSymbol name={getNotificationIcon(n.type)} size={20} color={getNotificationColor(n.type)} />
                     </View>
                   </View>
-                  
-                  <View className="flex-1">
-                    <View className="flex-row justify-between items-start mb-1">
-                      <Text className={`text-base font-semibold ${!n.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
+                  <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '700', color: '#111827' }}>
                         {n.type === 'approval_decision' ? 'Decyzja o aplikacji' : 'Zaproszenie na wydarzenie'}
                       </Text>
                       {!n.isRead && (
-                        <View className="w-2 h-2 bg-primary rounded-full ml-2 mt-2" />
+                        <View style={{ width: 8, height: 8, backgroundColor: Colors.primary, borderRadius: 4, marginLeft: 8, marginTop: 6 }} />
                       )}
                     </View>
-                    
-                    <Text className={`text-sm mb-2 ${!n.isRead ? 'text-gray-700' : 'text-gray-500'}`}>
+                    <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 6 }}>
                       {n.message || (n.type === 'approval_decision' ? (n.decision === 'accepted' ? 'Twoja aplikacja została zaakceptowana.' : 'Twoja aplikacja została odrzucona.') : 'Zaproszenie do udziału w wydarzeniu')}
                     </Text>
-                    
                     {n.type === 'event_invitation' && n.actionRequired && (
-                      <View className="flex-row gap-3 mt-2">
-                        <TouchableOpacity className="px-3 py-2 rounded-md bg-green-600" onPress={() => handleInvitationAction(n, 'accept')}>
-                          <Text className="text-white">Akceptuj</Text>
+                      <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
+                        <TouchableOpacity onPress={() => handleInvitationAction(n, 'accept')} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18, backgroundColor: '#16A34A' }}>
+                          <Text style={{ color: 'white', fontWeight: '600' }}>Akceptuj</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity className="px-3 py-2 rounded-md bg-red-600" onPress={() => handleInvitationAction(n, 'decline')}>
-                          <Text className="text-white">Odrzuć</Text>
+                        <TouchableOpacity onPress={() => handleInvitationAction(n, 'decline')} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18, backgroundColor: '#DC2626' }}>
+                          <Text style={{ color: 'white', fontWeight: '600' }}>Odrzuć</Text>
                         </TouchableOpacity>
                       </View>
                     )}

@@ -235,21 +235,15 @@ export default function MapViewNative({ events, loading, onOpenFilters, activeFi
 												}}>
 												<Text style={styles.secondaryButtonText}>Pokaż</Text>
 											</TouchableOpacity>
-											<TouchableOpacity
-												style={styles.primaryButton}
-												onPress={async () => {
-													try {
-														setJoining(true);
-														await applyToEvent({ eventId: event.id });
-														setSelectedMarker(null);
-														router.push(`/event/${event.id}` as any);
-													} finally {
-														setJoining(false);
-													}
-												}}
-												disabled={joining}>
-												<Text style={styles.primaryButtonText}>{joining ? 'Zapisywanie…' : 'Zapisz się'}</Text>
-											</TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={styles.primaryButton}
+                                                onPress={() => {
+                                                    setSelectedMarker(null);
+                                                    router.push(`/event/${event.id}` as any);
+                                                }}
+                                                disabled={joining}>
+                                                <Text style={styles.primaryButtonText}>Przejdź do wydarzenia</Text>
+                                            </TouchableOpacity>
 										</View>
 									</ScrollView>
 								</View>

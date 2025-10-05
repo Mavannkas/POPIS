@@ -1,7 +1,7 @@
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { NextRequest } from 'next/server'
-import { StreamChat } from 'stream-chat'
+// Stream Chat removed
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -23,17 +23,6 @@ export const POST = async (request: NextRequest) => {
       return Response.json(
         { success: false, error: 'Application ID is required' },
         { status: 400 }
-      )
-    }
-    
-    // Get Stream credentials
-    const apiKey = process.env.STREAM_API_KEY
-    const apiSecret = process.env.STREAM_API_SECRET
-    
-    if (!apiKey || !apiSecret) {
-      return Response.json(
-        { success: false, error: 'Chat service not configured' },
-        { status: 500 }
       )
     }
     
@@ -64,39 +53,7 @@ export const POST = async (request: NextRequest) => {
     const event: any = application.event
     const organization: any = event.organization
     
-    // Initialize Stream
-    const serverClient = StreamChat.getInstance(apiKey, apiSecret)
-    
-    // Generate Stream user IDs
-    const volunteerStreamId = `user-${volunteer.id || volunteer}`
-    const organizationStreamId = `user-${organization.id || organization}`
-    
-    // Create channel
-    const channelId = `application-${application.id}`
-    const channel = serverClient.channel('messaging', channelId, {
-      name: `${event.title}`,
-      members: [volunteerStreamId, organizationStreamId],
-      created_by_id: user.streamUserId || `user-${user.id}`,
-      application_id: application.id,
-      event_id: event.id,
-    })
-    
-    await channel.create()
-    
-    // Update application with channel ID
-    await payload.update({
-      collection: 'applications',
-      id: applicationId,
-      data: {
-        chatChannelId: channelId,
-      },
-    })
-    
-    return Response.json({
-      success: true,
-      channelId,
-      message: 'Chat channel created successfully',
-    })
+    return Response.json({ success: false, error: 'Stream chat disabled' }, { status: 400 })
   } catch (error: any) {
     console.error('Error creating chat channel:', error)
     return Response.json(
