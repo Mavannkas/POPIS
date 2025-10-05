@@ -9,6 +9,7 @@ import {
   School,
   UserCircle,
   Bell,
+  FileUser,
 } from 'lucide-react'
 import { type CollectionSlug, type GlobalSlug } from 'payload'
 import { type ExoticComponent } from 'react'
@@ -25,6 +26,7 @@ export const navIconMap: Partial<
   users: UserCircle,
   media: Image,
   notifications: Bell,
+  group_applications: FileUser,
 }
 
 export const getNavIcon = (slug: string) =>
