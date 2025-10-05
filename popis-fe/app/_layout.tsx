@@ -3,13 +3,22 @@ import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
 import { theme } from '@/constants/theme';
 import { AuthProvider } from '@/lib/auth/context';
-import { useFonts, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold } from '@expo-google-fonts/roboto';
-import { View } from 'react-native';
+import { useFonts } from 'expo-font';
+import { Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import './globals.css';
 
 export default function RootLayout() {
-  const [loaded] = useFonts({ Roboto_400Regular, Roboto_500Medium, Roboto_700Bold });
+  const [loaded] = useFonts({ Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold });
   if (!loaded) return <View />;
+
+  // Set global default font family to Poppins
+  const T: any = Text as any;
+  const TI: any = TextInput as any;
+  if (!T.defaultProps) T.defaultProps = {};
+  if (!TI.defaultProps) TI.defaultProps = {};
+  T.defaultProps.style = StyleSheet.flatten([T.defaultProps.style, { fontFamily: 'Poppins_400Regular' }]);
+  TI.defaultProps.style = StyleSheet.flatten([TI.defaultProps.style, { fontFamily: 'Poppins_400Regular' }]);
 
   return (
     <PaperProvider theme={theme}>
@@ -22,7 +31,7 @@ export default function RootLayout() {
             },
             headerTintColor: '#A61F5E',
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontFamily: 'Poppins_600SemiBold',
             },
           }}
         >

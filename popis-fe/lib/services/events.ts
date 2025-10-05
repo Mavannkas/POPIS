@@ -311,8 +311,6 @@ export function getCategoryColor(category: string): string {
 }
 
 export function getCategoryEmoji(category: string): string {
-  console.log('category', category);
-
   const emojis: Record<string, string> = {
     education: '📚',
     environment: '🌱',

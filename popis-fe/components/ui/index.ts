@@ -5,3 +5,4 @@ export { CategoryIcon } from './category-icon';
 export { TopBar } from './top-bar';
 export { IconSymbol } from './icon-symbol';
 export { Collapsible } from './collapsible';
+export { EventCard } from './EventCard';

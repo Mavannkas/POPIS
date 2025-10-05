@@ -1,9 +1,28 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl } from 'react-native';
 import { TopBar } from '@/components/ui/top-bar';
-import { Card, Chip } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import { router } from 'expo-router';
-import { getCategoryEmoji, getCategoryLabel, getMyApplications, type Application, type Event } from '@/lib/services/events';
+import { getMyApplications, type Application, type Event } from '@/lib/services/events';
+
+// Extract plain text from possible rich-text (e.g., Payload Lexical) or string
+function extractPlainText(value: any): string {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    const extract = (node: any): string => {
+        if (!node) return '';
+        if (typeof node === 'string') return node;
+        if (Array.isArray(node)) return node.map(extract).join(' ');
+        if (typeof node === 'object') {
+            if (typeof node.text === 'string') return node.text;
+            if (node.root) return extract(node.root);
+            if (node.children) return extract(node.children);
+        }
+        return '';
+    };
+    const text = extract(value);
+    return typeof text === 'string' ? text.trim() : '';
+}
 
 export default function CalendarScreen() {
 	const [applications, setApplications] = useState<Application[]>([]);
@@ -33,7 +52,7 @@ export default function CalendarScreen() {
 	};
 
 	const groupedByMonth = useMemo(() => {
-		const map = new Map<string, { label: string; items: { app: Application; event: Event }[] }>();
+    const map = new Map<string, { label: string; items: { app: Application; event: Event }[] }>();
 		const formatter = new Intl.DateTimeFormat('pl-PL', { month: 'long', year: 'numeric' });
 		const eventsWithApps = applications
 			.map(app => {
@@ -57,25 +76,20 @@ export default function CalendarScreen() {
 			.map(([key, value]) => ({ key, ...value }));
 	}, [applications]);
 
-	const statusLabel: Record<string, string> = {
-		pending: 'Oczekujące',
-		accepted: 'Zaakceptowane',
-		rejected: 'Odrzucone',
-		completed: 'Ukończone',
-	};
+    // Status dot colors only; labels not used in this view
 
-	const statusColor: Record<string, { bg: string; text: string }> = {
-		pending: { bg: 'bg-gray-200', text: 'text-gray-700' },
-		accepted: { bg: 'bg-green-100', text: 'text-green-700' },
-		rejected: { bg: 'bg-red-100', text: 'text-red-700' },
-		completed: { bg: 'bg-blue-100', text: 'text-blue-700' },
-	};
+  const statusDot: Record<string, string> = {
+    pending: '#E8A031',
+    accepted: '#73A641',
+    rejected: '#EF4444',
+    completed: '#3B82F6',
+  };
 
 	return (
 		<View className="flex-1 bg-white">
 			<TopBar showSearch={true} />
 			
-			<ScrollView className="flex-1 px-4 py-4" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+            <ScrollView className="flex-1 px-4 py-4" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				{loading && (
 					<View className="flex-row items-center mb-4">
 						<ActivityIndicator />
@@ -87,88 +101,59 @@ export default function CalendarScreen() {
 					<Text className="text-gray-600">Brak zgłoszeń na wydarzenia.</Text>
 				)}
 
-				{groupedByMonth.map(group => (
-					<View key={group.key} className="mb-6">
-						<Text className="text-xl font-bold text-gray-800 mb-3">{group.label}</Text>
-						{group.items.map(({ app, event }) => (
-							<TouchableOpacity
-								key={app.id + ':' + (event.id as string)}
-								className="mb-4"
-								onPress={() => router.push(`/event/${event.id}` as any)}
-							>
-								<Card className="bg-white shadow-sm">
-									<Card.Content className="p-4">
-										<View className="flex-row justify-between items-start mb-3">
-											<View className="flex-1 mr-3">
-												<Text className="text-lg font-semibold text-gray-800 mb-1">
-													{event.title}
-												</Text>
-												{event.organization && (
-													<Text className="text-primary font-medium text-sm mb-2">
-														👤 {typeof event.organization === 'object' ? (event.organization.name || 'Organizacja') : 'Organizacja'}
-													</Text>
-												)}
-											</View>
-											<View className={`px-3 py-1 rounded-full bg-primary/10 flex-row items-center`}>
-												<Text className="text-xs mr-1">{getCategoryEmoji(event.category)}</Text>
-												<Text className="text-xs font-medium text-primary">
-													{getCategoryLabel(event.category)}
-												</Text>
-											</View>
-										</View>
+                {groupedByMonth.map(group => (
+                    <View key={group.key} className="mb-8">
+                        <Text className="text-2xl font-bold text-gray-900 mb-4">{group.label}</Text>
+                        {group.items.map(({ app, event }) => {
+                            const date = new Date(event.startDate);
+                            const day = date.getDate();
+                            const weekday = new Intl.DateTimeFormat('pl-PL', { weekday: 'long' })
+                                .format(date)
+                                .replace(/^./, c => c.toUpperCase());
+                            const year = date.getFullYear();
+                            return (
+                                <TouchableOpacity
+                                    key={app.id + ':' + (event.id as string)}
+                                    className="mb-4"
+                                    onPress={() => router.push(`/event/${event.id}` as any)}
+                                >
+                                    <View className="flex-row items-stretch">
+                                        {/* Left date rail */}
+                                        <View className="w-14 mr-2 items-center justify-center">
+                                            <Text className="text-2xl font-bold text-gray-800 leading-none">{day}</Text>
+                                            <Text className="text-[11px] text-gray-500 mt-1 leading-3">{weekday}</Text>
+                                            <Text className="text-[10px] text-gray-400 leading-3">{year}</Text>
+                                        </View>
 
-										<View className="space-y-2 mb-3">
-											<View className="flex-row items-center">
-												<View style={styles.iconCircle}>
-													<Text style={styles.iconEmoji}>📅</Text>
-												</View>
-												<Text className="text-gray-600 text-sm ml-2">{new Date(event.startDate).toLocaleDateString('pl-PL')}</Text>
-											</View>
-											<View className="flex-row items-center">
-												<View style={styles.iconCircle}>
-													<Text style={styles.iconEmoji}>⏰</Text>
-												</View>
-												<Text className="text-gray-600 text-sm ml-2">{event.duration}h</Text>
-											</View>
-											<View className="flex-row items-center">
-												<View style={styles.iconCircle}>
-													<Text style={styles.iconEmoji}>📍</Text>
-												</View>
-												<Text className="text-gray-600 text-sm ml-2">{event.location?.address || ''} {event.location?.city ? `• ${event.location.city}` : ''}</Text>
-											</View>
-										</View>
+                                        {/* Card */}
+                                        <Card className="flex-1 bg-white shadow-sm rounded-2xl overflow-hidden">
+                                            <Card.Content className="p-4">
+                                                <View className="flex-row items-start justify-between">
+                                                    <View className="flex-1 pr-3">
+                                                        <Text className="text-lg font-semibold text-gray-900" numberOfLines={2}>
+                                                            {event.title}
+                                                        </Text>
+                                                        {(() => {
+                                                            const descriptionText = extractPlainText((event as any).description);
+                                                            return descriptionText ? (
+                                                                <Text className="text-gray-500 mt-1" numberOfLines={1} ellipsizeMode="tail">
+                                                                    {descriptionText}
+                                                                </Text>
+                                                            ) : null;
+                                                        })()}
+                                                    </View>
+                                                    <View style={[styles.statusDot, { backgroundColor: statusDot[app.status] }]} />
+                                                </View>
 
-										<View className="mb-3">
-											<View className="flex-row flex-wrap gap-2">
-												<View className="flex-row items-center">
-													<Chip
-														style={{ backgroundColor: '#F5F5F5' }}
-														textStyle={{ color: '#666', fontSize: 12 }}
-													>
-														{getCategoryLabel(event.category)}
-													</Chip>
-												</View>
-												<View className={`px-3 py-1 rounded-full ${statusColor[app.status].bg}`}>
-													<Text className={`text-xs font-medium ${statusColor[app.status].text}`}>
-														{statusLabel[app.status]}
-													</Text>
-												</View>
-											</View>
-										</View>
-
-										<View className="flex-row justify-between items-center">
-											<View className="flex-row items-center">
-												<Text className="text-gray-500 text-sm">
-													{event.maxVolunteers ? `👥 miejsca: ${event.maxVolunteers}` : '👥 liczba miejsc n/d'}
-												</Text>
-											</View>
-										</View>
-									</Card.Content>
-								</Card>
-							</TouchableOpacity>
-						))}
-					</View>
-				))}
+                                                {/* Meta row removed per new design: date/time shown on rail; keep card clean */}
+                                            </Card.Content>
+                                        </Card>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                ))}
 
 				<View className="h-20" />
 			</ScrollView>
@@ -188,4 +173,22 @@ const styles = StyleSheet.create({
 	iconEmoji: {
 		fontSize: 16,
 	},
+    statusDot: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        backgroundColor: '#73A641',
+        marginLeft: 8,
+        marginTop: 4,
+    },
+    metaIcon: {
+        fontSize: 16,
+        color: '#D17A92',
+        marginRight: 8,
+    },
+    metaText: {
+        fontSize: 14,
+        color: '#D17A92',
+        fontWeight: '600',
+    },
 });
