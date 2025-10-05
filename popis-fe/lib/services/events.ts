@@ -57,6 +57,8 @@ export interface EventFilters {
   eventType?: 'public' | 'school';
   size?: ('small' | 'medium' | 'large')[] | 'small' | 'medium' | 'large';
   limit?: number;
+  // client-only filter: whether the current user applied or not
+  applied?: 'applied' | 'not_applied';
 }
 
 // Mock data for development - replace with real API later
@@ -182,6 +184,7 @@ export async function getAvailableEvents(filters?: EventFilters): Promise<Events
     const sizes = Array.isArray(filters.size) ? filters.size : [filters.size];
     sizes.forEach(s => params.append('size', s));
   }
+  if (filters?.applied) params.append('applied', filters.applied);
   if (filters?.limit) params.append('limit', String(filters.limit));
   const queryString = params.toString();
   const path = `/api/events/available${queryString ? `?${queryString}` : ''}`;

@@ -28,6 +28,7 @@ export default function SearchScreen() {
   const load = useCallback(async () => {
     try {
       setLoading(true);
+      // Client-side applied/not_applied filtering handled by screen; backend doesn't support it directly
       const response = await getAvailableEvents({ ...filters, search: searchQuery || undefined });
       setEvents(response.events);
     } catch (e) {

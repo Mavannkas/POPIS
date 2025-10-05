@@ -101,6 +101,28 @@ export function FilterModal({
           </View>
 
           <ScrollView className="flex-1 p-4">
+            {/* My application status */}
+            <View className="mb-6">
+              <Text className="text-base font-semibold mb-3">Moje zgłoszenia</Text>
+              <View className="flex-row gap-2">
+                <TouchableOpacity
+                  onPress={() => toggleSingle('applied', 'applied')}
+                  className={`px-4 py-2 rounded-full border-2 ${
+                    filters.applied === 'applied' ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
+                  }`}
+                >
+                  <Text className={`${filters.applied === 'applied' ? 'text-white' : 'text-gray-700'} font-medium`}>Tylko zapisane</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleSingle('applied', 'not_applied')}
+                  className={`px-4 py-2 rounded-full border-2 ${
+                    filters.applied === 'not_applied' ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
+                  }`}
+                >
+                  <Text className={`${filters.applied === 'not_applied' ? 'text-white' : 'text-gray-700'} font-medium`}>Bez moich zgłoszeń</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
             {/* Event Type - Only for Students */}
             {user?.isStudent && (
               <View className="mb-6">

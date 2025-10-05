@@ -2,31 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { Card } from 'react-native-paper';
 import { TopBar } from '@/components/ui/top-bar';
-import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, applyToEvent, getMyApplications, type Event } from '@/lib/services/events';
+import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, applyToEvent, getMyApplications, type Event, type ApplicationStatus, type EventFilters } from '@/lib/services/events';
 import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [joiningId, setJoiningId] = useState<string | null>(null);
-  const [appliedEventIds, setAppliedEventIds] = useState<Set<string>>(new Set());
+  const [applicationStatusByEvent, setApplicationStatusByEvent] = useState<Record<string, ApplicationStatus>>({});
+  const [filters, setFilters] = useState<EventFilters>({});
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const res = await getAvailableEvents({ limit: 5 });
+        const res = await getAvailableEvents({ limit: 5, ...filters });
         setEvents(res.events);
-        // Load my applications to show "Zapisano" status on cards
+        // Load my applications to show status on cards (pending/accepted)
         try {
           const apps = await getMyApplications();
-          const ids = new Set<string>();
+          const map: Record<string, ApplicationStatus> = {};
           (apps.applications || []).forEach(app => {
             const ev: any = app.event as any;
             const eventId = typeof ev === 'object' ? String(ev.id) : String(ev);
-            if (eventId) ids.add(eventId);
+            if (eventId) map[eventId] = app.status as ApplicationStatus;
           });
-          setAppliedEventIds(ids);
+          setApplicationStatusByEvent(map);
         } catch (e) {
           // non-blocking
           console.warn('Failed to load my applications', e);
@@ -37,7 +38,7 @@ export default function HomeScreen() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [filters]);
 
   const onJoin = async (eventId: string) => {
     try {
@@ -61,6 +62,14 @@ export default function HomeScreen() {
       <TopBar showSearch={true} />
       
       <ScrollView className="flex-1 px-4 py-4">
+        {/* Active filter: My applications */}
+        {filters.applied && (
+          <View className="mb-3">
+            <Text className="text-sm text-gray-600">
+              {filters.applied === 'applied' ? 'Pokazuję tylko zapisane wydarzenia' : 'Pokazuję tylko wydarzenia, na które nie jestem zapisany'}
+            </Text>
+          </View>
+        )}
         <Text className="text-2xl font-bold text-gray-800 mb-6">
           🏠 Nadchodzące wydarzenia
         </Text>
@@ -72,7 +81,15 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {events.map((event) => (
+        {events
+          .filter(e => {
+            if (!filters.applied) return true;
+            const st = applicationStatusByEvent[String(e.id)];
+            if (filters.applied === 'applied') return !!st;
+            if (filters.applied === 'not_applied') return !st;
+            return true;
+          })
+          .map((event) => (
           <TouchableOpacity
             key={event.id}
             className="mb-6"
@@ -88,14 +105,21 @@ export default function HomeScreen() {
                     resizeMode="cover"
                   />
                 ) : null}
-                {/* Saved badge */}
-                {appliedEventIds.has(String(event.id)) && (
+                {/* Application status badge */}
+                {applicationStatusByEvent[String(event.id)] && (
                   <View className="absolute left-3 bottom-3">
-                    <View style={styles.savedBadge} className="flex-row items-center">
-                      <View style={styles.savedIconCircle} className="items-center justify-center mr-2">
-                        <Text style={styles.savedIcon}>✓</Text>
-                      </View>
-                      <Text style={styles.savedText}>Zapisano</Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        {
+                          backgroundColor:
+                            applicationStatusByEvent[String(event.id)] === 'accepted' ? '#73A641' : '#E8A031',
+                        },
+                      ]}
+                    >
+                      <Text style={styles.statusBadgeText}>
+                        {applicationStatusByEvent[String(event.id)] === 'accepted' ? 'Zaakceptowano' : 'Zapisano'}
+                      </Text>
                     </View>
                   </View>
                 )}
@@ -178,6 +202,16 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 18,
+  },
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+  },
+  statusBadgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '700',
   },
   savedIconCircle: {
     width: 18,

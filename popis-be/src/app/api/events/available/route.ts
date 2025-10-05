@@ -21,6 +21,7 @@ export const GET = async (request: NextRequest) => {
     const search = searchParams.get('search')
     const eventType = searchParams.get('eventType') // 'public' or 'school'
     const limitParam = searchParams.get('limit')
+    const applied = searchParams.get('applied') // 'applied' | 'not_applied'
     const limit = limitParam ? parseInt(limitParam) : undefined
     
     // Build where query
@@ -130,6 +131,7 @@ export const GET = async (request: NextRequest) => {
     const filteredDocs: any[] = []
     for (const ev of events.docs as any[]) {
       let acceptedCount = 0
+      let hasMyApplication: boolean | null = null
       try {
         const apps = await payload.find({
           collection: 'applications',
@@ -146,8 +148,33 @@ export const GET = async (request: NextRequest) => {
         // ignore; keep 0
       }
 
+      // If user is logged in, determine whether they applied
+      if (user) {
+        try {
+          const myApps = await payload.find({
+            collection: 'applications',
+            where: {
+              and: [
+                { event: { equals: ev.id } },
+                { volunteer: { equals: user.id } },
+              ],
+            },
+            limit: 1,
+          })
+          hasMyApplication = (myApps.totalDocs || 0) > 0
+        } catch (e) {
+          hasMyApplication = null
+        }
+      }
+
       // include event if has capacity or no limit
+      // Capacity filter
       if (!ev.maxVolunteers || acceptedCount < (ev.maxVolunteers as number)) {
+        // Apply applied/not_applied filter if provided
+        if (applied && user) {
+          if (applied === 'applied' && hasMyApplication !== true) continue
+          if (applied === 'not_applied' && hasMyApplication === true) continue
+        }
         filteredDocs.push({ ...ev, acceptedCount })
       }
       if (limit && filteredDocs.length >= limit) break
