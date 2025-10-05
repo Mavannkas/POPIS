@@ -4,6 +4,7 @@ import { Button, ActivityIndicator } from 'react-native-paper';
 import { useAuth } from '@/lib/auth/context';
 import { getSchools, type School } from '@/lib/schools';
 import { Input } from '@/components/ui';
+import { useNotificationsBadge } from '@/lib/notifications/context';
 
 export default function AccountScreen() {
 	const { user, updateProfile, refresh } = useAuth();
@@ -17,6 +18,7 @@ export default function AccountScreen() {
 	const [schoolsLoading, setSchoolsLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState('');
+  const { showToast } = useNotificationsBadge();
 	const [firstNameError, setFirstNameError] = useState('');
 	const [lastNameError, setLastNameError] = useState('');
 	const [schoolError, setSchoolError] = useState('');
@@ -70,6 +72,10 @@ export default function AccountScreen() {
 			setSaving(true);
 			await updateProfile({ firstName: firstName.trim(), lastName: lastName.trim(), isStudent, school: isStudent ? schoolId : null });
 			await refresh();
+      showToast('Zapisano zmiany');
+    } catch (e: any) {
+      setError('Nie udało się zapisać zmian');
+      showToast('Nie udało się zapisać zmian');
 		} finally {
 			setSaving(false);
 		}

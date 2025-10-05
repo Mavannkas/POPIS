@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth/context';
 import { Colors } from '@/constants/theme';
 import { getSchools, type School } from '@/lib/schools';
 import { KeyboardAwareScrollView, Input } from '@/components/ui';
+import { useNotificationsBadge } from '@/lib/notifications/context';
 
 export default function RegisterScreen() {
   const { signUp } = useAuth();
@@ -25,6 +26,11 @@ export default function RegisterScreen() {
   const [error, setError] = useState('');
   const [schools, setSchools] = useState<School[]>([]);
   const [schoolsLoading, setSchoolsLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const { showToast } = useNotificationsBadge();
+
+  const isValidEmail = (v: string) => /.+@.+\..+/.test(v.trim());
+  const isStrongPassword = (v: string) => v.length >= 6;
 
   useEffect(() => {
     if (isStudent && schools.length === 0) {
@@ -67,6 +73,9 @@ export default function RegisterScreen() {
     setError('');
     setLoading(true);
     try {
+      if (!isValidEmail(email)) throw new Error('Podaj poprawny e-mail');
+      if (!isStrongPassword(password)) throw new Error('Hasło musi mieć min. 6 znaków');
+      if (password !== confirmPassword) throw new Error('Hasła nie są takie same');
       const fn = firstName.trim();
       const ln = lastName.trim();
       if (!fn || fn.length < 2) throw new Error('Podaj poprawne imię');
@@ -80,9 +89,11 @@ export default function RegisterScreen() {
         payload.school = schoolId
       }
       await signUp(payload);
+      showToast('Rejestracja zakończona. Zaloguj się.');
       router.replace('/auth/login');
     } catch (e: any) {
       setError(e?.message || 'Błąd');
+      showToast(e?.message || 'Błąd');
     } finally {
       setLoading(false);
     }
@@ -116,6 +127,16 @@ export default function RegisterScreen() {
           label="Hasło"
           value={password}
           onChangeText={setPassword}
+          variant="outlined"
+          secureTextEntry
+        />
+      </View>
+
+      <View style={{ marginBottom: 16 }}>
+        <Input
+          label="Powtórz hasło"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
           variant="outlined"
           secureTextEntry
         />

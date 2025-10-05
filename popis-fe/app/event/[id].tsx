@@ -7,6 +7,7 @@ import { Colors } from '@/constants/theme';
 import { API_URL } from '@/lib/http';
 import { getCategoryEmoji, getCategoryLabel, getCategoryColor, applyToEvent, getEventById, getMyApplications, type Event, type Application } from '@/lib/services/events';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
+import { useNotificationsBadge } from '@/lib/notifications/context';
 
 export default function EventDetailScreen() {
   const colors = Colors;
@@ -15,6 +16,7 @@ export default function EventDetailScreen() {
   const [event, setEvent] = useState<Event | null>(null);
   const [myApplication, setMyApplication] = useState<Application | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const { showToast } = useNotificationsBadge();
 
   const loadData = async () => {
     if (!id) return;
@@ -33,6 +35,7 @@ export default function EventDetailScreen() {
       }
     } catch (e) {
       console.error('Failed to load event', e);
+      showToast('Nie udało się załadować wydarzenia');
     } finally {
     }
   };
@@ -70,27 +73,28 @@ export default function EventDetailScreen() {
       const res = await applyToEvent({ eventId: actualEventId, message: justification.trim() });
       if (res.success) {
         // Navigate back or show success toast
-        console.log('Applied successfully');
+        showToast('Zgłoszono udział');
         router.back();
       } else {
         console.warn('Apply failed', res.error);
+        showToast(res.error || 'Nie udało się zapisać');
       }
     } catch (e) {
       console.error('Apply error', e);
+      showToast('Błąd przy zapisywaniu');
     } finally {
       setJoining(false);
     }
   };
 
   const handleOpenChat = async () => {
-    // Navigate to chat screen if possible (requires either chatChannelId or event/org context)
-    const channelId = (myApplication as any)?.chatChannelId as string | undefined;
-    if (channelId) {
-      router.push(`/chat?channelId=${encodeURIComponent(channelId)}` as any);
-    } else {
-      // Fallback: navigate with event id; chat screen can handle creation or show info
-      router.push(`/chat?eventId=${encodeURIComponent(String(id || ''))}` as any);
+    const appId = (myApplication as any)?.id as string | undefined;
+    if (appId) {
+      router.push(`/chat?applicationId=${encodeURIComponent(appId)}` as any);
+      return;
     }
+    // If application unknown, open placeholder
+    router.push(`/chat` as any);
   };
 
   // Share action can be implemented later if needed
@@ -228,10 +232,10 @@ export default function EventDetailScreen() {
                     description={event.location?.address || ''}
                   >
                     <View style={styles.markerContainer}>
-                      <View style={[styles.markerPin, { backgroundColor: getCategoryColor(event?.category || 'other') }]}> 
+                      <View style={[styles.markerPin, { backgroundColor: colors.primary }]}> 
                         <Text style={styles.markerEmoji}>{getCategoryEmoji(event?.category || 'other')}</Text>
                       </View>
-                      <View style={[styles.markerTip, { borderTopColor: getCategoryColor(event?.category || 'other') }]} />
+                      <View style={[styles.markerTip, { borderTopColor: colors.primary }]} />
                     </View>
                   </Marker>
                 </MapView>

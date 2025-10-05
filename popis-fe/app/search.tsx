@@ -10,6 +10,7 @@ import { FilterModal } from '@/components/FilterModal';
 import { Event, EventFilters, getAvailableEvents, getCategoryEmoji, getCategoryLabel, getMyApplications, type ApplicationStatus } from '@/lib/services/events';
 import { API_URL } from '@/lib/http';
 import { EventCard } from '@/components/ui';
+import { useNotificationsBadge } from '@/lib/notifications/context';
 
 const resolveImageUrl = (img: any): string | null => {
   if (!img) return null;
@@ -31,6 +32,7 @@ export default function SearchScreen() {
   const [loading, setLoading] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [applicationStatusByEvent, setApplicationStatusByEvent] = useState<Record<string, ApplicationStatus>>({});
+  const { showToast } = useNotificationsBadge();
 
   const activeFiltersCount = useMemo(() => {
     return Object.entries(filters).reduce((acc, [key, val]) => {
@@ -48,6 +50,7 @@ export default function SearchScreen() {
       setEvents(response.events);
     } catch (e) {
       console.error('Search load failed', e);
+      showToast('Nie udało się pobrać wyników');
     } finally {
       setLoading(false);
     }
@@ -72,6 +75,7 @@ export default function SearchScreen() {
       } catch (e) {
         // non-blocking
         console.warn('Failed to load my applications', e);
+        showToast('Nie udało się załadować zgłoszeń');
       }
     })();
   }, []);

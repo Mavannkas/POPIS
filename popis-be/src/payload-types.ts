@@ -77,6 +77,7 @@ export interface Config {
     schools: School;
     invitations: Invitation;
     notifications: Notification;
+    messages: Message;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -99,6 +100,7 @@ export interface Config {
     schools: SchoolsSelect<false> | SchoolsSelect<true>;
     invitations: InvitationsSelect<false> | InvitationsSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
+    messages: MessagesSelect<false> | MessagesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -191,9 +193,9 @@ export interface User {
    */
   isAdult?: boolean | null;
   /**
-   * Stream Chat user ID (auto-generated)
+   * Token do powiadomień push (Expo) – ustawiane z aplikacji
    */
-  streamUserId?: string | null;
+  expoPushToken?: string | null;
   events?: {
     docs?: (string | Event)[];
     hasNextPage?: boolean;
@@ -395,10 +397,6 @@ export interface Application {
    * Data ukończenia wolontariatu
    */
   completedAt?: string | null;
-  /**
-   * Stream Chat channel ID (auto-generated po akceptacji)
-   */
-  chatChannelId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -427,9 +425,9 @@ export interface Admin {
    */
   verified?: boolean | null;
   /**
-   * Stream Chat user ID (auto-generated)
+   * Token do powiadomień push (Expo) – ustawiane z aplikacji
    */
-  streamUserId?: string | null;
+  expoPushToken?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -545,6 +543,36 @@ export interface Notification {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "messages".
+ */
+export interface Message {
+  id: string;
+  application: string | Application;
+  sender:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'admins';
+        value: string | Admin;
+      };
+  receiver:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'admins';
+        value: string | Admin;
+      };
+  content: string;
+  read?: boolean | null;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -585,6 +613,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'notifications';
         value: string | Notification;
+      } | null)
+    | ({
+        relationTo: 'messages';
+        value: string | Message;
       } | null);
   globalSlug?: string | null;
   user:
@@ -652,7 +684,7 @@ export interface UsersSelect<T extends boolean = true> {
   isAgeIsVerified?: T;
   isMinor?: T;
   isAdult?: T;
-  streamUserId?: T;
+  expoPushToken?: T;
   events?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -693,7 +725,7 @@ export interface AdminsSelect<T extends boolean = true> {
   schoolAddress?: T;
   role?: T;
   verified?: T;
-  streamUserId?: T;
+  expoPushToken?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -784,7 +816,6 @@ export interface ApplicationsSelect<T extends boolean = true> {
   status?: T;
   appliedAt?: T;
   completedAt?: T;
-  chatChannelId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -849,6 +880,19 @@ export interface NotificationsSelect<T extends boolean = true> {
   message?: T;
   isRead?: T;
   actionRequired?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "messages_select".
+ */
+export interface MessagesSelect<T extends boolean = true> {
+  application?: T;
+  sender?: T;
+  receiver?: T;
+  content?: T;
+  read?: T;
   createdAt?: T;
   updatedAt?: T;
 }

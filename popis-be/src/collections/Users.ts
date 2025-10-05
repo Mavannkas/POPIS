@@ -110,13 +110,12 @@ export const Users: CollectionConfig = {
       },
     },
     {
-      name: 'streamUserId',
+      name: 'expoPushToken',
       type: 'text',
-      label: 'ID użytkownika Stream',
+      label: 'Expo Push Token',
       admin: {
         position: 'sidebar',
-        description: 'Stream Chat user ID (auto-generated)',
-        readOnly: true,
+        description: 'Token do powiadomień push (Expo) – ustawiane z aplikacji',
       },
     },
     {
