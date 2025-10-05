@@ -10,6 +10,10 @@ export const Schools: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'city', 'type'],
     description: 'Cache szkół wybranych przez użytkowników (dane z zewnętrznego API)',
+    hidden: ({ user }) => {
+      // console.log(user)
+      return user?.role !== 'superadmin'
+    },
   },
   fields: [
     {
@@ -85,4 +89,3 @@ export const Schools: CollectionConfig = {
     delete: () => true,
   },
 }
-

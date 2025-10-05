@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, TypedUser } from 'payload'
 import { LocationPicker } from '../components/LocationPicker'
 
 export const Events: CollectionConfig = {
@@ -10,6 +10,27 @@ export const Events: CollectionConfig = {
     hidden: ({ user }: { user: any }) => {
       return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
     },
+  },
+  access: {
+    read: ({ req }) => {
+      const user = req.user
+      if (user?.collection === 'admins') {
+        if (user?.role === 'coordinator') {
+          return {
+            targetSchool: {
+              equals: user?.schoolName,
+            },
+          }
+        } else {
+          return true
+        }
+      } else {
+        return false
+      }
+    },
+    update: () => true,
+    delete: () => true,
+    create: () => true,
   },
   labels: {
     singular: 'Wydarzenie',
@@ -323,14 +344,10 @@ export const Events: CollectionConfig = {
       type: 'relationship',
       relationTo: 'admins',
       required: true,
-      filterOptions: {
-        role: { equals: 'organization' },
-      },
-      label: 'Organizacja',
+      label: 'Organizator',
       admin: {
         position: 'sidebar',
-        description: 'Organizacja odpowiedzialna za wydarzenie',
-        appearance: 'drawer',
+        description: 'Organizator odpowiedzialny za wydarzenie',
       },
     },
     {
@@ -345,12 +362,7 @@ export const Events: CollectionConfig = {
       },
     },
   ],
-  access: {
-    create: () => true,
-    read: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+
   hooks: {
     beforeChange: [
       ({ data, req, operation }: { data: any; req: any; operation: string }) => {

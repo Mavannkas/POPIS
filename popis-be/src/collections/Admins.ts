@@ -5,6 +5,10 @@ export const Admins: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['email', 'role', 'firstName', 'lastName', 'verified'],
+    hidden: ({ user }) => {
+      // console.log(user)
+      return user?.role !== 'superadmin'
+    },
   },
   labels: {
     singular: 'Administrator',
@@ -106,7 +110,8 @@ export const Admins: CollectionConfig = {
           fields: [
             {
               name: 'schoolName',
-              type: 'text',
+              type: 'relationship',
+              relationTo: 'schools',
               label: 'Nazwa szkoły',
               admin: {
                 condition: (data: any) => data.role === 'coordinator',

@@ -144,7 +144,6 @@ export const seed = async (payload: Payload): Promise<void> => {
           lastName: 'Wiśniewska',
           phone: '+48 345 678 901',
           verified: true,
-          schoolName: 'I Liceum Ogólnokształcące im. Juliusza Słowackiego',
           schoolAddress: 'ul. Marszałkowska 15, Warszawa',
         },
       }),

@@ -334,7 +334,7 @@ export interface Event {
   };
   status: 'draft' | 'published' | 'completed' | 'cancelled';
   /**
-   * Organizacja odpowiedzialna za wydarzenie
+   * Organizator odpowiedzialny za wydarzenie
    */
   organization: string | Admin;
   /**
@@ -419,7 +419,7 @@ export interface Admin {
     city?: string | null;
     postalCode?: string | null;
   };
-  schoolName?: string | null;
+  schoolName?: (string | null) | School;
   schoolAddress?: string | null;
   role: 'organization' | 'coordinator' | 'superadmin';
   /**
