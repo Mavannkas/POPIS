@@ -155,11 +155,9 @@ export const Invitations: CollectionConfig = {
     ],
     afterChange: [
       async ({ doc, req, operation, previousDoc }) => {
-        // Send notification when invitation is created
+        // Create notification when invitation is created
         if (operation === 'create') {
           try {
-            const NotificationService = (await import('../services/NotificationService')).default
-
             // Get event details
             const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
             const event = await req.payload.findByID({
@@ -170,7 +168,7 @@ export const Invitations: CollectionConfig = {
             const volunteerId = typeof doc.volunteer === 'object' ? doc.volunteer.id : doc.volunteer
 
             // Create notification in database
-            const notification = await req.payload.create({
+            await req.payload.create({
               collection: 'notifications',
               data: {
                 type: 'event_invitation',
@@ -185,31 +183,19 @@ export const Invitations: CollectionConfig = {
               },
             })
 
-            // Send real-time notification via SSE
-            NotificationService.sendNotification(volunteerId, {
-              id: notification.id,
-              type: 'event_invitation',
-              message: notification.message,
-              event: event,
-              createdAt: notification.createdAt,
-              read: false,
-            })
-
-            console.log('Notification sent for invitation:', doc.id)
+            console.log('Notification created for invitation:', doc.id)
           } catch (error) {
-            console.error('Error sending invitation notification:', error)
+            console.error('Error creating invitation notification:', error)
           }
         }
 
-        // Send notification to inviter when invitation is responded to
+        // Create notification to inviter when invitation is responded to
         if (
           operation === 'update' &&
           previousDoc?.status === 'pending' &&
           (doc.status === 'accepted' || doc.status === 'declined')
         ) {
           try {
-            const NotificationService = (await import('../services/NotificationService')).default
-
             // Get event details
             const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
             const event = await req.payload.findByID({
@@ -229,7 +215,7 @@ export const Invitations: CollectionConfig = {
               : `${volunteer.firstName || 'Wolontariusz'} odrzucił zaproszenie do wydarzenia "${event.title}"`
 
             // Create notification in database
-            const notification = await req.payload.create({
+            await req.payload.create({
               collection: 'notifications',
               data: {
                 type: notificationType,
@@ -245,19 +231,9 @@ export const Invitations: CollectionConfig = {
               },
             })
 
-            // Send real-time notification via SSE
-            NotificationService.sendNotification(inviterId, {
-              id: notification.id,
-              type: notificationType,
-              message: notification.message,
-              event: event,
-              createdAt: notification.createdAt,
-              read: false,
-            })
-
-            console.log('Notification sent for invitation response:', doc.id)
+            console.log('Notification created for invitation response:', doc.id)
           } catch (error) {
-            console.error('Error sending invitation response notification:', error)
+            console.error('Error creating invitation response notification:', error)
           }
         }
 

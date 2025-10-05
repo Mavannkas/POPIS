@@ -127,15 +127,13 @@ export const Applications: CollectionConfig = {
     ],
     afterChange: [
       async ({ doc, req, operation, previousDoc }) => {
-        // Send notification when application status changes to accepted or rejected
+        // Create notification when application status changes to accepted or rejected
         if (
           operation === 'update' &&
           previousDoc?.status === 'pending' &&
           (doc.status === 'accepted' || doc.status === 'rejected')
         ) {
           try {
-            const NotificationService = (await import('../services/NotificationService')).default
-
             // Get event details
             const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
             const event = await req.payload.findByID({
@@ -153,7 +151,7 @@ export const Applications: CollectionConfig = {
                 : `Twoje zgłoszenie do wydarzenia "${event.title}" zostało odrzucone.`
 
             // Create notification in database
-            const notification = await req.payload.create({
+            await req.payload.create({
               collection: 'notifications',
               data: {
                 type: notificationType,
@@ -168,19 +166,9 @@ export const Applications: CollectionConfig = {
               },
             })
 
-            // Send real-time notification via SSE
-            NotificationService.sendNotification(volunteerId, {
-              id: notification.id,
-              type: notificationType,
-              message: notification.message,
-              event: event,
-              createdAt: notification.createdAt,
-              read: false,
-            })
-
-            console.log('Notification sent for application status change:', doc.id)
+            console.log('Notification created for application status change:', doc.id)
           } catch (error) {
-            console.error('Error sending application notification:', error)
+            console.error('Error creating application notification:', error)
           }
         }
 

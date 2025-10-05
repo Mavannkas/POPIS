@@ -1,5 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useSSE } from '../hooks/useSSE';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { apiFetch } from '../http';
 import { useAuth } from '../auth/context';
 
@@ -56,37 +55,33 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   }, [user]);
 
-  // Connect to SSE for real-time notifications
-  const { connected } = useSSE('/api/notifications/stream', {
-    enabled: !!user,
-    onMessage: (message) => {
-      if (message.type === 'connected') {
-        console.log('[Notifications] Connected to notification stream');
-        return;
+  // Polling for notifications every 5 seconds
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [connected, setConnected] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setConnected(false);
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
       }
+      return;
+    }
 
-      // Add new notification to the list
-      const newNotification: Notification = {
-        id: message.id || '',
-        type: message.type as any,
-        recipient: user?.id || '',
-        event: message.event,
-        message: message.message,
-        read: message.read || false,
-        metadata: {},
-        createdAt: message.createdAt || new Date().toISOString(),
-        updatedAt: message.createdAt || new Date().toISOString(),
-      };
+    // Start polling
+    setConnected(true);
+    pollingIntervalRef.current = setInterval(() => {
+      fetchNotifications();
+    }, 5000); // Poll every 5 seconds
 
-      setNotifications((prev) => [newNotification, ...prev]);
-    },
-    onConnected: () => {
-      console.log('[Notifications] SSE connected');
-    },
-    onError: (error) => {
-      console.error('[Notifications] SSE error:', error);
-    },
-  });
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
+  }, [user, fetchNotifications]);
 
   // Mark notification as read
   const markAsRead = useCallback(async (notificationId: string) => {
