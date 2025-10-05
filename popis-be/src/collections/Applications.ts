@@ -43,6 +43,15 @@ export const Applications: CollectionConfig = {
       ],
     },
     {
+      name: 'groupApplication',
+      type: 'relationship',
+      relationTo: 'group_applications',
+      label: 'Zgłoszenie grupowe',
+      admin: {
+        description: 'Jeśli aplikacja została utworzona w wyniku zgłoszenia grupowego',
+      },
+    },
+    {
       name: 'message',
       type: 'textarea',
       label: 'Wiadomość',

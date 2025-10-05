@@ -12,21 +12,14 @@ export const Events: CollectionConfig = {
     },
   },
   access: {
-    read: ({ req }) => {
+    read: ({ req }: { req: any }) => {
       const user = req.user
+      // Allow all admins (organization, coordinator, superadmin) to read events
       if (user?.collection === 'admins') {
-        if (user?.role === 'coordinator') {
-          return {
-            targetSchool: {
-              equals: user?.schoolName,
-            },
-          }
-        } else {
-          return true
-        }
-      } else {
-        return false
+        return true
       }
+      // Block non-admins from admin events collection
+      return false
     },
     update: () => true,
     delete: () => true,
@@ -317,6 +310,17 @@ export const Events: CollectionConfig = {
               on: 'event',
               admin: {
                 description: 'Lista zgłoszeń przypisanych do tego wydarzenia',
+              },
+            },
+            {
+              name: 'groupApplications',
+              label: 'Zgłoszenia grupowe',
+              type: 'join',
+              hasMany: true,
+              collection: 'group_applications',
+              on: 'targetEvent',
+              admin: {
+                description: 'Lista zgłoszeń grupowych przypisanych do tego wydarzenia',
               },
             },
           ],
