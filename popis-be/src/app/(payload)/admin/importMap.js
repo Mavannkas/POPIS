@@ -22,6 +22,7 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { LocationPicker as LocationPicker_62bd8abbbb2481494468e4bcf06068bf } from '@/components/LocationPicker'
+import { NotificationTypeCell as NotificationTypeCell_ed363b41dc0068793f533207c011ba58 } from '@/components/AdminDashboard/components/NotificationTypeCell'
 import { AdminNavbar as AdminNavbar_967b713f8b884906a229587bbbb38a9a } from '@/components/AdminNavbar'
 import { AdminLogoIcon as AdminLogoIcon_b44db66c75684c15f88e108165ed4089 } from '@/components/AdminLogoIcon/AdminLogoIcon'
 import { AdminLogoBig as AdminLogoBig_06da07c1f0ebe9eb350437b211008391 } from '@/components/AdminLogoBig/AdminLogoBig'
@@ -52,6 +53,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/LocationPicker#LocationPicker": LocationPicker_62bd8abbbb2481494468e4bcf06068bf,
+  "@/components/AdminDashboard/components/NotificationTypeCell#NotificationTypeCell": NotificationTypeCell_ed363b41dc0068793f533207c011ba58,
   "@/components/AdminNavbar#AdminNavbar": AdminNavbar_967b713f8b884906a229587bbbb38a9a,
   "@/components/AdminLogoIcon/AdminLogoIcon#AdminLogoIcon": AdminLogoIcon_b44db66c75684c15f88e108165ed4089,
   "@/components/AdminLogoBig/AdminLogoBig#AdminLogoBig": AdminLogoBig_06da07c1f0ebe9eb350437b211008391,

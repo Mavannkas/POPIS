@@ -32,7 +32,7 @@ export const Notifications: CollectionConfig = {
       admin: {
         position: 'sidebar',
         components: {
-          Cell: NotificationTypeCell,
+          Cell: '@/components/AdminDashboard/components/NotificationTypeCell#NotificationTypeCell',
         },
       },
     },
@@ -112,5 +112,3 @@ export const Notifications: CollectionConfig = {
     ],
   },
 }
-
-
