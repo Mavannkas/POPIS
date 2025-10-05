@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
 import { theme } from '@/constants/theme';
 import { AuthProvider } from '@/lib/auth/context';
+import { NotificationsProvider } from '@/lib/notifications/context';
 import { useFonts } from 'expo-font';
 import { Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
@@ -23,6 +24,7 @@ export default function RootLayout() {
   return (
     <PaperProvider theme={theme}>
       <AuthProvider>
+        <NotificationsProvider>
         <Stack
           screenOptions={{
             headerBackTitle: '',
@@ -75,6 +77,7 @@ export default function RootLayout() {
           />
         </Stack>
         <StatusBar style="dark" />
+        </NotificationsProvider>
       </AuthProvider>
     </PaperProvider>
   );

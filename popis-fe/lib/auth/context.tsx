@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				user,
 				loading,
 				signIn: async p => setUser(await signIn(p)),
-				signUp: async p => setUser(await signUp(p)),
+				signUp: async p => { await signUp(p); },
 				signOut: async () => {
 					await signOut();
 					setUser(null);

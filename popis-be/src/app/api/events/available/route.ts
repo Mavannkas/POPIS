@@ -130,6 +130,14 @@ export const GET = async (request: NextRequest) => {
     // Filter by available spots and attach acceptedCount to each event
     const filteredDocs: any[] = []
     for (const ev of events.docs as any[]) {
+      // Age restriction: NEVER show events above user's age
+      if (user) {
+        const userAge = user.isMinor ? 17 : 18
+        if (typeof ev.minAge === 'number' && userAge < ev.minAge) {
+          continue
+        }
+      }
+      // If not logged in, keep as-is (public listing); backend already enforces published + public
       let acceptedCount = 0
       let hasMyApplication: boolean | null = null
       try {

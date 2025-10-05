@@ -284,6 +284,22 @@ export const Events: CollectionConfig = {
             },
           ],
         },
+        {
+          label: 'Zgłoszenia',
+          fields: [
+            {
+              name: 'applications',
+              label: 'Zgłoszenia',
+              type: 'join',
+              hasMany: true,
+              collection: 'applications',
+              on: 'event',
+              admin: {
+                description: 'Lista zgłoszeń przypisanych do tego wydarzenia',
+              },
+            },
+          ],
+        },
       ],
     },
     {

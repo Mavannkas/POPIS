@@ -12,6 +12,8 @@ export type SignUpPayload = {
   password: string;
   firstName?: string;
   lastName?: string;
-  isUnder18?: boolean;
+  birthDate?: string; // ISO string expected by backend
+  isStudent?: boolean;
+  school?: string | null;
 };
 

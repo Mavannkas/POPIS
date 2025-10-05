@@ -76,6 +76,7 @@ export interface Config {
     certificates: Certificate;
     schools: School;
     invitations: Invitation;
+    notifications: Notification;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -83,6 +84,9 @@ export interface Config {
   collectionsJoins: {
     users: {
       events: 'events';
+    };
+    events: {
+      applications: 'applications';
     };
   };
   collectionsSelect: {
@@ -94,6 +98,7 @@ export interface Config {
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     schools: SchoolsSelect<false> | SchoolsSelect<true>;
     invitations: InvitationsSelect<false> | InvitationsSelect<true>;
+    notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -319,6 +324,14 @@ export interface Event {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Lista zgłoszeń przypisanych do tego wydarzenia
+   */
+  applications?: {
+    docs?: (string | Application)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   status: 'draft' | 'published' | 'completed' | 'cancelled';
   /**
    * Organizacja odpowiedzialna za wydarzenie
@@ -349,6 +362,45 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications".
+ */
+export interface Application {
+  id: string;
+  /**
+   * Kliknij, aby podejrzeć szczegóły wydarzenia
+   */
+  event: string | Event;
+  /**
+   * Kliknij, aby podejrzeć szczegóły wolontariusza
+   */
+  volunteer: string | User;
+  /**
+   * Wiadomość od wolontariusza
+   */
+  message?: string | null;
+  /**
+   * Liczba przepracowanych godzin (wypełnia organizacja)
+   */
+  hoursWorked?: number | null;
+  /**
+   * Notatki organizacji (widoczne tylko dla organizacji i superadmina)
+   */
+  organizationNotes?: string | null;
+  status: 'pending' | 'accepted' | 'rejected' | 'completed';
+  appliedAt?: string | null;
+  /**
+   * Data ukończenia wolontariatu
+   */
+  completedAt?: string | null;
+  /**
+   * Stream Chat channel ID (auto-generated po akceptacji)
+   */
+  chatChannelId?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -395,39 +447,6 @@ export interface Admin {
       }[]
     | null;
   password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "applications".
- */
-export interface Application {
-  id: string;
-  event: string | Event;
-  volunteer: string | User;
-  /**
-   * Wiadomość od wolontariusza
-   */
-  message?: string | null;
-  /**
-   * Liczba przepracowanych godzin (wypełnia organizacja)
-   */
-  hoursWorked?: number | null;
-  /**
-   * Notatki organizacji (widoczne tylko dla organizacji i superadmina)
-   */
-  organizationNotes?: string | null;
-  status: 'pending' | 'accepted' | 'rejected' | 'completed';
-  appliedAt?: string | null;
-  /**
-   * Data ukończenia wolontariatu
-   */
-  completedAt?: string | null;
-  /**
-   * Stream Chat channel ID (auto-generated po akceptacji)
-   */
-  chatChannelId?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -509,6 +528,23 @@ export interface Invitation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications".
+ */
+export interface Notification {
+  id: string;
+  user: string | User;
+  type: 'approval_decision' | 'event_invitation';
+  event?: (string | null) | Event;
+  invitation?: (string | null) | Invitation;
+  decision?: ('accepted' | 'rejected') | null;
+  message?: string | null;
+  isRead?: boolean | null;
+  actionRequired?: boolean | null;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -545,6 +581,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'invitations';
         value: string | Invitation;
+      } | null)
+    | ({
+        relationTo: 'notifications';
+        value: string | Notification;
       } | null);
   globalSlug?: string | null;
   user:
@@ -724,6 +764,7 @@ export interface EventsSelect<T extends boolean = true> {
         isAccepted?: T;
         id?: T;
       };
+  applications?: T;
   status?: T;
   organization?: T;
   createdBy?: T;
@@ -794,6 +835,22 @@ export interface InvitationsSelect<T extends boolean = true> {
   respondedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications_select".
+ */
+export interface NotificationsSelect<T extends boolean = true> {
+  user?: T;
+  type?: T;
+  event?: T;
+  invitation?: T;
+  decision?: T;
+  message?: T;
+  isRead?: T;
+  actionRequired?: T;
+  createdAt?: T;
+  updatedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

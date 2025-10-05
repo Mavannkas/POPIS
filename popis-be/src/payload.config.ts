@@ -16,6 +16,7 @@ import { Applications } from './collections/Applications'
 import { Certificates } from './collections/Certificates'
 import { Schools } from './collections/Schools'
 import { Invitations } from './collections/Invitations'
+import { Notifications } from './collections/Notifications'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 
 const filename = fileURLToPath(import.meta.url)
@@ -52,7 +53,17 @@ export default buildConfig({
       pl,
     },
   },
-  collections: [Users, Admins, Media, Events, Applications, Certificates, Schools, Invitations],
+  collections: [
+    Users,
+    Admins,
+    Media,
+    Events,
+    Applications,
+    Certificates,
+    Schools,
+    Invitations,
+    Notifications,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -5,6 +5,7 @@ import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
 import { Linking } from 'react-native';
 import { useAuth } from '@/lib/auth/context';
+import { useNotificationsBadge } from '@/lib/notifications/context';
 
 interface TopBarProps {
 	showSearch?: boolean;
@@ -99,9 +100,7 @@ const handleAccountPress = () => {
             className="relative p-2"
           >
             <IconSymbol name="bell.fill" size={24} color={colors.primary} />
-            <View className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full items-center justify-center">
-              <Text className="text-white text-xs font-bold">3</Text>
-            </View>
+            <Badge />
           </TouchableOpacity>
         </View>
 
@@ -217,5 +216,15 @@ const handleAccountPress = () => {
         </Pressable>
       </Modal>
     </>
+  );
+}
+
+function Badge() {
+  const { unread } = useNotificationsBadge();
+  if (!unread) return null;
+  return (
+    <View className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-red-500 rounded-full items-center justify-center">
+      <Text className="text-white text-xs font-bold">{unread > 99 ? '99+' : String(unread)}</Text>
+    </View>
   );
 }

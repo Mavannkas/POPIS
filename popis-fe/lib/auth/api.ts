@@ -11,7 +11,7 @@ export async function signIn(payload: SignInPayload): Promise<AuthUser> {
 			email: payload.email,
 		};
 	}
-	return apiFetch<AuthUser>('/api/users/login', { method: 'POST', json: payload });
+  return apiFetch<AuthUser>('/api/users/login', { method: 'POST', json: payload, credentials: 'include' });
 }
 
 export async function signUp(payload: SignUpPayload): Promise<AuthUser> {
@@ -24,7 +24,7 @@ export async function signUp(payload: SignUpPayload): Promise<AuthUser> {
 			lastName: payload.lastName,
 		};
 	}
-	return apiFetch<AuthUser>('/api/users', { method: 'POST', json: payload });
+  return apiFetch<AuthUser>('/api/users', { method: 'POST', json: payload, credentials: 'include' });
 }
 
 export async function me(): Promise<AuthUser | null> {
