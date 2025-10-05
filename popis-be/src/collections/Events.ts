@@ -12,14 +12,18 @@ export const Events: CollectionConfig = {
     },
   },
   access: {
-    read: ({ req }: { req: any }) => {
+    read: ({ req }) => {
       const user = req.user
       // Allow all admins (organization, coordinator, superadmin) to read events
-      if (user?.collection === 'admins') {
-        return true
+      if (user?.collection === 'admins' && user.role === 'coordinator') {
+        return {
+          targetSchool: {
+            equals: user.schoolName,
+          },
+        }
       }
       // Block non-admins from admin events collection
-      return false
+      return true
     },
     update: () => true,
     delete: () => true,
