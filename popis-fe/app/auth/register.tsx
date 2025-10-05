@@ -41,13 +41,46 @@ export default function RegisterScreen() {
     school.name.toLowerCase().includes(schoolSearchTerm.toLowerCase())
   );
 
+  function toISODate(d: string) {
+    // Accept formats like YYYY-MM-DD or DD.MM.YYYY or MM/DD/YYYY and convert to ISO date
+    const trimmed = d.trim()
+    if (!trimmed) return ''
+    // YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return new Date(trimmed + 'T00:00:00Z').toISOString()
+    // DD.MM.YYYY
+    const dmY = trimmed.match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
+    if (dmY) {
+      const [, dd, mm, yyyy] = dmY
+      return new Date(`${yyyy}-${mm}-${dd}T00:00:00Z`).toISOString()
+    }
+    // MM/DD/YYYY
+    const mDY = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+    if (mDY) {
+      const [, mm, dd, yyyy] = mDY
+      return new Date(`${yyyy}-${mm}-${dd}T00:00:00Z`).toISOString()
+    }
+    return ''
+  }
+
   async function onSubmit() {
     if (!accept) return setError('Zaznacz akceptację regulaminu');
     setError('');
     setLoading(true);
     try {
-      await signUp({ email, password, firstName, lastName });
-      router.replace('/(tabs)');
+      const fn = firstName.trim();
+      const ln = lastName.trim();
+      if (!fn || fn.length < 2) throw new Error('Podaj poprawne imię');
+      if (!ln || ln.length < 2) throw new Error('Podaj poprawne nazwisko');
+      const isoBirth = toISODate(birthDate)
+      if (!isoBirth) throw new Error('Nieprawidłowa data urodzenia')
+      const payload: any = { email: email.trim(), password, firstName: fn, lastName: ln, birthDate: isoBirth }
+      if (isStudent) {
+        if (!schoolId) throw new Error('Wybierz szkołę z listy')
+        payload.isStudent = true
+        payload.school = schoolId
+      }
+      await signUp(payload);
+      router.replace('/auth/login');
     } catch (e: any) {
       setError(e?.message || 'Błąd');
     } finally {
@@ -108,11 +141,11 @@ export default function RegisterScreen() {
       
       <View style={{ marginBottom: 16 }}>
         <Input
-          label="Data urodzin"
+          label="Data urodzenia"
           value={birthDate}
           onChangeText={setBirthDate}
           variant="outlined"
-          placeholder="MM/DD/YYYY"
+          placeholder="RRRR-MM-DD lub DD.MM.RRRR"
         />
       </View>
 

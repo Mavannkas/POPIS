@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Linking, RefreshControl } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, Image, StyleSheet, Linking, RefreshControl, TextInput } from 'react-native';
 import { Card, Button } from 'react-native-paper';
-import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView, TextArea } from '@/components/ui';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { API_URL } from '@/lib/http';
@@ -49,11 +49,25 @@ export default function EventDetailScreen() {
   };
 
   const [joining, setJoining] = useState(false);
+  const [justification, setJustification] = useState('');
+  const [justificationError, setJustificationError] = useState('');
+  const justificationRef = useRef<TextInput | null>(null);
   const handleJoinEvent = async () => {
-    if (!id) return;
+    // Prefer the loaded event's actual ID over the route param
+    const actualEventId = (event && (event as any).id) ? String((event as any).id) : (id ? String(id) : '')
+    if (!actualEventId) return;
     try {
+      setJustificationError('');
+      if (!justification || justification.trim().length < 10) {
+        setJustificationError('Uzasadnienie jest wymagane (min. 10 znaków)');
+        // Scroll to bottom and focus the field
+        setTimeout(() => {
+          justificationRef.current?.focus();
+        }, 50);
+        return;
+      }
       setJoining(true);
-      const res = await applyToEvent({ eventId: String(id) });
+      const res = await applyToEvent({ eventId: actualEventId, message: justification.trim() });
       if (res.success) {
         // Navigate back or show success toast
         console.log('Applied successfully');
@@ -104,18 +118,16 @@ export default function EventDetailScreen() {
                 <Image source={{ uri: imageUrl }} style={styles.headerImage} resizeMode="cover" />
               ) : null;
             })()}
-            {myApplication ? (
-              <View
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: myApplication.status === 'accepted' ? '#73A641' : '#E8A031' },
-                ]}
-              >
-                <Text style={styles.statusBadgeText}>
-                  {myApplication.status === 'accepted' ? 'Zaakceptowano' : 'Zapisano'}
-                </Text>
-              </View>
-            ) : null}
+            {myApplication ? (() => {
+              const s = myApplication.status
+              const bg = s === 'accepted' ? '#73A641' : (s === 'rejected' ? '#EF4444' : (s === 'completed' ? '#3B82F6' : '#E8A031'))
+              const label = s === 'accepted' ? 'Zaakceptowano' : (s === 'rejected' ? 'Odrzucono' : (s === 'completed' ? 'Ukończony' : 'Zapisano'))
+              return (
+                <View style={[styles.statusBadge, { backgroundColor: bg }]}>
+                  <Text style={styles.statusBadgeText}>{label}</Text>
+                </View>
+              )
+            })() : null}
           </View>
         </View>
 
@@ -251,7 +263,20 @@ export default function EventDetailScreen() {
 
           {/* Category section omitted in this view per mock */}
 
-          {/* Recommendation field removed in new UX */}
+          {/* Uzasadnienie (wymagane) */}
+          <View className="mb-6">
+            <Text className="text-lg font-semibold text-gray-800 mb-3">Uzasadnienie zgłoszenia</Text>
+            <TextArea
+              ref={justificationRef as any}
+              label={undefined}
+              value={justification}
+              onChangeText={setJustification}
+              placeholder="Napisz, dlaczego chcesz wziąć udział..."
+              error={justificationError}
+              minHeight={120}
+              maxHeight={200}
+            />
+          </View>
         </View>
       </KeyboardAwareScrollView>
 

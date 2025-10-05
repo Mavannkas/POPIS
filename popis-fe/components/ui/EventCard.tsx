@@ -36,16 +36,16 @@ export function EventCard({ event, applicationStatus, containerStyle }: EventCar
           })()}
           {applicationStatus && (
             <View className="absolute left-3 bottom-3">
-              <View
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: applicationStatus === 'accepted' ? '#73A641' : '#E8A031' },
-                ]}
-              >
-                <Text style={styles.statusBadgeText}>
-                  {applicationStatus === 'accepted' ? 'Zaakceptowano' : 'Zapisano'}
-                </Text>
-              </View>
+              {(() => {
+                const s = applicationStatus
+                const bg = s === 'accepted' ? '#73A641' : (s === 'rejected' ? '#EF4444' : (s === 'completed' ? '#3B82F6' : '#E8A031'))
+                const label = s === 'accepted' ? 'Zaakceptowano' : (s === 'rejected' ? 'Odrzucono' : (s === 'completed' ? 'Ukończony' : 'Zapisano'))
+                return (
+                  <View style={[styles.statusBadge, { backgroundColor: bg }]}>
+                    <Text style={styles.statusBadgeText}>{label}</Text>
+                  </View>
+                )
+              })()}
             </View>
           )}
           <View className="absolute right-3 bottom-3">

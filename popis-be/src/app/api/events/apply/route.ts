@@ -106,12 +106,19 @@ export const POST = async (request: NextRequest) => {
       }
     }
     
-    // Create application
+    // Re-fetch volunteer to ensure it exists as a document id usable for relationships
+    const volunteerDoc = await payload.findByID({
+      collection: 'users',
+      id: user.id,
+    })
+
+    // Create application - always use canonical event.id
+    const canonicalEventId = (event as any)?.id ?? eventId
     const application = await payload.create({
       collection: 'applications',
       data: {
-        event: eventId,
-        volunteer: user.id,
+        event: (canonicalEventId as any),
+        volunteer: ((volunteerDoc as any)?.id ?? user.id) as any,
         message: message.trim(),
         status: 'pending',
       },
