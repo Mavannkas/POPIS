@@ -1,33 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Image, RefreshControl } from 'react-native';
-import { Card } from 'react-native-paper';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { TopBar } from '@/components/ui/top-bar';
 import { EventCard } from '@/components/ui';
-import { getCategoryEmoji, getCategoryLabel, getAvailableEvents, applyToEvent, getMyApplications, type Event, type ApplicationStatus, type EventFilters } from '@/lib/services/events';
-import { router } from 'expo-router';
-import { API_URL } from '@/lib/http';
-
-const resolveImageUrl = (img: any): string | null => {
-  if (!img) return null;
-  if (typeof img === 'string') {
-    return img.startsWith('http') ? img : (API_URL ? `${API_URL}${img}` : null);
-  }
-  if (typeof img === 'object' && img.url) {
-    const u = String(img.url);
-    return u.startsWith('http') ? u : (API_URL ? `${API_URL}${u}` : u);
-  }
-  return null;
-};
+import { getAvailableEvents, getMyApplications, type Event, type ApplicationStatus, type EventFilters } from '@/lib/services/events';
+import { useNotificationsBadge } from '@/lib/notifications/context';
 
 export default function HomeScreen() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [joiningId, setJoiningId] = useState<string | null>(null);
   const [applicationStatusByEvent, setApplicationStatusByEvent] = useState<Record<string, ApplicationStatus>>({});
-  const [filters, setFilters] = useState<EventFilters>({});
+  const [filters] = useState<EventFilters>({});
   const [refreshing, setRefreshing] = useState(false);
+  const { showToast } = useNotificationsBadge();
 
-  const loadHomeData = async () => {
+  const loadHomeData = useCallback(async () => {
     try {
       setLoading(true);
       const res = await getAvailableEvents({ limit: 5, ...filters });
@@ -43,39 +29,24 @@ export default function HomeScreen() {
         setApplicationStatusByEvent(map);
       } catch (e) {
         console.warn('Failed to load my applications', e);
+        showToast('Nie udało się załadować zgłoszeń');
       }
     } catch (e) {
       console.error('Failed to load home events', e);
+      showToast('Nie udało się załadować wydarzeń');
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, showToast]);
 
   useEffect(() => {
     loadHomeData();
-  }, [filters]);
+  }, [loadHomeData]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     await loadHomeData();
     setRefreshing(false);
-  };
-
-  const onJoin = async (eventId: string) => {
-    try {
-      setJoiningId(eventId);
-      const res = await applyToEvent({ eventId });
-      if (res.success) {
-        // Simple success feedback; could add toast
-        console.log('Applied to event', eventId);
-      } else {
-        console.warn('Apply failed', res.error);
-      }
-    } catch (e) {
-      console.error('Apply error', e);
-    } finally {
-      setJoiningId(prev => (prev === eventId ? null : prev));
-    }
   };
 
   return (
@@ -125,73 +96,4 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F1DAE5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconEmoji: {
-    fontSize: 16,
-  },
-  savedBadge: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 18,
-  },
-  statusBadge: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 18,
-  },
-  statusBadgeText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  savedIconCircle: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: 'white',
-  },
-  savedIcon: {
-    color: '#4CAF50',
-    fontSize: 12,
-    fontWeight: '700',
-    lineHeight: 16,
-  },
-  savedText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  infoPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: '#F5F5F5',
-  },
-  pillEmoji: {
-    fontSize: 13,
-    marginRight: 6,
-  },
-  pillText: {
-    fontSize: 12,
-    color: '#4B5563',
-  },
-  metaIcon: {
-    fontSize: 16,
-    color: '#D17A92',
-    marginRight: 8,
-  },
-  metaText: {
-    fontSize: 14,
-    color: '#D17A92',
-    fontWeight: '600',
-  },
-});
+

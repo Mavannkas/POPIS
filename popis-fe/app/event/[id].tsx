@@ -7,6 +7,7 @@ import { Colors } from '@/constants/theme';
 import { API_URL } from '@/lib/http';
 import { getCategoryEmoji, getCategoryLabel, getCategoryColor, applyToEvent, getEventById, getMyApplications, type Event, type Application } from '@/lib/services/events';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
+import { useNotificationsBadge } from '@/lib/notifications/context';
 
 export default function EventDetailScreen() {
   const colors = Colors;
@@ -15,6 +16,7 @@ export default function EventDetailScreen() {
   const [event, setEvent] = useState<Event | null>(null);
   const [myApplication, setMyApplication] = useState<Application | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const { showToast } = useNotificationsBadge();
 
   const loadData = async () => {
     if (!id) return;
@@ -33,6 +35,7 @@ export default function EventDetailScreen() {
       }
     } catch (e) {
       console.error('Failed to load event', e);
+      showToast('Nie udało się załadować wydarzenia');
     } finally {
     }
   };
@@ -70,13 +73,15 @@ export default function EventDetailScreen() {
       const res = await applyToEvent({ eventId: actualEventId, message: justification.trim() });
       if (res.success) {
         // Navigate back or show success toast
-        console.log('Applied successfully');
+        showToast('Zgłoszono udział');
         router.back();
       } else {
         console.warn('Apply failed', res.error);
+        showToast(res.error || 'Nie udało się zapisać');
       }
     } catch (e) {
       console.error('Apply error', e);
+      showToast('Błąd przy zapisywaniu');
     } finally {
       setJoining(false);
     }

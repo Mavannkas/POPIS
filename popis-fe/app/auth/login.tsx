@@ -6,6 +6,7 @@ import { Button, Text } from "react-native-paper";
 import { useAuth } from "@/lib/auth/context";
 import { Colors } from "@/constants/theme";
 import { KeyboardAwareScrollView, Input } from "@/components/ui";
+import { useNotificationsBadge } from "@/lib/notifications/context";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -16,12 +17,19 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const { showToast } = useNotificationsBadge();
+
+  const isValidEmail = (v: string) => /.+@.+\..+/.test(v.trim());
+  const canSubmit = isValidEmail(email) && password.trim().length > 0 && !loading;
 
   async function onSubmit() {
     setError(null);
     setLoading(true);
     try {
-      await signIn({ email, password });
+      if (!isValidEmail(email)) throw new Error('Podaj poprawny e-mail');
+      if (!password.trim()) throw new Error('Hasło jest wymagane');
+      await signIn({ email: email.trim(), password });
       // Try to register Expo push token and send to backend
       try {
         const { status } = await Notifications.requestPermissionsAsync();
@@ -40,10 +48,12 @@ export default function LoginScreen() {
             }
           }
         }
-      } catch {}
+      } catch (e) {}
+      showToast('Zalogowano pomyślnie');
       router.replace("/(tabs)");
     } catch (e: any) {
       setError(e?.message ?? "Wystąpił błąd");
+      showToast(e?.message ?? 'Wystąpił błąd');
     } finally {
       setLoading(false);
     }
@@ -103,15 +113,22 @@ export default function LoginScreen() {
           value={password}
           onChangeText={setPassword}
           variant="outlined"
-          secureTextEntry
+          secureTextEntry={!showPassword}
           error={error || undefined}
         />
+        <Text
+          onPress={() => setShowPassword(v => !v)}
+          style={{ color: colors.primary, marginTop: 6 }}
+        >
+          {showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+        </Text>
       </View>
 
       <Button
         mode="contained"
         onPress={onSubmit}
         loading={loading}
+        disabled={!canSubmit}
         style={{
           backgroundColor: colors.primary,
           borderRadius: 50,
