@@ -22,12 +22,12 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { LocationPicker as LocationPicker_62bd8abbbb2481494468e4bcf06068bf } from '@/components/LocationPicker'
+import { AdminApplicationChat as AdminApplicationChat_49f6f9f7a64a0dd6e951288ea163dd6c } from '@/components/AdminApplicationChat'
 import { NotificationTypeCell as NotificationTypeCell_ed363b41dc0068793f533207c011ba58 } from '@/components/AdminDashboard/components/NotificationTypeCell'
 import { AdminNavbar as AdminNavbar_967b713f8b884906a229587bbbb38a9a } from '@/components/AdminNavbar'
 import { AdminLogoIcon as AdminLogoIcon_b44db66c75684c15f88e108165ed4089 } from '@/components/AdminLogoIcon/AdminLogoIcon'
 import { AdminLogoBig as AdminLogoBig_06da07c1f0ebe9eb350437b211008391 } from '@/components/AdminLogoBig/AdminLogoBig'
 import { AdminDashboard as AdminDashboard_d2e5e8cdcf265e3c61c4d683161d9698 } from '@/components/AdminDashboard'
-import { AdminApplicationChat as AdminApplicationChat_c2a1d5c4b8a84b19a1b27bb65ae0f3b2 } from '@/components/AdminApplicationChat'
 
 export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -54,10 +54,10 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/LocationPicker#LocationPicker": LocationPicker_62bd8abbbb2481494468e4bcf06068bf,
+  "@/components/AdminApplicationChat#AdminApplicationChat": AdminApplicationChat_49f6f9f7a64a0dd6e951288ea163dd6c,
   "@/components/AdminDashboard/components/NotificationTypeCell#NotificationTypeCell": NotificationTypeCell_ed363b41dc0068793f533207c011ba58,
   "@/components/AdminNavbar#AdminNavbar": AdminNavbar_967b713f8b884906a229587bbbb38a9a,
   "@/components/AdminLogoIcon/AdminLogoIcon#AdminLogoIcon": AdminLogoIcon_b44db66c75684c15f88e108165ed4089,
   "@/components/AdminLogoBig/AdminLogoBig#AdminLogoBig": AdminLogoBig_06da07c1f0ebe9eb350437b211008391,
   "@/components/AdminDashboard#AdminDashboard": AdminDashboard_d2e5e8cdcf265e3c61c4d683161d9698
-  ,"@/components/AdminApplicationChat#AdminApplicationChat": AdminApplicationChat_c2a1d5c4b8a84b19a1b27bb65ae0f3b2
 }

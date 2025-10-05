@@ -73,6 +73,7 @@ export interface Config {
     media: Media;
     events: Event;
     applications: Application;
+    group_applications: GroupApplication;
     certificates: Certificate;
     schools: School;
     invitations: Invitation;
@@ -88,6 +89,7 @@ export interface Config {
     };
     events: {
       applications: 'applications';
+      groupApplications: 'group_applications';
     };
   };
   collectionsSelect: {
@@ -96,6 +98,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
+    group_applications: GroupApplicationsSelect<false> | GroupApplicationsSelect<true>;
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     schools: SchoolsSelect<false> | SchoolsSelect<true>;
     invitations: InvitationsSelect<false> | InvitationsSelect<true>;
@@ -334,6 +337,14 @@ export interface Event {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  /**
+   * Lista zgłoszeń grupowych przypisanych do tego wydarzenia
+   */
+  groupApplications?: {
+    docs?: (string | GroupApplication)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   status: 'draft' | 'published' | 'completed' | 'cancelled';
   /**
    * Organizator odpowiedzialny za wydarzenie
@@ -380,6 +391,10 @@ export interface Application {
    */
   volunteer: string | User;
   /**
+   * Jeśli aplikacja została utworzona w wyniku zgłoszenia grupowego
+   */
+  groupApplication?: (string | null) | GroupApplication;
+  /**
    * Wiadomość od wolontariusza
    */
   message?: string | null;
@@ -399,6 +414,28 @@ export interface Application {
   completedAt?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "group_applications".
+ */
+export interface GroupApplication {
+  id: string;
+  targetEvent: string | Event;
+  /**
+   * Automatycznie ustawiany na aktualnie zalogowanego użytkownika
+   */
+  coordinator: string | Admin;
+  /**
+   * Wybierz szkolne wydarzenie z zebranymi uczniami
+   */
+  sourceSchoolEvent: string | Event;
+  message?: string | null;
+  studentsCount?: number | null;
+  status: 'pending' | 'accepted' | 'rejected';
+  createdAt: string;
+  processedAt?: string | null;
+  updatedAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -599,6 +636,10 @@ export interface PayloadLockedDocument {
         value: string | Application;
       } | null)
     | ({
+        relationTo: 'group_applications';
+        value: string | GroupApplication;
+      } | null)
+    | ({
         relationTo: 'certificates';
         value: string | Certificate;
       } | null)
@@ -797,6 +838,7 @@ export interface EventsSelect<T extends boolean = true> {
         id?: T;
       };
   applications?: T;
+  groupApplications?: T;
   status?: T;
   organization?: T;
   createdBy?: T;
@@ -810,6 +852,7 @@ export interface EventsSelect<T extends boolean = true> {
 export interface ApplicationsSelect<T extends boolean = true> {
   event?: T;
   volunteer?: T;
+  groupApplication?: T;
   message?: T;
   hoursWorked?: T;
   organizationNotes?: T;
@@ -818,6 +861,21 @@ export interface ApplicationsSelect<T extends boolean = true> {
   completedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "group_applications_select".
+ */
+export interface GroupApplicationsSelect<T extends boolean = true> {
+  targetEvent?: T;
+  coordinator?: T;
+  sourceSchoolEvent?: T;
+  message?: T;
+  studentsCount?: T;
+  status?: T;
+  createdAt?: T;
+  processedAt?: T;
+  updatedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

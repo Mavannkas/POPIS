@@ -15,6 +15,7 @@ import { Events } from './collections/Events'
 import { Applications } from './collections/Applications'
 import { Certificates } from './collections/Certificates'
 import { Schools } from './collections/Schools'
+import { GroupApplications } from './collections/GroupApplications'
 import { Invitations } from './collections/Invitations'
 import { Notifications } from './collections/Notifications'
 import { Messages } from './collections/Messages'
@@ -60,6 +61,7 @@ export default buildConfig({
     Media,
     Events,
     Applications,
+    GroupApplications,
     Certificates,
     Schools,
     Invitations,

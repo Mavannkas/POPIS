@@ -149,8 +149,8 @@ export const AdminLogoIcon = () => {
           y2="392.209"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#51ABE3" />
-          <stop offset="1" stop-color="#2E358B" />
+          <stop stopColor="#51ABE3" />
+          <stop offset="1" stopColor="#2E358B" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_21_114"
@@ -160,8 +160,8 @@ export const AdminLogoIcon = () => {
           y2="373.39"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F03976" />
-          <stop offset="1" stop-color="#961245" />
+          <stop stopColor="#F03976" />
+          <stop offset="1" stopColor="#961245" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_21_114"
@@ -171,8 +171,8 @@ export const AdminLogoIcon = () => {
           y2="208.809"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7FCC2A" />
-          <stop offset="1" stop-color="#3E8434" />
+          <stop stopColor="#7FCC2A" />
+          <stop offset="1" stopColor="#3E8434" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_21_114"
@@ -182,8 +182,8 @@ export const AdminLogoIcon = () => {
           y2="203.295"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7FCC2A" />
-          <stop offset="1" stop-color="#3E8434" />
+          <stop stopColor="#7FCC2A" />
+          <stop offset="1" stopColor="#3E8434" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_21_114"
@@ -193,8 +193,8 @@ export const AdminLogoIcon = () => {
           y2="190.231"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7FCC2A" />
-          <stop offset="1" stop-color="#3E8434" />
+          <stop stopColor="#7FCC2A" />
+          <stop offset="1" stopColor="#3E8434" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_21_114"
@@ -204,8 +204,8 @@ export const AdminLogoIcon = () => {
           y2="170.774"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7FCC2A" />
-          <stop offset="1" stop-color="#3E8434" />
+          <stop stopColor="#7FCC2A" />
+          <stop offset="1" stopColor="#3E8434" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_21_114"
@@ -215,8 +215,8 @@ export const AdminLogoIcon = () => {
           y2="174.345"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7FCC2A" />
-          <stop offset="1" stop-color="#3E8434" />
+          <stop stopColor="#7FCC2A" />
+          <stop offset="1" stopColor="#3E8434" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_21_114"
@@ -226,8 +226,8 @@ export const AdminLogoIcon = () => {
           y2="140.741"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7FCC2A" />
-          <stop offset="1" stop-color="#3E8434" />
+          <stop stopColor="#7FCC2A" />
+          <stop offset="1" stopColor="#3E8434" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_21_114"
@@ -237,8 +237,8 @@ export const AdminLogoIcon = () => {
           y2="133.767"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7FCC2A" />
-          <stop offset="1" stop-color="#3E8434" />
+          <stop stopColor="#7FCC2A" />
+          <stop offset="1" stopColor="#3E8434" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_21_114"
@@ -248,8 +248,8 @@ export const AdminLogoIcon = () => {
           y2="78.8979"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F03976" />
-          <stop offset="1" stop-color="#961245" />
+          <stop stopColor="#F03976" />
+          <stop offset="1" stopColor="#961245" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_21_114"
@@ -259,8 +259,8 @@ export const AdminLogoIcon = () => {
           y2="218.492"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7FCC2A" />
-          <stop offset="1" stop-color="#3E8434" />
+          <stop stopColor="#7FCC2A" />
+          <stop offset="1" stopColor="#3E8434" />
         </linearGradient>
         <linearGradient
           id="paint11_linear_21_114"
@@ -270,8 +270,8 @@ export const AdminLogoIcon = () => {
           y2="92.2286"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#51ABE3" />
-          <stop offset="1" stop-color="#2E358B" />
+          <stop stopColor="#51ABE3" />
+          <stop offset="1" stopColor="#2E358B" />
         </linearGradient>
         <linearGradient
           id="paint12_linear_21_114"
@@ -281,8 +281,8 @@ export const AdminLogoIcon = () => {
           y2="103.981"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F8DE1A" />
-          <stop offset="1" stop-color="#D34C27" />
+          <stop stopColor="#F8DE1A" />
+          <stop offset="1" stopColor="#D34C27" />
         </linearGradient>
         <linearGradient
           id="paint13_linear_21_114"
@@ -292,8 +292,8 @@ export const AdminLogoIcon = () => {
           y2="123.689"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#51ABE3" />
-          <stop offset="1" stop-color="#2E358B" />
+          <stop stopColor="#51ABE3" />
+          <stop offset="1" stopColor="#2E358B" />
         </linearGradient>
         <clipPath id="clip0_21_114">
           <rect width="728.373" height="450.667" fill="white" />
