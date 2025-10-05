@@ -26,6 +26,7 @@ import { AdminNavbar as AdminNavbar_967b713f8b884906a229587bbbb38a9a } from '@/c
 import { AdminLogoIcon as AdminLogoIcon_b44db66c75684c15f88e108165ed4089 } from '@/components/AdminLogoIcon/AdminLogoIcon'
 import { AdminLogoBig as AdminLogoBig_06da07c1f0ebe9eb350437b211008391 } from '@/components/AdminLogoBig/AdminLogoBig'
 import { AdminDashboard as AdminDashboard_d2e5e8cdcf265e3c61c4d683161d9698 } from '@/components/AdminDashboard'
+import { AdminApplicationChat as AdminApplicationChat_c2a1d5c4b8a84b19a1b27bb65ae0f3b2 } from '@/components/AdminApplicationChat'
 
 export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -56,4 +57,5 @@ export const importMap = {
   "@/components/AdminLogoIcon/AdminLogoIcon#AdminLogoIcon": AdminLogoIcon_b44db66c75684c15f88e108165ed4089,
   "@/components/AdminLogoBig/AdminLogoBig#AdminLogoBig": AdminLogoBig_06da07c1f0ebe9eb350437b211008391,
   "@/components/AdminDashboard#AdminDashboard": AdminDashboard_d2e5e8cdcf265e3c61c4d683161d9698
+  ,"@/components/AdminApplicationChat#AdminApplicationChat": AdminApplicationChat_c2a1d5c4b8a84b19a1b27bb65ae0f3b2
 }

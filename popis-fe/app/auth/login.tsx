@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import * as Notifications from 'expo-notifications';
 import { Image, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import { useAuth } from "@/lib/auth/context";
@@ -21,6 +22,25 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await signIn({ email, password });
+      // Try to register Expo push token and send to backend
+      try {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status === 'granted') {
+          const tokenResponse = await Notifications.getExpoPushTokenAsync();
+          const token = (tokenResponse as any)?.data || (tokenResponse as any)?.expoPushToken || '';
+          if (token) {
+            const base = process.env.EXPO_PUBLIC_API_URL || '';
+            if (base) {
+              await fetch(`${base}/api/users/me`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ expoPushToken: token }),
+              });
+            }
+          }
+        }
+      } catch {}
       router.replace("/(tabs)");
     } catch (e: any) {
       setError(e?.message ?? "Wystąpił błąd");

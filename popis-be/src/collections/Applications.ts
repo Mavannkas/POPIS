@@ -67,6 +67,16 @@ export const Applications: CollectionConfig = {
       },
     },
     {
+      type: 'ui',
+      name: 'chatPanel',
+      admin: {
+        components: {
+          Field: '@/components/AdminApplicationChat#AdminApplicationChat',
+        },
+        description: 'Czat z wolontariuszem dla tej aplikacji',
+      },
+    },
+    {
       name: 'status',
       type: 'select',
       required: true,
@@ -98,16 +108,6 @@ export const Applications: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Data ukończenia wolontariatu',
-      },
-    },
-    {
-      name: 'chatChannelId',
-      type: 'text',
-      label: 'ID kanału czatu',
-      admin: {
-        position: 'sidebar',
-        description: 'Stream Chat channel ID (auto-generated po akceptacji)',
-        readOnly: true,
       },
     },
   ],
@@ -173,47 +173,7 @@ export const Applications: CollectionConfig = {
             console.error('Error creating approval notification:', error)
           }
         }
-        // When status changes to 'accepted', create Stream Chat channel
-        if (doc.status === 'accepted' && previousDoc?.status !== 'accepted') {
-          try {
-            // Import streamChat helper
-            const { createChatChannel } = await import('../lib/streamChat')
-
-            // Get full event data
-            const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
-            const event = await req.payload.findByID({
-              collection: 'events',
-              id: eventId as string,
-            })
-
-            // Get volunteer and organization IDs
-            const volunteerId = typeof doc.volunteer === 'object' ? doc.volunteer.id : doc.volunteer
-            const organizationId =
-              typeof event.organization === 'object' ? event.organization.id : event.organization
-
-            // Create chat channel
-            const channelId = await createChatChannel(
-              volunteerId,
-              organizationId.toString(),
-              doc.id,
-              event.title,
-            )
-
-            // Update application with channel ID
-            await req.payload.update({
-              collection: 'applications',
-              id: doc.id,
-              data: {
-                chatChannelId: channelId,
-              },
-            })
-
-            console.log('Created Stream Chat channel:', channelId)
-          } catch (error) {
-            console.error('Error creating Stream Chat channel:', error)
-            // Don't throw - allow application to be accepted even if chat fails
-          }
-        }
+        // Stream Chat integration removed
 
         // When status changes to 'completed', auto-create certificate
         if (doc.status === 'completed' && previousDoc?.status !== 'completed') {

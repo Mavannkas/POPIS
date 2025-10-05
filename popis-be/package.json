@@ -40,7 +40,8 @@
     "react-dom": "19.1.0",
     "react-leaflet": "^5.0.0",
     "sharp": "0.34.2",
-    "stream-chat": "^9.20.3"
+    
+    "expo-server-sdk": "^4.0.0"
   },
   "devDependencies": {
     "@playwright/test": "1.54.1",

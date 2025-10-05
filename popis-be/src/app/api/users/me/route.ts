@@ -57,19 +57,21 @@ export const PATCH = async (request: NextRequest) => {
 			)
 		}
 
-		const body = await request.json().catch(() => ({}))
-		const { firstName, lastName, isStudent, school } = body || {}
+  const body = await request.json().catch(() => ({}))
+  const { firstName, lastName, isStudent, school, expoPushToken } = body || {}
 
 		const updateData: any = {}
 		if (typeof firstName === 'string') updateData.firstName = firstName
 		if (typeof lastName === 'string') updateData.lastName = lastName
-		if (typeof isStudent === 'boolean') updateData.isStudent = isStudent
+  if (typeof isStudent === 'boolean') updateData.isStudent = isStudent
 		// school can be string id or null
 		if (school === null || typeof school === 'string') {
 			updateData.school = school
 		}
 		// If isStudent explicitly false, ensure school is cleared
 		if (isStudent === false) updateData.school = null
+  // allow setting expo push token
+  if (typeof expoPushToken === 'string') updateData.expoPushToken = expoPushToken
 
 		const updated = await payload.update({
 			collection: 'users',

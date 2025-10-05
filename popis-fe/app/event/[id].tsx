@@ -83,14 +83,13 @@ export default function EventDetailScreen() {
   };
 
   const handleOpenChat = async () => {
-    // Navigate to chat screen if possible (requires either chatChannelId or event/org context)
-    const channelId = (myApplication as any)?.chatChannelId as string | undefined;
-    if (channelId) {
-      router.push(`/chat?channelId=${encodeURIComponent(channelId)}` as any);
-    } else {
-      // Fallback: navigate with event id; chat screen can handle creation or show info
-      router.push(`/chat?eventId=${encodeURIComponent(String(id || ''))}` as any);
+    const appId = (myApplication as any)?.id as string | undefined;
+    if (appId) {
+      router.push(`/chat?applicationId=${encodeURIComponent(appId)}` as any);
+      return;
     }
+    // If application unknown, open placeholder
+    router.push(`/chat` as any);
   };
 
   // Share action can be implemented later if needed
@@ -228,10 +227,10 @@ export default function EventDetailScreen() {
                     description={event.location?.address || ''}
                   >
                     <View style={styles.markerContainer}>
-                      <View style={[styles.markerPin, { backgroundColor: getCategoryColor(event?.category || 'other') }]}> 
+                      <View style={[styles.markerPin, { backgroundColor: colors.primary }]}> 
                         <Text style={styles.markerEmoji}>{getCategoryEmoji(event?.category || 'other')}</Text>
                       </View>
-                      <View style={[styles.markerTip, { borderTopColor: getCategoryColor(event?.category || 'other') }]} />
+                      <View style={[styles.markerTip, { borderTopColor: colors.primary }]} />
                     </View>
                   </Marker>
                 </MapView>
