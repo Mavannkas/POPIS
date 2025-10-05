@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { Card } from 'react-native-paper';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Stack } from 'expo-router';
+//
 import { getMyNotifications, markNotificationRead, type AppNotification } from '@/lib/services/notifications';
 import { useNotificationsBadge } from '@/lib/notifications/context';
 import { useAuth } from '@/lib/auth/context';
@@ -54,6 +54,7 @@ export default function NotificationsScreen() {
     switch (type) {
       case 'approval_decision': return 'checkmark.circle.fill';
       case 'event_invitation': return 'envelope.badge';
+      case 'chat_message': return 'bubble.left.and.bubble.right.fill';
       default: return 'bell.fill';
     }
   };
@@ -62,7 +63,23 @@ export default function NotificationsScreen() {
     switch (type) {
       case 'approval_decision': return colors.primary;
       case 'event_invitation': return '#FF6B35';
+      case 'chat_message': return '#2563EB';
       default: return colors.icon;
+    }
+  };
+
+  const getChatPartnerName = (n: AppNotification) => {
+    try {
+      const app: any = typeof n.application === 'object' ? n.application : null;
+      const ev: any = app?.event && typeof app.event === 'object' ? app.event : (typeof n.event === 'object' ? n.event : null);
+      const org: any = ev?.organization && typeof ev.organization === 'object' ? ev.organization : null;
+      const school: any = ev?.targetSchool && typeof ev.targetSchool === 'object' ? ev.targetSchool : null;
+      const schoolName = ev?.eventType === 'school' ? (school?.name || '') : '';
+      const orgName = org?.organizationName || [org?.firstName, org?.lastName].filter(Boolean).join(' ').trim();
+      const name = (schoolName && schoolName.trim()) ? schoolName : orgName;
+      return name || (ev?.eventType === 'school' ? 'Szkoła' : 'Organizator');
+    } catch {
+      return 'Organizator';
     }
   };
 
@@ -90,8 +107,11 @@ export default function NotificationsScreen() {
       }
       if (n.type === 'approval_decision') {
         await handleNavigateToEvent(n);
+      } else if (n.type === 'chat_message' && n.application) {
+        const applicationId = typeof n.application === 'object' ? n.application.id : n.application;
+        router.push(`/chat?applicationId=${encodeURIComponent(String(applicationId))}` as any);
       }
-    } catch (e) {
+  } catch {
       // best-effort
     }
   };
@@ -139,7 +159,11 @@ export default function NotificationsScreen() {
                   <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
                       <Text style={{ fontSize: 15, fontWeight: '700', color: '#111827' }}>
-                        {n.type === 'approval_decision' ? 'Decyzja o aplikacji' : 'Zaproszenie na wydarzenie'}
+                        {n.type === 'approval_decision'
+                          ? 'Decyzja o aplikacji'
+                          : n.type === 'event_invitation'
+                          ? 'Zaproszenie na wydarzenie'
+                          : `Wiadomość od “${getChatPartnerName(n)}”`}
                       </Text>
                       {!n.isRead && (
                         <View style={{ width: 8, height: 8, backgroundColor: Colors.primary, borderRadius: 4, marginLeft: 8, marginTop: 6 }} />

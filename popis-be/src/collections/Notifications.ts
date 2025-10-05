@@ -28,6 +28,7 @@ export const Notifications: CollectionConfig = {
       options: [
         { label: 'Decyzja o akceptacji', value: 'approval_decision' },
         { label: 'Zaproszenie na wydarzenie', value: 'event_invitation' },
+        { label: 'Wiadomość czatu', value: 'chat_message' },
       ],
       admin: {
         position: 'sidebar',
@@ -50,6 +51,12 @@ export const Notifications: CollectionConfig = {
           type: 'relationship',
           relationTo: 'invitations',
           label: 'Zaproszenie',
+        },
+        {
+          name: 'application',
+          type: 'relationship',
+          relationTo: 'applications',
+          label: 'Aplikacja (czat)',
         },
       ],
     },
@@ -101,7 +108,7 @@ export const Notifications: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      ({ data, operation }) => {
+      ({ data, operation }: { data: any; operation: string }) => {
         if (operation === 'create') {
           if (!data.createdAt) {
             data.createdAt = new Date().toISOString()

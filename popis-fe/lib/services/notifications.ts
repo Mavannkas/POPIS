@@ -2,9 +2,10 @@ import { apiFetch } from '../http'
 
 export type AppNotification = {
   id: string
-  type: 'approval_decision' | 'event_invitation'
+  type: 'approval_decision' | 'event_invitation' | 'chat_message'
   event?: any
   invitation?: any
+  application?: any
   decision?: 'accepted' | 'rejected'
   message?: string
   isRead: boolean

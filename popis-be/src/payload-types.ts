@@ -568,9 +568,10 @@ export interface Invitation {
 export interface Notification {
   id: string;
   user: string | User;
-  type: 'approval_decision' | 'event_invitation';
+  type: 'approval_decision' | 'event_invitation' | 'chat_message';
   event?: (string | null) | Event;
   invitation?: (string | null) | Invitation;
+  application?: (string | null) | Application;
   decision?: ('accepted' | 'rejected') | null;
   message?: string | null;
   isRead?: boolean | null;
@@ -934,6 +935,7 @@ export interface NotificationsSelect<T extends boolean = true> {
   type?: T;
   event?: T;
   invitation?: T;
+  application?: T;
   decision?: T;
   message?: T;
   isRead?: T;

@@ -43,9 +43,12 @@ export default function ChatScreen() {
         const volunteer = app?.volunteer;
         const event = app?.event;
         const org = typeof event?.organization === 'object' ? event.organization : null;
-        // As wolontariusz, partner to organizator
-        const name = org?.organizationName || [org?.firstName, org?.lastName].filter(Boolean).join(' ').trim();
-        setPartnerName(name || 'Organizator');
+        const school = typeof event?.targetSchool === 'object' ? event.targetSchool : null;
+        // Prefer school name for school-type events; otherwise organizer name
+        const schoolName = event?.eventType === 'school' ? (school?.name || '') : '';
+        const orgName = org?.organizationName || [org?.firstName, org?.lastName].filter(Boolean).join(' ').trim();
+        const name = (schoolName && schoolName.trim()) ? schoolName : orgName;
+        setPartnerName(name || (event?.eventType === 'school' ? 'Szkoła' : 'Organizator'));
       } catch {}
     };
     loadPartner();

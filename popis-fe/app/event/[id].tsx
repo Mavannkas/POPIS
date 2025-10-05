@@ -18,6 +18,32 @@ export default function EventDetailScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const { showToast } = useNotificationsBadge();
 
+  // Payload richText (Lexical) -> plain text
+  const getPlainTextFromRichText = (value: any): string => {
+    try {
+      if (!value) return ''
+      if (typeof value === 'string') return value
+      const root = (value && value.root) ? value.root : value
+      const parts: string[] = []
+      const walk = (node: any) => {
+        if (!node) return
+        if (Array.isArray(node)) {
+          node.forEach(walk)
+          return
+        }
+        if (node.text) parts.push(String(node.text))
+        if (node.children && Array.isArray(node.children)) {
+          node.children.forEach(walk)
+          if (node.type === 'paragraph') parts.push('\n\n')
+        }
+      }
+      walk(root)
+      return parts.join('').replace(/\n{3,}/g, '\n\n').trim()
+    } catch {
+      return ''
+    }
+  }
+
   const loadData = async () => {
     if (!id) return;
     try {
@@ -143,7 +169,11 @@ export default function EventDetailScreen() {
                 {event?.title || 'Wydarzenie'}
               </Text>
               <Text style={{ color: '#3088BF', fontWeight: '500', fontSize: 16 }}>
-                👤 {event && event.organization ? (typeof event.organization === 'object' ? (event.organization.name || 'Organizacja') : 'Organizacja') : 'Organizacja'}
+                {(() => {
+                  const org: any = event && typeof event.organization === 'object' ? event.organization : null;
+                  const name = org?.organizationName || [org?.firstName, org?.lastName].filter(Boolean).join(' ').trim();
+                  return `👤 ${name || 'Organizator'}`;
+                })()}
               </Text>
             </View>
             <View style={styles.categoryPillHeaderLight}>
@@ -201,7 +231,7 @@ export default function EventDetailScreen() {
           {/* Description */}
           <View className="mb-6">
             <Text className="text-lg font-semibold text-gray-800 mb-3">Opis</Text>
-            <Text className="text-gray-600 leading-6">{event?.additionalInfo || ''}</Text>
+            <Text className="text-gray-600 leading-6">{getPlainTextFromRichText(event?.description) || ''}</Text>
           </View>
 
           {/* Mini mapa z lokalizacją i linkiem do Google Maps */}
@@ -262,6 +292,14 @@ export default function EventDetailScreen() {
                 Wymagania
               </Text>
               <Text className="text-gray-600 leading-6">{event.requirements}</Text>
+            </View>
+          ) : null}
+
+          {/* Additional Info */}
+          {event?.additionalInfo ? (
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-800 mb-3">Dodatkowe informacje</Text>
+              <Text className="text-gray-600 leading-6">{event.additionalInfo}</Text>
             </View>
           ) : null}
 

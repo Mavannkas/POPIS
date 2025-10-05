@@ -37,8 +37,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			value={{
 				user,
 				loading,
-				signIn: async p => setUser(await signIn(p)),
-				signUp: async p => { await signUp(p); },
+				signIn: async p => {
+					await signIn(p);
+					await refresh(); // Fetch full user data with relations
+				},
+				signUp: async p => {
+					await signUp(p);
+					await refresh(); // Fetch full user data with relations
+				},
 				signOut: async () => {
 					await signOut();
 					setUser(null);

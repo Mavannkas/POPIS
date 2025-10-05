@@ -64,7 +64,14 @@ export function EventCard({ event, applicationStatus, containerStyle }: EventCar
               </Text>
               {event.organization && (
                 <Text className="text-primary font-medium text-sm">
-                  👤 {typeof event.organization === 'object' ? (event.organization.name || 'Organizacja') : 'Organizacja'}
+                  {(() => {
+                    const org: any = typeof event.organization === 'object' ? event.organization : null;
+                    const school: any = event?.targetSchool && typeof (event as any).targetSchool === 'object' ? (event as any).targetSchool : null;
+                    const schoolName = event.eventType === 'school' ? (school?.name || '') : '';
+                    const orgName = org?.organizationName || [org?.firstName, org?.lastName].filter(Boolean).join(' ').trim();
+                    const name = (schoolName && schoolName.trim()) ? schoolName : orgName;
+                    return `👤 ${name || (event.eventType === 'school' ? 'Szkoła' : 'Organizator')}`;
+                  })()}
                 </Text>
               )}
             </View>

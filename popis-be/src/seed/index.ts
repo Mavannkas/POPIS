@@ -543,7 +543,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Sprzątanie Bulwarów Wiślanych',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Dołącz do akcji sprzątania bulwarów nad Wisłą.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Dołącz do akcji sprzątania bulwarów nad Wisłą. Wspólnie zadbamy o czystość i piękno naszych terenów nadrzecznych. Będziemy zbierać śmieci, segregować odpady oraz dbać o estetykę bulwarów. To świetna okazja, aby aktywnie spędzić czas i przyczynić się do poprawy stanu środowiska naturalnego w naszym mieście.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           eventType: 'public',
           category: 'environment',
@@ -563,7 +583,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Zbiórka żywności dla potrzebujących',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Wsparcie przy zbiórce i sortowaniu żywności.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Zapraszamy do wsparcia przy zbiórce i sortowaniu żywności dla osób potrzebujących. Będziemy przyjmować dary od mieszkańców, sortować je według kategorii oraz przygotowywać paczki dla rodzin w trudnej sytuacji życiowej. Twoja pomoc może sprawić, że ktoś otrzyma ciepły posiłek na stół.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           eventType: 'public',
           category: 'social',
@@ -583,7 +623,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Maraton pisania listów',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Akcja społeczna – piszemy listy wsparcia.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Weź udział w wyjątkowej akcji społecznej - maratonie pisania listów wsparcia. Będziemy pisać ciepłe słowa dla osób w szpitalach, domach opieki oraz dla tych, którzy czują się samotni. Czasem jeden list może odmienić czyjś dzień. Nie potrzebujesz żadnych szczególnych umiejętności - wystarczy empatia i chęć niesienia pomocy.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[1].id,
           eventType: 'public',
           category: 'culture',
@@ -603,7 +663,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Bieg charytatywny – obsługa punktów',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Pomoc przy punktach wodnych i logistyce.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Szukamy wolontariuszy do pomocy przy organizacji dużego biegu charytatywnego na Błoniach Krakowskich. Twoje zadania będą obejmować obsługę punktów wodnych, pomoc przy stanowiskach rejestracyjnych oraz wsparcie logistyczne dla uczestników. To świetna okazja, aby być częścią wielkiego wydarzenia sportowego i wesprzeć szczytny cel.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           eventType: 'public',
           category: 'sport',
@@ -623,7 +703,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Warsztaty programowania dla młodzieży',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Prowadzenie warsztatów z podstaw programowania.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Zostań mentorem na warsztatach programowania dla młodzieży! Pomożesz młodym ludziom odkryć świat kodowania, nauczysz ich podstaw HTML, CSS i JavaScript. To doskonała okazja, aby podzielić się swoją pasją do technologii i zainspirować następne pokolenie programistów. Mile widziana podstawowa znajomość języków webowych.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           eventType: 'public',
           category: 'education',
@@ -643,7 +743,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Magazyn darów – sortowanie',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Pomoc w sortowaniu i wydawaniu darów.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Potrzebujemy pomocnych rąk w magazynie darów! Twoje zadania będą obejmować sortowanie przekazanych rzeczy według kategorii, wydawanie ich potrzebującym rodzinom oraz utrzymanie porządku w magazynie. To praca wymagająca dobrej organizacji, ale niezwykle satysfakcjonująca, gdy widzisz uśmiech osoby otrzymującej pomoc.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           eventType: 'public',
           category: 'social',
@@ -663,7 +783,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Warsztaty pierwszej pomocy',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Wsparcie organizacyjne w warsztatach.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Wesprzyj nas w organizacji warsztatów pierwszej pomocy dla mieszkańców Krakowa. Pomożesz w przygotowaniu materiałów, rejestrowaniu uczestników oraz dbaniu o sprawny przebieg zajęć. To wydarzenie może pomóc wielu osobom nauczyć się ratować życie w sytuacjach awaryjnych.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           eventType: 'public',
           category: 'health',
@@ -683,7 +823,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Kiermasz świąteczny – wsparcie stoisk',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Obsługa i dekoracja stoisk.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Poczuj magię świąt pomagając przy organizacji kiermaszu świątecznego na Rynku Głównym! Będziesz obsługiwać stoiska, pomagać przy dekoracji, sprzedawać świąteczne ozdoby i produkty regionalne. Wszystkie zyski przeznaczone zostaną na cele charytatywne. Dołącz do nas i rozpromienij święta innym!',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[1].id,
           eventType: 'public',
           category: 'culture',
@@ -703,7 +863,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Wyprowadzanie psów w schronisku',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Pomoc w schronisku – spacery i opieka.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Dołącz do zespołu wolontariuszy w krakowskim schronisku dla zwierząt. Będziesz wyprowadzać psy na spacery, bawić się z nimi oraz pomagać w podstawowej opiece. To doskonała okazja, aby spędzić aktywnie czas, pomagając czworonogom i zapewniając im radość. Wymagamy jedynie miłości do zwierząt i odpowiedzialności.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           eventType: 'public',
           category: 'animals',
@@ -723,7 +903,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Malowanie świetlicy środowiskowej',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Odświeżamy sale dla dzieci i młodzieży.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Pomóż nam odświeżyć pomieszczenia świetlicy środowiskowej dla dzieci i młodzieży. Wspólnie pomalujemy ściany, stworzymy kolorowe murale i zadbamy o to, aby miejsce to było przyjazne i radosne dla wszystkich. Nie potrzebujesz doświadczenia - wystarczy chęć do pracy i uśmiech! Zapraszamy wszystkich z pędzlem w dłoni.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[1].id,
           eventType: 'public',
           category: 'social',
@@ -743,7 +943,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Turniej dla dzieci – sędziowanie i pomoc',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Wsparcie przy turnieju sportowym.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Organizujemy wielki turniej sportowy dla dzieci i potrzebujemy wolontariuszy! Pomożesz przy sędziowaniu zawodów, obsłudze stanowisk, rozdawaniu nagród oraz dbaniu o bezpieczeństwo małych sportowców. To wspaniała okazja, aby przyczynić się do promocji sportu wśród najmłodszych i wspierać ich zdrowy rozwój.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           eventType: 'public',
           category: 'sport',
@@ -767,7 +987,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Szkolny wolontariat – wizyta w domu seniora',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Odwiedziny i rozmowy z seniorami.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Akcja szkolna polegająca na odwiedzinach seniorów w lokalnym domu opieki. Będziemy rozmawiać z mieszkańcami, czytać im książki, pomagać przy prostych czynnościach i przede wszystkim - zapewniać im towarzystwo. To wyjątkowe doświadczenie, które uczy empatii i odpowiedzialności społecznej. Zapraszamy uczniów z naszej szkoły!',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           createdBy: krkCoordinators[0].id,
           eventType: 'school',
@@ -793,7 +1033,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Szkolny klub ekologiczny – nasadzenia drzew',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Wspólne sadzenie drzew na terenie szkoły.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'W ramach działalności szkolnego klubu ekologicznego organizujemy akcję sadzenia drzew na terenie naszej szkoły. Wspólnie zazielenimi otoczenie, tworząc przyjazną przestrzeń dla wszystkich uczniów. Przygotujemy dołki, zasadzimy młode drzewka i będziemy o nie dbać. To praktyczna lekcja ekologii i troska o naszą planetę!',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           createdBy: krkCoordinators[1].id,
           eventType: 'school',
@@ -819,7 +1079,27 @@ export const seed = async (payload: Payload): Promise<void> => {
         collection: 'events',
         data: {
           title: 'Kraków: Szkolny kiermasz charytatywny',
-          description: { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [ { type: 'paragraph', version: 1, children: [ { type: 'text', text: 'Organizacja kiermaszu i sprzedaż wypieków.' } ] } ] } },
+          description: {
+            root: {
+              type: 'root',
+              version: 1,
+              direction: 'ltr',
+              format: '',
+              indent: 0,
+              children: [
+                {
+                  type: 'paragraph',
+                  version: 1,
+                  children: [
+                    {
+                      type: 'text',
+                      text: 'Szkolny kiermasz charytatywny organizowany przez naszych uczniów! Będziemy sprzedawać domowe wypieki, książki, rękodzieło i inne przedmioty, a całość dochodu przeznaczymy na cele charytatywne. Potrzebujemy wolontariuszy do obsługi stoisk, sprzedaży, promocji i rozliczania. To świetna okazja do nauki organizacji i pracy w zespole!',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
           organization: admins[2].id,
           createdBy: krkCoordinators[0].id,
           eventType: 'school',
@@ -993,7 +1273,7 @@ export const seed = async (payload: Payload): Promise<void> => {
 
     // Seed Invitations
     payload.logger.info('Seeding Invitations...')
-    await Promise.all([
+    const invitations = await Promise.all([
       payload.create({
         collection: 'invitations',
         data: {
@@ -1030,6 +1310,18 @@ export const seed = async (payload: Payload): Promise<void> => {
           respondedAt: new Date('2025-10-02').toISOString(),
         },
       }),
+      payload.create({
+        collection: 'invitations',
+        data: {
+          event: moreKrakowEvents[7].id, // Kiermasz świąteczny
+          volunteer: moreUsers[3].id, // zofia.lato
+          invitedBy: admins[1].id,
+          status: 'pending',
+          message:
+            'Cześć Zofio! Widzieliśmy Twoje zaangażowanie i chcielibyśmy zaprosić Cię do pomocy przy kiermaszu świątecznym. Twoja energia i uśmiech będą idealne do tego wydarzenia!',
+          invitedAt: new Date('2025-10-15').toISOString(),
+        },
+      }),
     ])
 
     // Seed Certificates
@@ -1049,6 +1341,23 @@ export const seed = async (payload: Payload): Promise<void> => {
         certificateNumber: 'CERT-2025-001',
         issueDate: new Date('2025-11-16').toISOString(),
         notes: 'Wolontariusz bardzo zaangażowany i pomocny',
+      },
+    })
+
+    // Seed Notifications
+    payload.logger.info('Seeding Notifications...')
+    await payload.create({
+      collection: 'notifications',
+      data: {
+        user: moreUsers[3].id, // zofia.lato
+        type: 'event_invitation',
+        event: moreKrakowEvents[7].id, // Kiermasz świąteczny
+        invitation: invitations[3].id,
+        message:
+          'Zostałaś zaproszona do wydarzenia: Kraków: Kiermasz świąteczny – wsparcie stoisk',
+        isRead: false,
+        actionRequired: true,
+        createdAt: new Date('2025-10-15').toISOString(),
       },
     })
 
