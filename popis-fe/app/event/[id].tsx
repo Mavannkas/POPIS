@@ -263,20 +263,22 @@ export default function EventDetailScreen() {
 
           {/* Category section omitted in this view per mock */}
 
-          {/* Uzasadnienie (wymagane) */}
-          <View className="mb-6">
-            <Text className="text-lg font-semibold text-gray-800 mb-3">Uzasadnienie zgłoszenia</Text>
-            <TextArea
-              ref={justificationRef as any}
-              label={undefined}
-              value={justification}
-              onChangeText={setJustification}
-              placeholder="Napisz, dlaczego chcesz wziąć udział..."
-              error={justificationError}
-              minHeight={120}
-              maxHeight={200}
-            />
-          </View>
+          {/* Uzasadnienie (wymagane) - tylko jeśli użytkownik się jeszcze nie zgłosił */}
+          {!myApplication && (
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-800 mb-3">Uzasadnienie zgłoszenia</Text>
+              <TextArea
+                ref={justificationRef as any}
+                label={undefined}
+                value={justification}
+                onChangeText={setJustification}
+                placeholder="Napisz, dlaczego chcesz wziąć udział..."
+                error={justificationError}
+                minHeight={120}
+                maxHeight={200}
+              />
+            </View>
+          )}
         </View>
       </KeyboardAwareScrollView>
 

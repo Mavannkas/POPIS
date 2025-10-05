@@ -28,6 +28,13 @@ const MAPPING = {
   'line.3.horizontal.decrease.circle.fill': 'tune',
   'line.3.horizontal.decrease': 'tune',
   'slider.horizontal.3': 'tune',
+  // Notifications
+  'checkmark.circle.fill': 'check-circle',
+  'envelope.badge': 'email',
+  'bell.fill': 'notifications',
+  'checkmark.seal': 'verified',
+  'envelope.open': 'mail-outline',
+  'bell': 'notifications',
 } as IconMapping;
 
 /**

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { NotificationTypeCell } from '@/components/AdminDashboard/components/NotificationTypeCell'
 
 export const Notifications: CollectionConfig = {
   slug: 'notifications',
@@ -28,7 +29,12 @@ export const Notifications: CollectionConfig = {
         { label: 'Decyzja o akceptacji', value: 'approval_decision' },
         { label: 'Zaproszenie na wydarzenie', value: 'event_invitation' },
       ],
-      admin: { position: 'sidebar' },
+      admin: {
+        position: 'sidebar',
+        components: {
+          Cell: NotificationTypeCell,
+        },
+      },
     },
     {
       type: 'row',

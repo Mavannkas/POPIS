@@ -104,7 +104,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: number;
+    defaultIDType: string;
   };
   globals: {};
   globalsSelect: {};
@@ -162,7 +162,7 @@ export interface AdminAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   phone?: string | null;
@@ -177,7 +177,7 @@ export interface User {
   /**
    * Szkoła ucznia (wymagane jeśli isStudent=true)
    */
-  school?: (number | null) | School;
+  school?: (string | null) | School;
   /**
    * Zatwierdzenie wieku
    */
@@ -195,7 +195,7 @@ export interface User {
    */
   streamUserId?: string | null;
   events?: {
-    docs?: (number | Event)[];
+    docs?: (string | Event)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -224,7 +224,7 @@ export interface User {
  * via the `definition` "schools".
  */
 export interface School {
-  id: number;
+  id: string;
   /**
    * Nazwa szkoły
    */
@@ -257,7 +257,7 @@ export interface School {
  * via the `definition` "events".
  */
 export interface Event {
-  id: number;
+  id: string;
   title: string;
   description: {
     root: {
@@ -283,11 +283,11 @@ export interface Event {
   /**
    * Szkoła docelowa (opcjonalne, dla wydarzeń szkolnych)
    */
-  targetSchool?: (number | null) | School;
+  targetSchool?: (string | null) | School;
   /**
    * Główne zdjęcie wydarzenia
    */
-  image?: (number | null) | Media;
+  image?: (string | null) | Media;
   location: {
     address: string;
     city: string;
@@ -318,7 +318,7 @@ export interface Event {
   additionalInfo?: string | null;
   participants?:
     | {
-        user?: (number | null) | User;
+        user?: (string | null) | User;
         task?: string | null;
         isAccepted?: boolean | null;
         id?: string | null;
@@ -328,7 +328,7 @@ export interface Event {
    * Lista zgłoszeń przypisanych do tego wydarzenia
    */
   applications?: {
-    docs?: (number | Application)[];
+    docs?: (string | Application)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -336,11 +336,11 @@ export interface Event {
   /**
    * Organizacja odpowiedzialna za wydarzenie
    */
-  organization: number | Admin;
+  organization: string | Admin;
   /**
    * Użytkownik który stworzył wydarzenie
    */
-  createdBy?: (number | null) | Admin;
+  createdBy?: (string | null) | Admin;
   updatedAt: string;
   createdAt: string;
 }
@@ -349,7 +349,7 @@ export interface Event {
  * via the `definition` "media".
  */
 export interface Media {
-  id: number;
+  id: string;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -368,15 +368,15 @@ export interface Media {
  * via the `definition` "applications".
  */
 export interface Application {
-  id: number;
+  id: string;
   /**
    * Kliknij, aby podejrzeć szczegóły wydarzenia
    */
-  event: number | Event;
+  event: string | Event;
   /**
    * Kliknij, aby podejrzeć szczegóły wolontariusza
    */
-  volunteer: number | User;
+  volunteer: string | User;
   /**
    * Wiadomość od wolontariusza
    */
@@ -407,7 +407,7 @@ export interface Application {
  * via the `definition` "admins".
  */
 export interface Admin {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   phone?: string | null;
@@ -453,17 +453,17 @@ export interface Admin {
  * via the `definition` "certificates".
  */
 export interface Certificate {
-  id: number;
+  id: string;
   /**
    * Powiązane zgłoszenie
    */
-  application: number | Application;
-  volunteer: number | User;
-  event: number | Event;
+  application: string | Application;
+  volunteer: string | User;
+  event: string | Event;
   /**
    * Wypełniane automatycznie z wydarzenia
    */
-  organization?: (number | null) | Admin;
+  organization?: (string | null) | Admin;
   /**
    * Liczba przepracowanych godzin
    */
@@ -471,11 +471,11 @@ export interface Certificate {
   /**
    * Kto wystawił zaświadczenie (organizacja lub koordynator)
    */
-  issuedBy?: (number | null) | Admin;
+  issuedBy?: (string | null) | Admin;
   /**
    * Koordynator który zatwierdził (opcjonalne)
    */
-  approvedBy?: (number | null) | Admin;
+  approvedBy?: (string | null) | Admin;
   /**
    * Dodatkowe uwagi
    */
@@ -497,15 +497,15 @@ export interface Certificate {
  * via the `definition` "invitations".
  */
 export interface Invitation {
-  id: number;
+  id: string;
   /**
    * Wydarzenie do którego zapraszamy
    */
-  event: number | Event;
+  event: string | Event;
   /**
    * Zaproszony wolontariusz
    */
-  volunteer: number | User;
+  volunteer: string | User;
   /**
    * Wiadomość dla wolontariusza (opcjonalne)
    */
@@ -514,7 +514,7 @@ export interface Invitation {
   /**
    * Kto wysłał zaproszenie (organizacja lub koordynator)
    */
-  invitedBy: number | Admin;
+  invitedBy: string | Admin;
   /**
    * Data wysłania zaproszenia
    */
@@ -531,11 +531,11 @@ export interface Invitation {
  * via the `definition` "notifications".
  */
 export interface Notification {
-  id: number;
-  user: number | User;
+  id: string;
+  user: string | User;
   type: 'approval_decision' | 'event_invitation';
-  event?: (number | null) | Event;
-  invitation?: (number | null) | Invitation;
+  event?: (string | null) | Event;
+  invitation?: (string | null) | Invitation;
   decision?: ('accepted' | 'rejected') | null;
   message?: string | null;
   isRead?: boolean | null;
@@ -548,53 +548,53 @@ export interface Notification {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: number;
+  id: string;
   document?:
     | ({
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       } | null)
     | ({
         relationTo: 'admins';
-        value: number | Admin;
+        value: string | Admin;
       } | null)
     | ({
         relationTo: 'media';
-        value: number | Media;
+        value: string | Media;
       } | null)
     | ({
         relationTo: 'events';
-        value: number | Event;
+        value: string | Event;
       } | null)
     | ({
         relationTo: 'applications';
-        value: number | Application;
+        value: string | Application;
       } | null)
     | ({
         relationTo: 'certificates';
-        value: number | Certificate;
+        value: string | Certificate;
       } | null)
     | ({
         relationTo: 'schools';
-        value: number | School;
+        value: string | School;
       } | null)
     | ({
         relationTo: 'invitations';
-        value: number | Invitation;
+        value: string | Invitation;
       } | null)
     | ({
         relationTo: 'notifications';
-        value: number | Notification;
+        value: string | Notification;
       } | null);
   globalSlug?: string | null;
   user:
     | {
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       }
     | {
         relationTo: 'admins';
-        value: number | Admin;
+        value: string | Admin;
       };
   updatedAt: string;
   createdAt: string;
@@ -604,15 +604,15 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: number;
+  id: string;
   user:
     | {
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       }
     | {
         relationTo: 'admins';
-        value: number | Admin;
+        value: string | Admin;
       };
   key?: string | null;
   value?:
@@ -632,7 +632,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: number;
+  id: string;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;

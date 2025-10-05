@@ -52,9 +52,9 @@ export default function NotificationsScreen() {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'approval_decision': return 'checkmark.seal';
-      case 'event_invitation': return 'envelope.open';
-      default: return 'bell';
+      case 'approval_decision': return 'checkmark.circle.fill';
+      case 'event_invitation': return 'envelope.badge';
+      default: return 'bell.fill';
     }
   };
 
