@@ -11,6 +11,7 @@ export async function apiFetch<T>(path: string, options: HttpOptions = {}): Prom
 	const response = await fetch(`${API_URL}${path}`.replace(/\/$/, ''), {
 		...options,
 		headers,
+		credentials: (options.credentials as RequestCredentials) ?? 'include',
 		body: options.json !== undefined ? JSON.stringify(options.json) : options.body,
 	});
 

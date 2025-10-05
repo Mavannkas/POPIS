@@ -1,28 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Image, StyleSheet, Linking, TextInput, RefreshControl } from 'react-native';
-import { Card, Button, Chip } from 'react-native-paper';
-import { CategoryIcon } from '@/components/ui/category-icon';
-import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
-import { TextArea } from '@/components/ui/textarea';
+import { View, Text, Image, StyleSheet, Linking, RefreshControl, TextInput } from 'react-native';
+import { Card, Button } from 'react-native-paper';
+import { KeyboardAwareScrollView, TextArea } from '@/components/ui';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/theme';
+import { API_URL } from '@/lib/http';
 import { getCategoryEmoji, getCategoryLabel, getCategoryColor, applyToEvent, getEventById, getMyApplications, type Event, type Application } from '@/lib/services/events';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 
 export default function EventDetailScreen() {
   const colors = Colors;
   const { id } = useLocalSearchParams();
-  const [recommendation, setRecommendation] = useState('');
+  // Recommendation message removed from UI/logic per latest design
   const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(true);
   const [myApplication, setMyApplication] = useState<Application | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const textAreaRef = useRef<TextInput>(null);
 
   const loadData = async () => {
     if (!id) return;
     try {
-      setLoading(true);
       const ev = await getEventById(String(id));
       setEvent(ev);
       try {
@@ -38,7 +34,6 @@ export default function EventDetailScreen() {
     } catch (e) {
       console.error('Failed to load event', e);
     } finally {
-      setLoading(false);
     }
   };
 
@@ -54,19 +49,25 @@ export default function EventDetailScreen() {
   };
 
   const [joining, setJoining] = useState(false);
-  const [recommendationError, setRecommendationError] = useState('');
+  const [justification, setJustification] = useState('');
+  const [justificationError, setJustificationError] = useState('');
+  const justificationRef = useRef<TextInput | null>(null);
   const handleJoinEvent = async () => {
-    if (!id) return;
+    // Prefer the loaded event's actual ID over the route param
+    const actualEventId = (event && (event as any).id) ? String((event as any).id) : (id ? String(id) : '')
+    if (!actualEventId) return;
     try {
-      if (!recommendation.trim()) {
-        setRecommendationError('To pole jest wymagane');
-        // focus the text area for user convenience
-        setTimeout(() => textAreaRef.current?.focus(), 50);
+      setJustificationError('');
+      if (!justification || justification.trim().length < 10) {
+        setJustificationError('Uzasadnienie jest wymagane (min. 10 znaków)');
+        // Scroll to bottom and focus the field
+        setTimeout(() => {
+          justificationRef.current?.focus();
+        }, 50);
         return;
       }
-      setRecommendationError('');
       setJoining(true);
-      const res = await applyToEvent({ eventId: String(id), message: recommendation.trim() || undefined });
+      const res = await applyToEvent({ eventId: actualEventId, message: justification.trim() });
       if (res.success) {
         // Navigate back or show success toast
         console.log('Applied successfully');
@@ -97,15 +98,37 @@ export default function EventDetailScreen() {
   return (
     <View className="flex-1 bg-white">
       <KeyboardAwareScrollView className="flex-1" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        {/* Event Image */}
-        <View className="h-48 bg-gray-200">
-          {event && (event as any).image && typeof (event as any).image === 'object' && (event as any).image?.url ? (
-            <Image 
-              source={{ uri: (event as any).image.url as string }}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
-          ) : null}
+        {/* Header image full-bleed without side margins */}
+        <View>
+          <View style={styles.headerImageWrapper}>
+            {(() => {
+              const resolveImageUrl = (img: any): string | null => {
+                if (!img) return null;
+                if (typeof img === 'string') {
+                  return img.startsWith('http') ? img : (API_URL ? `${API_URL}${img}` : null);
+                }
+                if (typeof img === 'object' && img.url) {
+                  const u = String(img.url);
+                  return u.startsWith('http') ? u : (API_URL ? `${API_URL}${u}` : u);
+                }
+                return null;
+              };
+              const imageUrl = resolveImageUrl((event as any)?.image);
+              return imageUrl ? (
+                <Image source={{ uri: imageUrl }} style={styles.headerImage} resizeMode="cover" />
+              ) : null;
+            })()}
+            {myApplication ? (() => {
+              const s = myApplication.status
+              const bg = s === 'accepted' ? '#73A641' : (s === 'rejected' ? '#EF4444' : (s === 'completed' ? '#3B82F6' : '#E8A031'))
+              const label = s === 'accepted' ? 'Zaakceptowano' : (s === 'rejected' ? 'Odrzucono' : (s === 'completed' ? 'Ukończony' : 'Zapisano'))
+              return (
+                <View style={[styles.statusBadge, { backgroundColor: bg }]}>
+                  <Text style={styles.statusBadgeText}>{label}</Text>
+                </View>
+              )
+            })() : null}
+          </View>
         </View>
 
         <View className="px-4 py-6">
@@ -115,59 +138,56 @@ export default function EventDetailScreen() {
               <Text className="text-2xl font-bold text-gray-800 mb-2">
                 {event?.title || 'Wydarzenie'}
               </Text>
-              <Text className="text-primary font-medium text-base">
+              <Text style={{ color: '#3088BF', fontWeight: '500', fontSize: 16 }}>
                 👤 {event && event.organization ? (typeof event.organization === 'object' ? (event.organization.name || 'Organizacja') : 'Organizacja') : 'Organizacja'}
               </Text>
             </View>
-            <Chip
-              style={{ backgroundColor: colors.primary + '20' }}
-              textStyle={{ color: colors.primary, fontWeight: '600' }}
-            >
-              <Text className="mr-1">{getCategoryEmoji(event?.category || 'other')}</Text>
-              {getCategoryLabel(event?.category || 'other')}
-            </Chip>
+            <View style={styles.categoryPillHeaderLight}>
+              <Text style={styles.categoryPillEmojiLight}>{getCategoryEmoji(event?.category || 'other')}</Text>
+              <Text style={styles.categoryPillTextLight}>{getCategoryLabel(event?.category || 'other')}</Text>
+            </View>
           </View>
 
           {/* Event Details */}
-          <Card style={{ backgroundColor: '#F9F9F9', marginBottom: 24, elevation: 0 }}>
+          <Card style={{ backgroundColor: '#FFFFFF', marginBottom: 24, elevation: 0, borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, borderColor: '#E5E7EB' }}>
             <Card.Content style={{ padding: 16, backgroundColor: 'transparent' }}>
               <View style={{ gap: 12 }}>
+                {/* First row: capacity + right-aligned event type pill */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View className="flex-row items-center" style={{ marginBottom: 2 }}>
+                    <View style={styles.iconCircleSmall}>
+                      <Text style={styles.iconEmojiSmall}>👥</Text>
+                    </View>
+                    <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
+                      {(event?.acceptedCount || 0)}/{event?.maxVolunteers ?? '—'}
+                    </Text>
+                  </View>
+                  <View style={styles.freePill}>
+                    <Text style={styles.freePillText}>{event?.eventType === 'school' ? 'Szkolne' : 'Publiczne'}</Text>
+                  </View>
+                </View>
                 <View className="flex-row items-center" style={{ marginBottom: 2 }}>
-                  <View style={styles.iconCircle}>
-                    <Text style={styles.iconEmoji}>📅</Text>
+                  <View style={styles.iconCircleSmall}>
+                    <Text style={styles.iconEmojiSmall}>📅</Text>
                   </View>
                   <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
                     {event?.startDate ? new Date(event.startDate).toLocaleDateString('pl-PL') : ''}
                   </Text>
                 </View>
-                {event?.eventType === 'school' && (
-                  <View className="flex-row items-center" style={{ marginBottom: 2 }}>
-                    <View style={styles.iconCircle}>
-                      <Text style={styles.iconEmoji}>🏫</Text>
-                    </View>
-                    <Text className="text-gray-700 font-medium" style={{ marginLeft: 12, flex: 1, flexShrink: 1 }}>
-                      {(() => {
-                        const ts: any = (event as any)?.targetSchool;
-                        if (ts && typeof ts === 'object' && ts.name) return ts.name as string;
-                        return 'Wydarzenie szkolne';
-                      })()}
-                    </Text>
-                  </View>
-                )}
                 <View className="flex-row items-center" style={{ marginBottom: 2 }}>
-                  <View style={styles.iconCircle}>
-                    <Text style={styles.iconEmoji}>⏰</Text>
+                  <View style={styles.iconCircleSmall}>
+                    <Text style={styles.iconEmojiSmall}>⏰</Text>
                   </View>
                   <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
-                    {event?.duration ? `${event.duration}h` : ''}
+                    {event?.startDate ? new Date(event.startDate).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : ''}
                   </Text>
                 </View>
                 <View className="flex-row items-center" style={{ marginBottom: 2 }}>
-                  <View style={styles.iconCircle}>
-                    <Text style={styles.iconEmoji}>📍</Text>
+                  <View style={styles.iconCircleSmall}>
+                    <Text style={styles.iconEmojiSmall}>📍</Text>
                   </View>
                   <Text className="text-gray-700 font-medium" style={{ marginLeft: 12 }}>
-                    {event?.location?.address || ''} {event?.location?.city ? `• ${event.location.city}` : ''}
+                    {event?.location?.address || ''}
                   </Text>
                 </View>
               </View>
@@ -176,12 +196,8 @@ export default function EventDetailScreen() {
 
           {/* Description */}
           <View className="mb-6">
-            <Text className="text-lg font-semibold text-gray-800 mb-3">
-              Opis wydarzenia
-            </Text>
-            <Text className="text-gray-600 leading-6">
-              {event?.additionalInfo || ''}
-            </Text>
+            <Text className="text-lg font-semibold text-gray-800 mb-3">Opis</Text>
+            <Text className="text-gray-600 leading-6">{event?.additionalInfo || ''}</Text>
           </View>
 
           {/* Mini mapa z lokalizacją i linkiem do Google Maps */}
@@ -245,33 +261,21 @@ export default function EventDetailScreen() {
             </View>
           ) : null}
 
-          {/* Category */}
-          <View className="mb-6">
-            <Text className="text-lg font-semibold text-gray-800 mb-3">
-              Kategoria
-            </Text>
-            <View className="flex-row items-center">
-              <CategoryIcon category={event?.category || 'other'} size="small" />
-              <Chip
-                style={{ backgroundColor: '#F5F5F5', marginLeft: 4 }}
-                textStyle={{ color: '#666', fontSize: 12 }}
-              >
-                {getCategoryLabel(event?.category || 'other')}
-              </Chip>
-            </View>
-          </View>
+          {/* Category section omitted in this view per mock */}
 
-          {/* Recommendation Textarea (only when user has not applied) */}
+          {/* Uzasadnienie (wymagane) - tylko jeśli użytkownik się jeszcze nie zgłosił */}
           {!myApplication && (
-            <View className="mb-8">
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-800 mb-3">Uzasadnienie zgłoszenia</Text>
               <TextArea
-                label="Dlaczego powinieneś zostać wybrany?"
-                description="Opisz swoje doświadczenie, motywację lub powody, dla których chcesz uczestniczyć w tym wydarzeniu."
-                value={recommendation}
-                onChangeText={setRecommendation}
-                placeholder="Napisz swoją rekomendację..."
-                error={recommendationError}
-                ref={textAreaRef}
+                ref={justificationRef as any}
+                label={undefined}
+                value={justification}
+                onChangeText={setJustification}
+                placeholder="Napisz, dlaczego chcesz wziąć udział..."
+                error={justificationError}
+                minHeight={120}
+                maxHeight={200}
               />
             </View>
           )}
@@ -284,23 +288,23 @@ export default function EventDetailScreen() {
           <Button
             mode="contained"
             onPress={handleOpenChat}
-            style={{ backgroundColor: colors.primary, borderRadius: 20, paddingVertical: 4 }}
-            contentStyle={{ paddingVertical: 4 }}
-            labelStyle={{ fontSize: 14, fontWeight: '600' }}
+            style={{ backgroundColor: colors.primary, borderRadius: 24, paddingVertical: 6 }}
+            contentStyle={{ paddingVertical: 6 }}
+            labelStyle={{ fontSize: 16, fontWeight: '700', letterSpacing: 0.5 }}
           >
-            Otwórz czat z organizatorem
+            Czatuj z organizatorem
           </Button>
         ) : (
           <Button
             mode="contained"
             onPress={handleJoinEvent}
-            style={{ backgroundColor: colors.primary, borderRadius: 20, paddingVertical: 4 }}
-            contentStyle={{ paddingVertical: 4 }}
-            labelStyle={{ fontSize: 14, fontWeight: '600' }}
+            style={{ backgroundColor: colors.primary, borderRadius: 24, paddingVertical: 6 }}
+            contentStyle={{ paddingVertical: 6 }}
+            labelStyle={{ fontSize: 16, fontWeight: '700', letterSpacing: 0.5 }}
             loading={joining}
             disabled={joining}
           >
-            Dołącz do wydarzenia
+            Zapisz się
           </Button>
         )}
       </View>
@@ -309,6 +313,94 @@ export default function EventDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerImageWrapper: {
+    height: 192,
+    overflow: 'hidden',
+    backgroundColor: '#E5E7EB',
+  },
+  headerImage: {
+    width: '100%',
+    height: '100%',
+  },
+  savedBadge: {
+    position: 'absolute',
+    left: 8,
+    top: 8,
+    backgroundColor: '#73A641',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  savedBadgeText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  freePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  freePillIcon: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginRight: 6,
+  },
+  freePillText: {
+    color: '#6B7280',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  statusBadge: {
+    position: 'absolute',
+    left: 8,
+    top: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusBadgeText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  categoryPillHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#A61F5E',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  categoryPillHeaderLight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F1DAE5',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  categoryPillEmoji: {
+    color: 'white',
+    fontSize: 12,
+    marginRight: 6,
+  },
+  categoryPillText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  categoryPillTextLight: {
+    color: '#A61F5E',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  categoryPillEmojiLight: {
+    color: '#A61F5E',
+    fontSize: 12,
+    marginRight: 6,
+  },
   iconCircle: {
     width: 36,
     height: 36,
@@ -319,6 +411,17 @@ const styles = StyleSheet.create({
   },
   iconEmoji: {
     fontSize: 18,
+  },
+  iconCircleSmall: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F1DAE5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconEmojiSmall: {
+    fontSize: 14,
   },
   miniMapContainer: {
     width: '100%',

@@ -18,6 +18,7 @@ export interface Event {
   duration: number;
   minAge: number;
   maxVolunteers?: number;
+  acceptedCount?: number; // number of accepted applications (server-provided)
   requirements?: string;
   additionalInfo?: string;
   status: 'draft' | 'published' | 'completed' | 'cancelled';
@@ -56,6 +57,8 @@ export interface EventFilters {
   eventType?: 'public' | 'school';
   size?: ('small' | 'medium' | 'large')[] | 'small' | 'medium' | 'large';
   limit?: number;
+  // client-only filter: whether the current user applied or not
+  applied?: 'applied' | 'not_applied';
 }
 
 // Mock data for development - replace with real API later
@@ -181,6 +184,7 @@ export async function getAvailableEvents(filters?: EventFilters): Promise<Events
     const sizes = Array.isArray(filters.size) ? filters.size : [filters.size];
     sizes.forEach(s => params.append('size', s));
   }
+  if (filters?.applied) params.append('applied', filters.applied);
   if (filters?.limit) params.append('limit', String(filters.limit));
   const queryString = params.toString();
   const path = `/api/events/available${queryString ? `?${queryString}` : ''}`;
@@ -307,8 +311,6 @@ export function getCategoryColor(category: string): string {
 }
 
 export function getCategoryEmoji(category: string): string {
-  console.log('category', category);
-
   const emojis: Record<string, string> = {
     education: '📚',
     environment: '🌱',

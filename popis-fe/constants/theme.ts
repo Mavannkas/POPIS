@@ -27,9 +27,30 @@ export const Colors = {
 };
 
 // Paper theme
+// Map Paper's MD3 type scale to Poppins families
+const paperFonts = configureFonts({
+  config: {
+    displayLarge: { fontFamily: 'Poppins_700Bold' },
+    displayMedium: { fontFamily: 'Poppins_600SemiBold' },
+    displaySmall: { fontFamily: 'Poppins_600SemiBold' },
+    headlineLarge: { fontFamily: 'Poppins_700Bold' },
+    headlineMedium: { fontFamily: 'Poppins_600SemiBold' },
+    headlineSmall: { fontFamily: 'Poppins_600SemiBold' },
+    titleLarge: { fontFamily: 'Poppins_600SemiBold' },
+    titleMedium: { fontFamily: 'Poppins_500Medium' },
+    titleSmall: { fontFamily: 'Poppins_500Medium' },
+    labelLarge: { fontFamily: 'Poppins_500Medium' },
+    labelMedium: { fontFamily: 'Poppins_500Medium' },
+    labelSmall: { fontFamily: 'Poppins_500Medium' },
+    bodyLarge: { fontFamily: 'Poppins_400Regular' },
+    bodyMedium: { fontFamily: 'Poppins_400Regular' },
+    bodySmall: { fontFamily: 'Poppins_400Regular' },
+  },
+});
+
 export const theme = {
   ...MD3LightTheme,
-  fonts: configureFonts({ config: { fontFamily: 'Roboto_400Regular' } }),
+  fonts: paperFonts,
   colors: {
     ...MD3LightTheme.colors,
     primary: c.magenta,

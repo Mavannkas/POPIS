@@ -53,7 +53,17 @@ export default buildConfig({
       pl,
     },
   },
-  collections: [Users, Admins, Media, Events, Applications, Certificates, Schools, Invitations, Notifications],
+  collections: [
+    Users,
+    Admins,
+    Media,
+    Events,
+    Applications,
+    Certificates,
+    Schools,
+    Invitations,
+    Notifications,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -21,6 +21,7 @@ export const GET = async (request: NextRequest) => {
     const search = searchParams.get('search')
     const eventType = searchParams.get('eventType') // 'public' or 'school'
     const limitParam = searchParams.get('limit')
+    const applied = searchParams.get('applied') // 'applied' | 'not_applied'
     const limit = limitParam ? parseInt(limitParam) : undefined
     
     // Build where query
@@ -126,13 +127,19 @@ export const GET = async (request: NextRequest) => {
       depth: 2,
     })
 
-    // Filter by available spots: accepted applications < maxVolunteers (if set)
+    // Filter by available spots and attach acceptedCount to each event
     const filteredDocs: any[] = []
     for (const ev of events.docs as any[]) {
-      if (!ev.maxVolunteers) {
-        filteredDocs.push(ev)
-        continue
+      // Age restriction: NEVER show events above user's age
+      if (user) {
+        const userAge = user.isMinor ? 17 : 18
+        if (typeof ev.minAge === 'number' && userAge < ev.minAge) {
+          continue
+        }
       }
+      // If not logged in, keep as-is (public listing); backend already enforces published + public
+      let acceptedCount = 0
+      let hasMyApplication: boolean | null = null
       try {
         const apps = await payload.find({
           collection: 'applications',
@@ -144,13 +151,39 @@ export const GET = async (request: NextRequest) => {
           },
           limit: 1, // we only need totalDocs
         })
-        const acceptedCount = apps.totalDocs || 0
-        if (acceptedCount < (ev.maxVolunteers as number)) {
-          filteredDocs.push(ev)
-        }
+        acceptedCount = apps.totalDocs || 0
       } catch (e) {
-        // If counting fails, be permissive and include the event
-        filteredDocs.push(ev)
+        // ignore; keep 0
+      }
+
+      // If user is logged in, determine whether they applied
+      if (user) {
+        try {
+          const myApps = await payload.find({
+            collection: 'applications',
+            where: {
+              and: [
+                { event: { equals: ev.id } },
+                { volunteer: { equals: user.id } },
+              ],
+            },
+            limit: 1,
+          })
+          hasMyApplication = (myApps.totalDocs || 0) > 0
+        } catch (e) {
+          hasMyApplication = null
+        }
+      }
+
+      // include event if has capacity or no limit
+      // Capacity filter
+      if (!ev.maxVolunteers || acceptedCount < (ev.maxVolunteers as number)) {
+        // Apply applied/not_applied filter if provided
+        if (applied && user) {
+          if (applied === 'applied' && hasMyApplication !== true) continue
+          if (applied === 'not_applied' && hasMyApplication === true) continue
+        }
+        filteredDocs.push({ ...ev, acceptedCount })
       }
       if (limit && filteredDocs.length >= limit) break
     }

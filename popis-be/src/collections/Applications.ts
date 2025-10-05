@@ -6,7 +6,7 @@ export const Applications: CollectionConfig = {
     useAsTitle: 'id',
     defaultColumns: ['event', 'volunteer', 'status', 'appliedAt'],
     // Tylko organizatorzy i koordynatorzy mają dostęp do admin panelu
-    hidden: ({ user }) => {
+    hidden: ({ user }: { user: any }) => {
       return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
     },
   },
@@ -24,6 +24,10 @@ export const Applications: CollectionConfig = {
           relationTo: 'events',
           required: true,
           label: 'Wydarzenie',
+          admin: {
+            appearance: 'drawer',
+            description: 'Kliknij, aby podejrzeć szczegóły wydarzenia',
+          },
         },
         {
           name: 'volunteer',
@@ -31,6 +35,10 @@ export const Applications: CollectionConfig = {
           relationTo: 'users',
           required: true,
           label: 'Wolontariusz',
+          admin: {
+            appearance: 'drawer',
+            description: 'Kliknij, aby podejrzeć szczegóły wolontariusza',
+          },
         },
       ],
     },
@@ -111,7 +119,7 @@ export const Applications: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      async ({ data, req, operation }) => {
+      async ({ data, req, operation }: { data: any; req: any; operation: string }) => {
         // Set appliedAt on create
         if (operation === 'create') {
           data.appliedAt = new Date().toISOString()
@@ -126,64 +134,45 @@ export const Applications: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, req, operation, previousDoc }) => {
-        // Send notification when application status changes to accepted or rejected
+      async ({
+        doc,
+        req,
+        operation,
+        previousDoc,
+      }: {
+        doc: any
+        req: any
+        operation: string
+        previousDoc: any
+      }) => {
+        // Create notification for approval decision when status changes from pending to accepted/rejected
         if (
-          operation === 'update' &&
-          previousDoc?.status === 'pending' &&
-          (doc.status === 'accepted' || doc.status === 'rejected')
+          (doc.status === 'accepted' || doc.status === 'rejected') &&
+          previousDoc?.status !== doc.status
         ) {
           try {
-            const NotificationService = (await import('../services/NotificationService')).default
-
-            // Get event details
-            const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
-            const event = await req.payload.findByID({
-              collection: 'events',
-              id: eventId as string,
-            })
-
             const volunteerId = typeof doc.volunteer === 'object' ? doc.volunteer.id : doc.volunteer
-
-            const notificationType =
-              doc.status === 'accepted' ? 'join_request_accepted' : 'join_request_rejected'
-            const message =
-              doc.status === 'accepted'
-                ? `Twoje zgłoszenie do wydarzenia "${event.title}" zostało zaakceptowane!`
-                : `Twoje zgłoszenie do wydarzenia "${event.title}" zostało odrzucone.`
-
-            // Create notification in database
-            const notification = await req.payload.create({
+            await req.payload.create({
               collection: 'notifications',
               data: {
-                type: notificationType,
-                recipient: volunteerId,
-                event: eventId,
-                message: message,
-                read: false,
-                metadata: {
-                  applicationId: doc.id,
-                  status: doc.status,
-                },
+                user: volunteerId,
+                type: 'approval_decision',
+                event: doc.event,
+                decision: doc.status,
+                isRead: false,
+                actionRequired: false,
+                message:
+                  doc.status === 'accepted'
+                    ? 'Twoja aplikacja została zaakceptowana.'
+                    : 'Twoja aplikacja została odrzucona.',
+                createdAt: new Date().toISOString(),
               },
+              req,
             })
-
-            // Send real-time notification via SSE
-            NotificationService.sendNotification(volunteerId, {
-              id: notification.id,
-              type: notificationType,
-              message: notification.message,
-              event: event,
-              createdAt: notification.createdAt,
-              read: false,
-            })
-
-            console.log('Notification sent for application status change:', doc.id)
           } catch (error) {
-            console.error('Error sending application notification:', error)
+            console.error('Error creating approval notification:', error)
           }
         }
-
         // When status changes to 'accepted', create Stream Chat channel
         if (doc.status === 'accepted' && previousDoc?.status !== 'accepted') {
           try {

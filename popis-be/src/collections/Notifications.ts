@@ -1,91 +1,116 @@
 import type { CollectionConfig } from 'payload'
+import { NotificationTypeCell } from '@/components/AdminDashboard/components/NotificationTypeCell'
 
 export const Notifications: CollectionConfig = {
   slug: 'notifications',
-  access: {
-    read: ({ req: { user } }) => {
-      if (!user) return false
-      // Users can only read their own notifications
-      return {
-        recipient: {
-          equals: user.id,
-        },
-      }
-    },
-    create: ({ req: { user } }) => {
-      // Only authenticated users can create notifications (system will do this)
-      return !!user
-    },
-    update: ({ req: { user } }) => {
-      if (!user) return false
-      // Users can only update their own notifications (mark as read)
-      return {
-        recipient: {
-          equals: user.id,
-        },
-      }
-    },
-    delete: ({ req: { user } }) => {
-      if (!user) return false
-      // Users can delete their own notifications
-      return {
-        recipient: {
-          equals: user.id,
-        },
-      }
-    },
+  admin: {
+    useAsTitle: 'type',
+    defaultColumns: ['user', 'type', 'event', 'isRead', 'actionRequired', 'createdAt'],
+  },
+  labels: {
+    singular: 'Powiadomienie',
+    plural: 'Powiadomienia',
   },
   fields: [
+    {
+      name: 'user',
+      type: 'relationship',
+      relationTo: 'users',
+      required: true,
+      label: 'Użytkownik',
+      admin: { position: 'sidebar' },
+    },
     {
       name: 'type',
       type: 'select',
       required: true,
+      label: 'Typ',
       options: [
+        { label: 'Decyzja o akceptacji', value: 'approval_decision' },
+        { label: 'Zaproszenie na wydarzenie', value: 'event_invitation' },
+      ],
+      admin: {
+        position: 'sidebar',
+        components: {
+          Cell: NotificationTypeCell,
+        },
+      },
+    },
+    {
+      type: 'row',
+      fields: [
         {
-          label: 'Zaproszenie do wydarzenia',
-          value: 'event_invitation',
+          name: 'event',
+          type: 'relationship',
+          relationTo: 'events',
+          label: 'Wydarzenie',
         },
         {
-          label: 'Prośba zaakceptowana',
-          value: 'join_request_accepted',
-        },
-        {
-          label: 'Prośba odrzucona',
-          value: 'join_request_rejected',
+          name: 'invitation',
+          type: 'relationship',
+          relationTo: 'invitations',
+          label: 'Zaproszenie',
         },
       ],
     },
     {
-      name: 'recipient',
-      type: 'relationship',
-      relationTo: 'users',
-      required: true,
-      hasMany: false,
-    },
-    {
-      name: 'event',
-      type: 'relationship',
-      relationTo: 'events',
-      required: true,
-      hasMany: false,
+      name: 'decision',
+      type: 'select',
+      label: 'Decyzja',
+      options: [
+        { label: 'Zaakceptowano', value: 'accepted' },
+        { label: 'Odrzucono', value: 'rejected' },
+      ],
     },
     {
       name: 'message',
       type: 'text',
-      required: true,
+      label: 'Wiadomość',
     },
     {
-      name: 'read',
-      type: 'checkbox',
-      defaultValue: false,
+      type: 'row',
+      fields: [
+        {
+          name: 'isRead',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Przeczytane',
+          admin: { position: 'sidebar' },
+        },
+        {
+          name: 'actionRequired',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Wymaga akcji',
+          admin: { position: 'sidebar' },
+        },
+      ],
     },
     {
-      name: 'metadata',
-      type: 'json',
-      admin: {
-        description: 'Additional data specific to notification type',
-      },
+      name: 'createdAt',
+      type: 'date',
+      label: 'Utworzono',
+      admin: { position: 'sidebar', readOnly: true },
     },
   ],
-  timestamps: true,
+  access: {
+    create: () => true,
+    read: () => true,
+    update: () => true,
+    delete: () => true,
+  },
+  hooks: {
+    beforeChange: [
+      ({ data, operation }) => {
+        if (operation === 'create') {
+          if (!data.createdAt) {
+            data.createdAt = new Date().toISOString()
+          }
+        }
+        return data
+      },
+    ],
+  },
 }
+
+

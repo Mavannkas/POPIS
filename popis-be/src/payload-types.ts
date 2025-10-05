@@ -85,6 +85,9 @@ export interface Config {
     users: {
       events: 'events';
     };
+    events: {
+      applications: 'applications';
+    };
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
@@ -321,6 +324,14 @@ export interface Event {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Lista zgłoszeń przypisanych do tego wydarzenia
+   */
+  applications?: {
+    docs?: (string | Application)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   status: 'draft' | 'published' | 'completed' | 'cancelled';
   /**
    * Organizacja odpowiedzialna za wydarzenie
@@ -351,6 +362,45 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications".
+ */
+export interface Application {
+  id: string;
+  /**
+   * Kliknij, aby podejrzeć szczegóły wydarzenia
+   */
+  event: string | Event;
+  /**
+   * Kliknij, aby podejrzeć szczegóły wolontariusza
+   */
+  volunteer: string | User;
+  /**
+   * Wiadomość od wolontariusza
+   */
+  message?: string | null;
+  /**
+   * Liczba przepracowanych godzin (wypełnia organizacja)
+   */
+  hoursWorked?: number | null;
+  /**
+   * Notatki organizacji (widoczne tylko dla organizacji i superadmina)
+   */
+  organizationNotes?: string | null;
+  status: 'pending' | 'accepted' | 'rejected' | 'completed';
+  appliedAt?: string | null;
+  /**
+   * Data ukończenia wolontariatu
+   */
+  completedAt?: string | null;
+  /**
+   * Stream Chat channel ID (auto-generated po akceptacji)
+   */
+  chatChannelId?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -397,39 +447,6 @@ export interface Admin {
       }[]
     | null;
   password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "applications".
- */
-export interface Application {
-  id: string;
-  event: string | Event;
-  volunteer: string | User;
-  /**
-   * Wiadomość od wolontariusza
-   */
-  message?: string | null;
-  /**
-   * Liczba przepracowanych godzin (wypełnia organizacja)
-   */
-  hoursWorked?: number | null;
-  /**
-   * Notatki organizacji (widoczne tylko dla organizacji i superadmina)
-   */
-  organizationNotes?: string | null;
-  status: 'pending' | 'accepted' | 'rejected' | 'completed';
-  appliedAt?: string | null;
-  /**
-   * Data ukończenia wolontariatu
-   */
-  completedAt?: string | null;
-  /**
-   * Stream Chat channel ID (auto-generated po akceptacji)
-   */
-  chatChannelId?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -515,25 +532,16 @@ export interface Invitation {
  */
 export interface Notification {
   id: string;
-  type: 'event_invitation' | 'join_request_accepted' | 'join_request_rejected';
-  recipient: string | User;
-  event: string | Event;
-  message: string;
-  read?: boolean | null;
-  /**
-   * Additional data specific to notification type
-   */
-  metadata?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
+  user: string | User;
+  type: 'approval_decision' | 'event_invitation';
+  event?: (string | null) | Event;
+  invitation?: (string | null) | Invitation;
+  decision?: ('accepted' | 'rejected') | null;
+  message?: string | null;
+  isRead?: boolean | null;
+  actionRequired?: boolean | null;
   createdAt: string;
+  updatedAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -756,6 +764,7 @@ export interface EventsSelect<T extends boolean = true> {
         isAccepted?: T;
         id?: T;
       };
+  applications?: T;
   status?: T;
   organization?: T;
   createdBy?: T;
@@ -832,14 +841,16 @@ export interface InvitationsSelect<T extends boolean = true> {
  * via the `definition` "notifications_select".
  */
 export interface NotificationsSelect<T extends boolean = true> {
+  user?: T;
   type?: T;
-  recipient?: T;
   event?: T;
+  invitation?: T;
+  decision?: T;
   message?: T;
-  read?: T;
-  metadata?: T;
-  updatedAt?: T;
+  isRead?: T;
+  actionRequired?: T;
   createdAt?: T;
+  updatedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
 import { Searchbar, Chip, Card } from 'react-native-paper';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
@@ -7,7 +7,21 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Stack } from 'expo-router';
 import { FilterModal } from '@/components/FilterModal';
-import { Event, EventFilters, getAvailableEvents, getCategoryEmoji, getCategoryLabel } from '@/lib/services/events';
+import { Event, EventFilters, getAvailableEvents, getCategoryEmoji, getCategoryLabel, getMyApplications, type ApplicationStatus } from '@/lib/services/events';
+import { API_URL } from '@/lib/http';
+import { EventCard } from '@/components/ui';
+
+const resolveImageUrl = (img: any): string | null => {
+  if (!img) return null;
+  if (typeof img === 'string') {
+    return img.startsWith('http') ? img : (API_URL ? `${API_URL}${img}` : null);
+  }
+  if (typeof img === 'object' && img.url) {
+    const u = String(img.url);
+    return u.startsWith('http') ? u : (API_URL ? `${API_URL}${u}` : u);
+  }
+  return null;
+};
 
 export default function SearchScreen() {
   const colors = Colors;
@@ -16,6 +30,7 @@ export default function SearchScreen() {
   const [filters, setFilters] = useState<EventFilters>({});
   const [loading, setLoading] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
+  const [applicationStatusByEvent, setApplicationStatusByEvent] = useState<Record<string, ApplicationStatus>>({});
 
   const activeFiltersCount = useMemo(() => {
     return Object.entries(filters).reduce((acc, [key, val]) => {
@@ -28,6 +43,7 @@ export default function SearchScreen() {
   const load = useCallback(async () => {
     try {
       setLoading(true);
+      // Client-side applied/not_applied filtering handled by screen; backend doesn't support it directly
       const response = await getAvailableEvents({ ...filters, search: searchQuery || undefined });
       setEvents(response.events);
     } catch (e) {
@@ -40,6 +56,25 @@ export default function SearchScreen() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Load my applications to show status on cards (pending/accepted)
+  useEffect(() => {
+    (async () => {
+      try {
+        const apps = await getMyApplications();
+        const map: Record<string, ApplicationStatus> = {};
+        (apps.applications || []).forEach(app => {
+          const ev: any = app.event as any;
+          const eventId = typeof ev === 'object' ? String(ev.id) : String(ev);
+          if (eventId) map[eventId] = app.status as ApplicationStatus;
+        });
+        setApplicationStatusByEvent(map);
+      } catch (e) {
+        // non-blocking
+        console.warn('Failed to load my applications', e);
+      }
+    })();
+  }, []);
 
   return (
     <View className="flex-1 bg-white">
@@ -79,54 +114,11 @@ export default function SearchScreen() {
 
         {/* Search Results */}
         {events.map((event) => (
-          <TouchableOpacity 
+          <EventCard
             key={event.id}
-            className="mb-4"
-            onPress={() => router.push(`/event/${event.id}` as any)}
-          >
-            <Card className="bg-white shadow-sm">
-              <Card.Content className="p-4">
-                <View className="flex-row justify-between items-start mb-3">
-                  <View className="flex-1 mr-3">
-                    <Text className="text-lg font-semibold text-gray-800 mb-1">
-                      {event.title}
-                    </Text>
-                  </View>
-                  <View className="bg-primary/10 px-3 py-1 rounded-full flex-row items-center">
-                    <Text className="text-xs mr-1">{getCategoryEmoji(event.category)}</Text>
-                    <Text className="text-primary text-xs font-medium">
-                      {getCategoryLabel(event.category)}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="space-y-2 mb-3">
-                  <View className="flex-row items-center">
-                    <Text className="text-primary font-medium text-sm mr-2">📅</Text>
-                    <Text className="text-gray-600 text-sm">{new Date(event.startDate).toLocaleDateString('pl-PL')}</Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <Text className="text-primary font-medium text-sm mr-2">⏰</Text>
-                    <Text className="text-gray-600 text-sm">{event.duration}h</Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <Text className="text-primary font-medium text-sm mr-2">📍</Text>
-                    <Text className="text-gray-600 text-sm">{event.location?.address || ''} {event.location?.city ? `• ${event.location.city}` : ''}</Text>
-                  </View>
-                </View>
-
-                {/* Tags */}
-                <View className="flex-row flex-wrap gap-1">
-                  <View className="bg-gray-100 px-2 py-1 rounded-full">
-                    <Text className="text-xs text-gray-600">{getCategoryLabel(event.category)}</Text>
-                  </View>
-                  <View className="bg-gray-100 px-2 py-1 rounded-full">
-                    <Text className="text-xs text-gray-600">{event.minAge}+</Text>
-                  </View>
-                </View>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
+            event={event}
+            applicationStatus={applicationStatusByEvent[String(event.id)] || null}
+          />
         ))}
 
         {/* No Results */}
@@ -184,3 +176,26 @@ export default function SearchScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+  },
+  statusBadgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  metaIcon: {
+    fontSize: 16,
+    color: '#D17A92',
+    marginRight: 8,
+  },
+  metaText: {
+    fontSize: 14,
+    color: '#D17A92',
+    fontWeight: '600',
+  },
+});

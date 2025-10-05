@@ -9,7 +9,7 @@ export const Invitations: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     defaultColumns: ['event', 'volunteer', 'invitedBy', 'status', 'invitedAt'],
-    hidden: ({ user }) => {
+    hidden: ({ user }: { user: any }) => {
       return !['organization', 'coordinator', 'superadmin'].includes(user?.role)
     },
   },
@@ -104,7 +104,7 @@ export const Invitations: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      async ({ data, req, operation }) => {
+      async ({ data, req, operation }: { data: any; req: any; operation: string }) => {
         // Set invitedBy and invitedAt on create
         if (operation === 'create') {
           if (!data.invitedBy) {
@@ -154,72 +154,72 @@ export const Invitations: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, req, operation, previousDoc }) => {
-        // Send notification when invitation is created
-        if (operation === 'create') {
-          try {
-            const NotificationService = (await import('../services/NotificationService')).default
-
-            // Get event details
-            const eventId = typeof doc.event === 'object' ? doc.event.id : doc.event
-            const event = await req.payload.findByID({
-              collection: 'events',
-              id: eventId as string,
-            })
-
+      async ({
+        doc,
+        req,
+        operation,
+        previousDoc,
+      }: {
+        doc: any
+        req: any
+        operation: string
+        previousDoc: any
+      }) => {
+        try {
+          // On create, create a notification for the volunteer
+          if (operation === 'create') {
             const volunteerId = typeof doc.volunteer === 'object' ? doc.volunteer.id : doc.volunteer
-
-            // Create notification in database
-            const notification = await req.payload.create({
+            await req.payload.create({
               collection: 'notifications',
               data: {
+                user: volunteerId,
                 type: 'event_invitation',
-                recipient: volunteerId,
-                event: eventId,
-                message: `Zostałeś zaproszony do wydarzenia: ${event.title}`,
-                read: false,
-                metadata: {
-                  invitationId: doc.id,
-                  invitedBy: doc.invitedBy,
-                },
-              },
-            })
-
-            // Send real-time notification via SSE
-            NotificationService.sendNotification(volunteerId, {
-              id: notification.id,
-              type: 'event_invitation',
-              message: notification.message,
-              event: event,
-              createdAt: notification.createdAt,
-              read: false,
-            })
-
-            console.log('Notification sent for invitation:', doc.id)
-          } catch (error) {
-            console.error('Error sending invitation notification:', error)
-          }
-        }
-
-        // When invitation is accepted, auto-create application
-        if (doc.status === 'accepted' && previousDoc?.status === 'pending') {
-          try {
-            // Create application with accepted status
-            await req.payload.create({
-              collection: 'applications',
-              data: {
                 event: doc.event,
-                volunteer: doc.volunteer,
-                status: 'accepted',
-                message: `Zaakceptowano zaproszenie od ${req.user?.firstName || 'organizatora'}`,
+                invitation: doc.id,
+                isRead: false,
+                actionRequired: true,
+                message: doc.message || 'Otrzymałeś zaproszenie na wydarzenie.',
+                createdAt: new Date().toISOString(),
               },
+              req,
             })
-
-            console.log('Auto-created application for accepted invitation:', doc.id)
-          } catch (error) {
-            console.error('Error auto-creating application:', error)
-            // Don't throw - allow invitation to be accepted even if application creation fails
           }
+
+          // When invitation is accepted, auto-create application
+          if (doc.status === 'accepted' && previousDoc?.status === 'pending') {
+            try {
+              await req.payload.create({
+                collection: 'applications',
+                data: {
+                  event: doc.event,
+                  volunteer: doc.volunteer,
+                  status: 'accepted',
+                  message: `Zaakceptowano zaproszenie od ${req.user?.firstName || 'organizatora'}`,
+                },
+              })
+              console.log('Auto-created application for accepted invitation:', doc.id)
+            } catch (error) {
+              console.error('Error auto-creating application:', error)
+            }
+          }
+
+          // When status changes from pending -> accepted/declined, mark related notifications handled
+          if (previousDoc?.status === 'pending' && doc.status !== 'pending') {
+            const notifList = await req.payload.find({
+              collection: 'notifications',
+              where: { invitation: { equals: doc.id } },
+              limit: 100,
+            })
+            for (const n of notifList.docs) {
+              await req.payload.update({
+                collection: 'notifications',
+                id: n.id,
+                data: { isRead: true, actionRequired: false },
+              })
+            }
+          }
+        } catch (error) {
+          console.error('Invitation hook notification error:', error)
         }
       },
     ],

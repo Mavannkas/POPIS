@@ -81,7 +81,25 @@ export const POST = async (
       },
     })
     
-    // The afterChange hook will auto-create application if accepted
+    // Mark related notifications as handled (best-effort; hooks also cover this)
+    try {
+      const relatedNotifs = await payload.find({
+        collection: 'notifications',
+        where: { invitation: { equals: id } },
+        limit: 50,
+      })
+      for (const n of relatedNotifs.docs) {
+        await payload.update({
+          collection: 'notifications',
+          id: n.id,
+          data: { isRead: true, actionRequired: false },
+        })
+      }
+    } catch (e) {
+      console.error('Failed to update related notifications for invitation:', e)
+    }
+
+    // The afterChange hook may auto-create application if accepted
     
     return Response.json({
       success: true,
